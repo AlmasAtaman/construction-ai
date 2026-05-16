@@ -1,0 +1,70 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "Back to dashboard" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - text: P
+        - generic [ref=e6]:
+          - generic [ref=e7]: Memorial Hospital — Wing C
+          - generic [ref=e8]: Acme General Contractors
+        - generic [ref=e9]: draft
+      - generic [ref=e10]:
+        - generic "Today's AI spend across all projects. Resets at midnight." [ref=e11]:
+          - generic [ref=e12]: "AI today:"
+          - generic [ref=e13]: $0.00 / $20
+        - link "Specs" [ref=e14] [cursor=pointer]:
+          - /url: /projects/cmp6b3ca90000zmhn3x0mfck4/specs
+          - button "Specs" [ref=e15]
+        - button "History" [ref=e16] [cursor=pointer]
+        - link "Generate Bid" [ref=e17] [cursor=pointer]:
+          - /url: /projects/cmp6b3ca90000zmhn3x0mfck4/bid
+          - button "Generate Bid" [ref=e18]
+    - generic [ref=e19]:
+      - generic [ref=e20]:
+        - complementary [ref=e21]:
+          - heading "Pages" [level=3] [ref=e23]
+          - list [ref=e25]:
+            - listitem [ref=e26]:
+              - button "Page 1" [ref=e27] [cursor=pointer]
+            - listitem [ref=e28]:
+              - button "Page 2" [ref=e29] [cursor=pointer]
+            - listitem [ref=e30]:
+              - button "Page 3" [ref=e31] [cursor=pointer]
+          - generic [ref=e32]:
+            - heading "AI Takeoff" [level=3] [ref=e33]
+            - button "Run AI Takeoff" [ref=e36] [cursor=pointer]
+          - generic [ref=e37]:
+            - heading "Layers" [level=3] [ref=e38]
+            - paragraph [ref=e39]: Show or hide walls, ceilings, trim, doors, and windows.
+        - main [ref=e40]:
+          - generic [ref=e41]:
+            - button "V" [ref=e42] [cursor=pointer]:
+              - img [ref=e43]
+              - generic [ref=e45]: V
+            - button "R" [ref=e46] [cursor=pointer]:
+              - img [ref=e47]
+              - generic [ref=e49]: R
+            - button "P" [ref=e50] [cursor=pointer]:
+              - img [ref=e51]
+              - generic [ref=e53]: P
+            - button "E" [ref=e54] [cursor=pointer]:
+              - img [ref=e55]
+              - generic [ref=e57]: E
+          - generic [ref=e61]: Loading blueprint page 1...
+        - complementary [ref=e62]:
+          - heading "Detection Queue" [level=3] [ref=e64]
+          - paragraph [ref=e66]: Surfaces the AI finds will appear here. You can accept or reject each one.
+          - heading "Chat" [level=3] [ref=e68]
+          - generic [ref=e70]:
+            - paragraph [ref=e72]: Ask me to make changes in plain English — for example, “change all bathroom walls to semi-gloss” or “what's the total square footage?”
+            - generic [ref=e74]:
+              - textbox "Ask me to make changes…" [ref=e75]
+              - button "Send" [disabled] [ref=e76]
+      - generic [ref=e77]:
+        - button "Estimate Worksheet Hide" [ref=e78] [cursor=pointer]:
+          - generic [ref=e79]: Estimate Worksheet
+          - generic [ref=e80]: Hide
+        - generic [ref=e82]: Loading your worksheet...
+  - button "Open Next.js Dev Tools" [ref=e88] [cursor=pointer]:
+    - img [ref=e89]

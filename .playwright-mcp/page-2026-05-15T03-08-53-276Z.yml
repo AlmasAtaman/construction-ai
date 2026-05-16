@@ -1,0 +1,41 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e3]:
+      - link "P" [ref=e4] [cursor=pointer]:
+        - /url: /
+      - generic [ref=e6]:
+        - link "Projects" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - img [ref=e8]
+        - link "Rates" [ref=e10] [cursor=pointer]:
+          - /url: /settings/rates
+          - img [ref=e11]
+        - link "Rules" [ref=e14] [cursor=pointer]:
+          - /url: /settings/rules
+          - img [ref=e15]
+        - link "Settings" [ref=e18] [cursor=pointer]:
+          - /url: /settings
+          - img [ref=e19]
+    - generic [ref=e22]:
+      - banner [ref=e23]:
+        - generic [ref=e25]:
+          - heading "Projects" [level=1] [ref=e27]
+          - generic [ref=e28]: Active bids and proposals
+        - generic [ref=e29]:
+          - searchbox "Search projects…" [ref=e30]
+          - generic "Today's AI spend across all projects. Resets at midnight." [ref=e31]:
+            - img [ref=e32]
+            - generic [ref=e35]: AI today
+            - generic [ref=e36]: $0.00 / $20
+          - link "New project" [ref=e37] [cursor=pointer]:
+            - /url: /projects/new
+            - button "New project" [ref=e38]
+      - main [ref=e39]:
+        - generic [ref=e41]:
+          - img [ref=e43]
+          - heading "No projects yet" [level=3] [ref=e45]
+          - paragraph [ref=e46]: Each bid starts with a new project. Upload a blueprint, run the AI takeoff, and generate a professional proposal in minutes.
+          - link "Create your first project" [ref=e48] [cursor=pointer]:
+            - /url: /projects/new
+            - button "Create your first project" [ref=e49]
+  - alert [ref=e50]

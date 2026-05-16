@@ -1,0 +1,768 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e3]:
+      - link "P" [ref=e4] [cursor=pointer]:
+        - /url: /
+      - generic [ref=e6]:
+        - link "Projects" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - img [ref=e8]
+        - link "Rates" [ref=e10] [cursor=pointer]:
+          - /url: /settings/rates
+          - img [ref=e11]
+        - link "Rules" [ref=e14] [cursor=pointer]:
+          - /url: /settings/rules
+          - img [ref=e15]
+        - link "Settings" [ref=e18] [cursor=pointer]:
+          - /url: /settings
+          - img [ref=e19]
+    - generic [ref=e22]:
+      - banner [ref=e23]:
+        - generic [ref=e25]:
+          - generic [ref=e26]:
+            - heading "IQ Buildings — Multi-Tenant Commercial" [level=1] [ref=e27]
+            - generic [ref=e28]: draft
+          - generic [ref=e29]: CTP Developers
+        - generic [ref=e30]:
+          - generic "Today's AI spend across all projects. Resets at midnight." [ref=e31]:
+            - img [ref=e32]
+            - generic [ref=e35]: AI today
+            - generic [ref=e36]: $0.03 / $20
+          - link "Specs" [ref=e37] [cursor=pointer]:
+            - /url: /projects/cmp6c9ov50000rfde0c7whl9b/specs
+            - button "Specs" [ref=e38]
+          - button "History" [ref=e39] [cursor=pointer]
+          - link "Bid review" [ref=e40] [cursor=pointer]:
+            - /url: /projects/cmp6c9ov50000rfde0c7whl9b/bid
+            - button "Bid review" [ref=e41]
+          - link "Generate Bid" [ref=e42] [cursor=pointer]:
+            - /url: /projects/cmp6c9ov50000rfde0c7whl9b/bid
+            - button "Generate Bid" [ref=e43]
+      - generic [ref=e44]:
+        - generic [ref=e45]:
+          - complementary [ref=e46]:
+            - heading "Pages" [level=3] [ref=e48]
+            - list [ref=e50]:
+              - listitem [ref=e51]:
+                - button "1 Page 1" [ref=e52] [cursor=pointer]:
+                  - generic [ref=e53]: "1"
+                  - generic [ref=e54]: Page 1
+              - listitem [ref=e55]:
+                - button "2 Page 2" [ref=e56] [cursor=pointer]:
+                  - generic [ref=e57]: "2"
+                  - generic [ref=e58]: Page 2
+              - listitem [ref=e59]:
+                - button "3 Page 3" [ref=e60] [cursor=pointer]:
+                  - generic [ref=e61]: "3"
+                  - generic [ref=e62]: Page 3
+              - listitem [ref=e63]:
+                - button "4 Page 4" [active] [ref=e64] [cursor=pointer]:
+                  - generic [ref=e65]: "4"
+                  - generic [ref=e66]: Page 4
+              - listitem [ref=e67]:
+                - button "5 Page 5" [ref=e68] [cursor=pointer]:
+                  - generic [ref=e69]: "5"
+                  - generic [ref=e70]: Page 5
+              - listitem [ref=e71]:
+                - button "6 Page 6" [ref=e72] [cursor=pointer]:
+                  - generic [ref=e73]: "6"
+                  - generic [ref=e74]: Page 6
+              - listitem [ref=e75]:
+                - button "7 Page 7" [ref=e76] [cursor=pointer]:
+                  - generic [ref=e77]: "7"
+                  - generic [ref=e78]: Page 7
+              - listitem [ref=e79]:
+                - button "8 Page 8" [ref=e80] [cursor=pointer]:
+                  - generic [ref=e81]: "8"
+                  - generic [ref=e82]: Page 8
+              - listitem [ref=e83]:
+                - button "9 Page 9" [ref=e84] [cursor=pointer]:
+                  - generic [ref=e85]: "9"
+                  - generic [ref=e86]: Page 9
+              - listitem [ref=e87]:
+                - button "10 Page 10" [ref=e88] [cursor=pointer]:
+                  - generic [ref=e89]: "10"
+                  - generic [ref=e90]: Page 10
+              - listitem [ref=e91]:
+                - button "11 Page 11" [ref=e92] [cursor=pointer]:
+                  - generic [ref=e93]: "11"
+                  - generic [ref=e94]: Page 11
+              - listitem [ref=e95]:
+                - button "12 Page 12" [ref=e96] [cursor=pointer]:
+                  - generic [ref=e97]: "12"
+                  - generic [ref=e98]: Page 12
+            - generic [ref=e99]:
+              - generic [ref=e100]:
+                - heading "AI Takeoff" [level=3] [ref=e101]
+                - generic [ref=e102]: 7 kept · 22 pending
+              - button "Run AI Takeoff" [ref=e104] [cursor=pointer]:
+                - img [ref=e105]
+                - text: Run AI Takeoff
+          - generic [ref=e107]:
+            - button "Select (V)" [ref=e108] [cursor=pointer]:
+              - img [ref=e109]
+              - generic:
+                - text: Select
+                - generic: (V)
+            - button "Area (R)" [ref=e111] [cursor=pointer]:
+              - img [ref=e112]
+              - generic:
+                - text: Area
+                - generic: (R)
+            - button "Polygon (P)" [ref=e114] [cursor=pointer]:
+              - img [ref=e115]
+              - generic:
+                - text: Polygon
+                - generic: (P)
+            - button "Erase (E)" [ref=e117] [cursor=pointer]:
+              - img [ref=e118]
+              - generic:
+                - text: Erase
+                - generic: (E)
+          - main [ref=e120]:
+            - generic [ref=e159]: Loading blueprint page 4...
+          - complementary [ref=e125]:
+            - generic [ref=e126]:
+              - button "Queue 22" [ref=e160] [cursor=pointer]:
+                - generic [ref=e128]:
+                  - text: Queue
+                  - generic [ref=e161]: "22"
+              - button "Chat" [ref=e130] [cursor=pointer]:
+                - generic [ref=e131]: Chat
+            - generic [ref=e133]:
+              - generic [ref=e162]: 22 pending
+              - list [ref=e163]:
+                - listitem [ref=e164] [cursor=pointer]:
+                  - generic [ref=e166]:
+                    - generic [ref=e167]:
+                      - generic [ref=e169]: Exterior West
+                      - generic [ref=e170]: medium
+                    - generic [ref=e171]:
+                      - generic [ref=e172]: Wall
+                      - generic [ref=e173]: ·
+                      - generic [ref=e174]: 504 sqft
+                      - generic [ref=e175]: ·
+                      - generic [ref=e176]: drywall
+                  - generic [ref=e177]:
+                    - button "Accept" [ref=e178]
+                    - button "Reject" [ref=e179]
+                - listitem [ref=e180] [cursor=pointer]:
+                  - generic [ref=e182]:
+                    - generic [ref=e183]:
+                      - generic [ref=e185]: Open Space West
+                      - generic [ref=e186]: medium
+                    - generic [ref=e187]:
+                      - generic [ref=e188]: Wall
+                      - generic [ref=e189]: ·
+                      - generic [ref=e190]: 1134 sqft
+                      - generic [ref=e191]: ·
+                      - generic [ref=e192]: drywall
+                  - generic [ref=e193]:
+                    - button "Accept" [ref=e194]
+                    - button "Reject" [ref=e195]
+                - listitem [ref=e196] [cursor=pointer]:
+                  - generic [ref=e198]:
+                    - generic [ref=e199]:
+                      - generic [ref=e201]: Open Space Center
+                      - generic [ref=e202]: medium
+                    - generic [ref=e203]:
+                      - generic [ref=e204]: Wall
+                      - generic [ref=e205]: ·
+                      - generic [ref=e206]: 374 sqft
+                      - generic [ref=e207]: ·
+                      - generic [ref=e208]: drywall
+                  - generic [ref=e209]:
+                    - button "Accept" [ref=e210]
+                    - button "Reject" [ref=e211]
+                - listitem [ref=e212] [cursor=pointer]:
+                  - generic [ref=e214]:
+                    - generic [ref=e215]:
+                      - generic [ref=e217]: OPEN SPACE PRIVATE
+                      - generic [ref=e218]: medium
+                    - generic [ref=e219]:
+                      - generic [ref=e220]: Wall
+                      - generic [ref=e221]: ·
+                      - generic [ref=e222]: 1170 sqft
+                      - generic [ref=e223]: ·
+                      - generic [ref=e224]: drywall
+                  - generic [ref=e225]:
+                    - button "Accept" [ref=e226]
+                    - button "Reject" [ref=e227]
+                - listitem [ref=e228] [cursor=pointer]:
+                  - generic [ref=e230]:
+                    - generic [ref=e231]:
+                      - generic [ref=e233]: SMALL OFFICES North
+                      - generic [ref=e234]: medium
+                    - generic [ref=e235]:
+                      - generic [ref=e236]: Wall
+                      - generic [ref=e237]: ·
+                      - generic [ref=e238]: 117 sqft
+                      - generic [ref=e239]: ·
+                      - generic [ref=e240]: drywall
+                  - generic [ref=e241]:
+                    - button "Accept" [ref=e242]
+                    - button "Reject" [ref=e243]
+                - listitem [ref=e244] [cursor=pointer]:
+                  - generic [ref=e246]:
+                    - generic [ref=e247]:
+                      - generic [ref=e249]: COLUMN Area South
+                      - generic [ref=e250]: medium
+                    - generic [ref=e251]:
+                      - generic [ref=e252]: Wall
+                      - generic [ref=e253]: ·
+                      - generic [ref=e254]: 111 sqft
+                      - generic [ref=e255]: ·
+                      - generic [ref=e256]: drywall
+                  - generic [ref=e257]:
+                    - button "Accept" [ref=e258]
+                    - button "Reject" [ref=e259]
+                - listitem [ref=e260] [cursor=pointer]:
+                  - generic [ref=e262]:
+                    - generic [ref=e263]:
+                      - generic [ref=e265]: STAIRWELLS
+                      - generic [ref=e266]: medium
+                    - generic [ref=e267]:
+                      - generic [ref=e268]: Ceiling
+                      - generic [ref=e269]: ·
+                      - generic [ref=e270]: 1260 sqft
+                      - generic [ref=e271]: ·
+                      - generic [ref=e272]: drywall
+                  - generic [ref=e273]:
+                    - button "Accept" [ref=e274]
+                    - button "Reject" [ref=e275]
+                - listitem [ref=e276] [cursor=pointer]:
+                  - generic [ref=e278]:
+                    - generic [ref=e279]:
+                      - generic [ref=e281]: Open Space West
+                      - generic [ref=e282]: medium
+                    - generic [ref=e283]:
+                      - generic [ref=e284]: Ceiling
+                      - generic [ref=e285]: ·
+                      - generic [ref=e286]: 1260 sqft
+                      - generic [ref=e287]: ·
+                      - generic [ref=e288]: drywall
+                  - generic [ref=e289]:
+                    - button "Accept" [ref=e290]
+                    - button "Reject" [ref=e291]
+                - listitem [ref=e292] [cursor=pointer]:
+                  - generic [ref=e294]:
+                    - generic [ref=e295]:
+                      - generic [ref=e297]: Open Space Center
+                      - generic [ref=e298]: medium
+                    - generic [ref=e299]:
+                      - generic [ref=e300]: Ceiling
+                      - generic [ref=e301]: ·
+                      - generic [ref=e302]: 415 sqft
+                      - generic [ref=e303]: ·
+                      - generic [ref=e304]: drywall
+                  - generic [ref=e305]:
+                    - button "Accept" [ref=e306]
+                    - button "Reject" [ref=e307]
+                - listitem [ref=e308] [cursor=pointer]:
+                  - generic [ref=e310]:
+                    - generic [ref=e311]:
+                      - generic [ref=e313]: STAIRWELLS East
+                      - generic [ref=e314]: medium
+                    - generic [ref=e315]:
+                      - generic [ref=e316]: Ceiling
+                      - generic [ref=e317]: ·
+                      - generic [ref=e318]: 467 sqft
+                      - generic [ref=e319]: ·
+                      - generic [ref=e320]: drywall
+                  - generic [ref=e321]:
+                    - button "Accept" [ref=e322]
+                    - button "Reject" [ref=e323]
+                - listitem [ref=e324] [cursor=pointer]:
+                  - generic [ref=e326]:
+                    - generic [ref=e327]:
+                      - generic [ref=e329]: RESTROOMS East
+                      - generic [ref=e330]: medium
+                    - generic [ref=e331]:
+                      - generic [ref=e332]: Ceiling
+                      - generic [ref=e333]: ·
+                      - generic [ref=e334]: 289 sqft
+                      - generic [ref=e335]: ·
+                      - generic [ref=e336]: drywall
+                  - generic [ref=e337]:
+                    - button "Accept" [ref=e338]
+                    - button "Reject" [ref=e339]
+                - listitem [ref=e340] [cursor=pointer]:
+                  - generic [ref=e342]:
+                    - generic [ref=e343]:
+                      - generic [ref=e345]: OPEN SPACE PRIVATE
+                      - generic [ref=e346]: medium
+                    - generic [ref=e347]:
+                      - generic [ref=e348]: Ceiling
+                      - generic [ref=e349]: ·
+                      - generic [ref=e350]: 1300 sqft
+                      - generic [ref=e351]: ·
+                      - generic [ref=e352]: drywall
+                  - generic [ref=e353]:
+                    - button "Accept" [ref=e354]
+                    - button "Reject" [ref=e355]
+                - listitem [ref=e356] [cursor=pointer]:
+                  - generic [ref=e358]:
+                    - generic [ref=e359]:
+                      - generic [ref=e361]: RESTROOMS Entry
+                      - generic [ref=e362]: medium
+                    - generic [ref=e363]:
+                      - generic [ref=e364]: Door
+                      - generic [ref=e365]: ·
+                      - generic [ref=e366]: 2 ea
+                      - generic [ref=e367]: ·
+                      - generic [ref=e368]: wood
+                  - generic [ref=e369]:
+                    - button "Accept" [ref=e370]
+                    - button "Reject" [ref=e371]
+                - listitem [ref=e372] [cursor=pointer]:
+                  - generic [ref=e374]:
+                    - generic [ref=e375]:
+                      - generic [ref=e377]: STAIRWELLS Entry
+                      - generic [ref=e378]: medium
+                    - generic [ref=e379]:
+                      - generic [ref=e380]: Door
+                      - generic [ref=e381]: ·
+                      - generic [ref=e382]: 2 ea
+                      - generic [ref=e383]: ·
+                      - generic [ref=e384]: metal
+                  - generic [ref=e385]:
+                    - button "Accept" [ref=e386]
+                    - button "Reject" [ref=e387]
+                - listitem [ref=e388] [cursor=pointer]:
+                  - generic [ref=e390]:
+                    - generic [ref=e391]:
+                      - generic [ref=e393]: ELEVATORS Entry
+                      - generic [ref=e394]: medium
+                    - generic [ref=e395]:
+                      - generic [ref=e396]: Door
+                      - generic [ref=e397]: ·
+                      - generic [ref=e398]: 3 ea
+                      - generic [ref=e399]: ·
+                      - generic [ref=e400]: metal
+                  - generic [ref=e401]:
+                    - button "Accept" [ref=e402]
+                    - button "Reject" [ref=e403]
+                - listitem [ref=e404] [cursor=pointer]:
+                  - generic [ref=e406]:
+                    - generic [ref=e407]:
+                      - generic [ref=e409]: SERVICE ELEVATOR Entry
+                      - generic [ref=e410]: medium
+                    - generic [ref=e411]:
+                      - generic [ref=e412]: Door
+                      - generic [ref=e413]: ·
+                      - generic [ref=e414]: 1 ea
+                      - generic [ref=e415]: ·
+                      - generic [ref=e416]: metal
+                  - generic [ref=e417]:
+                    - button "Accept" [ref=e418]
+                    - button "Reject" [ref=e419]
+                - listitem [ref=e420] [cursor=pointer]:
+                  - generic [ref=e422]:
+                    - generic [ref=e423]:
+                      - generic [ref=e425]: RESTROOMS East Entry
+                      - generic [ref=e426]: medium
+                    - generic [ref=e427]:
+                      - generic [ref=e428]: Door
+                      - generic [ref=e429]: ·
+                      - generic [ref=e430]: 2 ea
+                      - generic [ref=e431]: ·
+                      - generic [ref=e432]: wood
+                  - generic [ref=e433]:
+                    - button "Accept" [ref=e434]
+                    - button "Reject" [ref=e435]
+                - listitem [ref=e436] [cursor=pointer]:
+                  - generic [ref=e438]:
+                    - generic [ref=e439]:
+                      - generic [ref=e441]: STAIRWELLS East Entry
+                      - generic [ref=e442]: medium
+                    - generic [ref=e443]:
+                      - generic [ref=e444]: Door
+                      - generic [ref=e445]: ·
+                      - generic [ref=e446]: 1 ea
+                      - generic [ref=e447]: ·
+                      - generic [ref=e448]: metal
+                  - generic [ref=e449]:
+                    - button "Accept" [ref=e450]
+                    - button "Reject" [ref=e451]
+                - listitem [ref=e452] [cursor=pointer]:
+                  - generic [ref=e454]:
+                    - generic [ref=e455]:
+                      - generic [ref=e457]: Exterior West Wall
+                      - generic [ref=e458]: medium
+                    - generic [ref=e459]:
+                      - generic [ref=e460]: Window
+                      - generic [ref=e461]: ·
+                      - generic [ref=e462]: 8 ea
+                      - generic [ref=e463]: ·
+                      - generic [ref=e464]: glass
+                  - generic [ref=e465]:
+                    - button "Accept" [ref=e466]
+                    - button "Reject" [ref=e467]
+                - listitem [ref=e468] [cursor=pointer]:
+                  - generic [ref=e470]:
+                    - generic [ref=e471]:
+                      - generic [ref=e473]: Exterior East Wall
+                      - generic [ref=e474]: medium
+                    - generic [ref=e475]:
+                      - generic [ref=e476]: Window
+                      - generic [ref=e477]: ·
+                      - generic [ref=e478]: 8 ea
+                      - generic [ref=e479]: ·
+                      - generic [ref=e480]: glass
+                  - generic [ref=e481]:
+                    - button "Accept" [ref=e482]
+                    - button "Reject" [ref=e483]
+                - listitem [ref=e484] [cursor=pointer]:
+                  - generic [ref=e486]:
+                    - generic [ref=e487]:
+                      - generic [ref=e489]: Base trim core area
+                      - generic [ref=e490]: medium
+                    - generic [ref=e491]:
+                      - generic [ref=e492]: Trim
+                      - generic [ref=e493]: ·
+                      - generic [ref=e494]: 280 lf
+                      - generic [ref=e495]: ·
+                      - generic [ref=e496]: wood
+                  - generic [ref=e497]:
+                    - button "Accept" [ref=e498]
+                    - button "Reject" [ref=e499]
+                - listitem [ref=e500] [cursor=pointer]:
+                  - generic [ref=e502]:
+                    - generic [ref=e503]:
+                      - generic [ref=e505]: Base trim east area
+                      - generic [ref=e506]: medium
+                    - generic [ref=e507]:
+                      - generic [ref=e508]: Trim
+                      - generic [ref=e509]: ·
+                      - generic [ref=e510]: 220 lf
+                      - generic [ref=e511]: ·
+                      - generic [ref=e512]: wood
+                  - generic [ref=e513]:
+                    - button "Accept" [ref=e514]
+                    - button "Reject" [ref=e515]
+        - generic [ref=e139]:
+          - button "Estimate Worksheet (7 surfaces)" [ref=e516] [cursor=pointer]:
+            - generic [ref=e141]:
+              - img [ref=e142]
+              - generic [ref=e144]: Estimate Worksheet
+              - generic [ref=e145]: (7 surfaces)
+          - table [ref=e517]:
+            - rowgroup [ref=e518]:
+              - row "Room Type Paint Coats Qty Rate Hrs Material Labor" [ref=e519]:
+                - columnheader "Room" [ref=e520]
+                - columnheader "Type" [ref=e521]
+                - columnheader "Paint" [ref=e522]
+                - columnheader "Coats" [ref=e523]
+                - columnheader "Qty" [ref=e524]
+                - columnheader "Rate" [ref=e525]
+                - columnheader "Hrs" [ref=e526]
+                - columnheader "Material" [ref=e527]
+                - columnheader "Labor" [ref=e528]
+            - rowgroup [ref=e529]:
+              - row "RESTROOMS Wall semi-gloss epoxy 2 1143 sqft 175 sqft/h 13.1 $338.00 $933.99" [ref=e530]:
+                - cell "RESTROOMS" [ref=e531]
+                - cell "Wall" [ref=e532]
+                - cell "semi-gloss epoxy" [ref=e533]
+                - cell "2" [ref=e534]
+                - cell "1143 sqft" [ref=e535]
+                - cell "175 sqft/h" [ref=e536]
+                - cell "13.1" [ref=e537]
+                - cell "$338.00" [ref=e538]
+                - cell "$933.99" [ref=e539]
+              - row "STAIRWELLS Wall — 2 1134 sqft 175 sqft/h 13.0 $335.34 $926.64" [ref=e540]:
+                - cell "STAIRWELLS" [ref=e541]
+                - cell "Wall" [ref=e542]
+                - cell "—" [ref=e543]
+                - cell "2" [ref=e544]
+                - cell "1134 sqft" [ref=e545]
+                - cell "175 sqft/h" [ref=e546]
+                - cell "13.0" [ref=e547]
+                - cell "$335.34" [ref=e548]
+                - cell "$926.64" [ref=e549]
+              - row "Exterior West Wall — 2 504 sqft 175 sqft/h 5.8 $149.04 $411.84" [ref=e550]:
+                - cell "Exterior West" [ref=e551]
+                - cell "Wall" [ref=e552]
+                - cell "—" [ref=e553]
+                - cell "2" [ref=e554]
+                - cell "504 sqft" [ref=e555]
+                - cell "175 sqft/h" [ref=e556]
+                - cell "5.8" [ref=e557]
+                - cell "$149.04" [ref=e558]
+                - cell "$411.84" [ref=e559]
+              - row "Open Space West Wall — 2 1134 sqft 175 sqft/h 13.0 $335.34 $926.64" [ref=e560]:
+                - cell "Open Space West" [ref=e561]
+                - cell "Wall" [ref=e562]
+                - cell "—" [ref=e563]
+                - cell "2" [ref=e564]
+                - cell "1134 sqft" [ref=e565]
+                - cell "175 sqft/h" [ref=e566]
+                - cell "13.0" [ref=e567]
+                - cell "$335.34" [ref=e568]
+                - cell "$926.64" [ref=e569]
+              - row "Open Space Center Wall — 2 374 sqft 175 sqft/h 4.3 $110.60 $305.61" [ref=e570]:
+                - cell "Open Space Center" [ref=e571]
+                - cell "Wall" [ref=e572]
+                - cell "—" [ref=e573]
+                - cell "2" [ref=e574]
+                - cell "374 sqft" [ref=e575]
+                - cell "175 sqft/h" [ref=e576]
+                - cell "4.3" [ref=e577]
+                - cell "$110.60" [ref=e578]
+                - cell "$305.61" [ref=e579]
+              - row "STAIRWELLS East Wall — 2 420 sqft 175 sqft/h 4.8 $124.20 $343.20" [ref=e580]:
+                - cell "STAIRWELLS East" [ref=e581]
+                - cell "Wall" [ref=e582]
+                - cell "—" [ref=e583]
+                - cell "2" [ref=e584]
+                - cell "420 sqft" [ref=e585]
+                - cell "175 sqft/h" [ref=e586]
+                - cell "4.8" [ref=e587]
+                - cell "$124.20" [ref=e588]
+                - cell "$343.20" [ref=e589]
+              - row "RESTROOMS East Wall semi-gloss epoxy 2 333 sqft 175 sqft/h 3.8 $98.47 $272.11" [ref=e590]:
+                - cell "RESTROOMS East" [ref=e591]
+                - cell "Wall" [ref=e592]
+                - cell "semi-gloss epoxy" [ref=e593]
+                - cell "2" [ref=e594]
+                - cell "333 sqft" [ref=e595]
+                - cell "175 sqft/h" [ref=e596]
+                - cell "3.8" [ref=e597]
+                - cell "$98.47" [ref=e598]
+                - cell "$272.11" [ref=e599]
+              - row "OPEN SPACE PRIVATE Wall — 2 1170 sqft 175 sqft/h 13.4 $345.99 $956.06" [ref=e600]:
+                - cell "OPEN SPACE PRIVATE" [ref=e601]
+                - cell "Wall" [ref=e602]
+                - cell "—" [ref=e603]
+                - cell "2" [ref=e604]
+                - cell "1170 sqft" [ref=e605]
+                - cell "175 sqft/h" [ref=e606]
+                - cell "13.4" [ref=e607]
+                - cell "$345.99" [ref=e608]
+                - cell "$956.06" [ref=e609]
+              - row "SMALL OFFICES North Wall — 2 117 sqft 175 sqft/h 1.3 $34.60 $95.61" [ref=e610]:
+                - cell "SMALL OFFICES North" [ref=e611]
+                - cell "Wall" [ref=e612]
+                - cell "—" [ref=e613]
+                - cell "2" [ref=e614]
+                - cell "117 sqft" [ref=e615]
+                - cell "175 sqft/h" [ref=e616]
+                - cell "1.3" [ref=e617]
+                - cell "$34.60" [ref=e618]
+                - cell "$95.61" [ref=e619]
+              - row "COLUMN Area South Wall — 2 111 sqft 175 sqft/h 1.3 $32.82 $90.70" [ref=e620]:
+                - cell "COLUMN Area South" [ref=e621]
+                - cell "Wall" [ref=e622]
+                - cell "—" [ref=e623]
+                - cell "2" [ref=e624]
+                - cell "111 sqft" [ref=e625]
+                - cell "175 sqft/h" [ref=e626]
+                - cell "1.3" [ref=e627]
+                - cell "$32.82" [ref=e628]
+                - cell "$90.70" [ref=e629]
+              - row "RESTROOMS Ceiling — 2 1270 sqft 135 sqft/h 18.8 $375.56 $1,345.26" [ref=e630]:
+                - cell "RESTROOMS" [ref=e631]
+                - cell "Ceiling" [ref=e632]
+                - cell "—" [ref=e633]
+                - cell "2" [ref=e634]
+                - cell "1270 sqft" [ref=e635]
+                - cell "135 sqft/h" [ref=e636]
+                - cell "18.8" [ref=e637]
+                - cell "$375.56" [ref=e638]
+                - cell "$1,345.26" [ref=e639]
+              - row "STAIRWELLS Ceiling — 2 1260 sqft 135 sqft/h 18.7 $372.60 $1,334.67" [ref=e640]:
+                - cell "STAIRWELLS" [ref=e641]
+                - cell "Ceiling" [ref=e642]
+                - cell "—" [ref=e643]
+                - cell "2" [ref=e644]
+                - cell "1260 sqft" [ref=e645]
+                - cell "135 sqft/h" [ref=e646]
+                - cell "18.7" [ref=e647]
+                - cell "$372.60" [ref=e648]
+                - cell "$1,334.67" [ref=e649]
+              - row "ELEVATORS Ceiling — 2 1260 sqft 135 sqft/h 18.7 $372.60 $1,334.67" [ref=e650]:
+                - cell "ELEVATORS" [ref=e651]
+                - cell "Ceiling" [ref=e652]
+                - cell "—" [ref=e653]
+                - cell "2" [ref=e654]
+                - cell "1260 sqft" [ref=e655]
+                - cell "135 sqft/h" [ref=e656]
+                - cell "18.7" [ref=e657]
+                - cell "$372.60" [ref=e658]
+                - cell "$1,334.67" [ref=e659]
+              - row "SERVICE ELEVATOR Ceiling — 2 1260 sqft 135 sqft/h 18.7 $372.60 $1,334.67" [ref=e660]:
+                - cell "SERVICE ELEVATOR" [ref=e661]
+                - cell "Ceiling" [ref=e662]
+                - cell "—" [ref=e663]
+                - cell "2" [ref=e664]
+                - cell "1260 sqft" [ref=e665]
+                - cell "135 sqft/h" [ref=e666]
+                - cell "18.7" [ref=e667]
+                - cell "$372.60" [ref=e668]
+                - cell "$1,334.67" [ref=e669]
+              - row "Open Space West Ceiling — 2 1260 sqft 135 sqft/h 18.7 $372.60 $1,334.67" [ref=e670]:
+                - cell "Open Space West" [ref=e671]
+                - cell "Ceiling" [ref=e672]
+                - cell "—" [ref=e673]
+                - cell "2" [ref=e674]
+                - cell "1260 sqft" [ref=e675]
+                - cell "135 sqft/h" [ref=e676]
+                - cell "18.7" [ref=e677]
+                - cell "$372.60" [ref=e678]
+                - cell "$1,334.67" [ref=e679]
+              - row "Open Space Center Ceiling — 2 415 sqft 135 sqft/h 6.1 $122.72 $439.59" [ref=e680]:
+                - cell "Open Space Center" [ref=e681]
+                - cell "Ceiling" [ref=e682]
+                - cell "—" [ref=e683]
+                - cell "2" [ref=e684]
+                - cell "415 sqft" [ref=e685]
+                - cell "135 sqft/h" [ref=e686]
+                - cell "6.1" [ref=e687]
+                - cell "$122.72" [ref=e688]
+                - cell "$439.59" [ref=e689]
+              - row "STAIRWELLS East Ceiling — 2 467 sqft 135 sqft/h 6.9 $138.10 $494.67" [ref=e690]:
+                - cell "STAIRWELLS East" [ref=e691]
+                - cell "Ceiling" [ref=e692]
+                - cell "—" [ref=e693]
+                - cell "2" [ref=e694]
+                - cell "467 sqft" [ref=e695]
+                - cell "135 sqft/h" [ref=e696]
+                - cell "6.9" [ref=e697]
+                - cell "$138.10" [ref=e698]
+                - cell "$494.67" [ref=e699]
+              - row "RESTROOMS East Ceiling — 2 289 sqft 135 sqft/h 4.3 $85.46 $306.13" [ref=e700]:
+                - cell "RESTROOMS East" [ref=e701]
+                - cell "Ceiling" [ref=e702]
+                - cell "—" [ref=e703]
+                - cell "2" [ref=e704]
+                - cell "289 sqft" [ref=e705]
+                - cell "135 sqft/h" [ref=e706]
+                - cell "4.3" [ref=e707]
+                - cell "$85.46" [ref=e708]
+                - cell "$306.13" [ref=e709]
+              - row "OPEN SPACE PRIVATE Ceiling — 2 1300 sqft 135 sqft/h 19.3 $384.43 $1,377.04" [ref=e710]:
+                - cell "OPEN SPACE PRIVATE" [ref=e711]
+                - cell "Ceiling" [ref=e712]
+                - cell "—" [ref=e713]
+                - cell "2" [ref=e714]
+                - cell "1300 sqft" [ref=e715]
+                - cell "135 sqft/h" [ref=e716]
+                - cell "19.3" [ref=e717]
+                - cell "$384.43" [ref=e718]
+                - cell "$1,377.04" [ref=e719]
+              - row "RESTROOMS Entry Door — 2 2 ea 4 ea/h 1.1 $51.75 $79.44" [ref=e720]:
+                - cell "RESTROOMS Entry" [ref=e721]
+                - cell "Door" [ref=e722]
+                - cell "—" [ref=e723]
+                - cell "2" [ref=e724]
+                - cell "2 ea" [ref=e725]
+                - cell "4 ea/h" [ref=e726]
+                - cell "1.1" [ref=e727]
+                - cell "$51.75" [ref=e728]
+                - cell "$79.44" [ref=e729]
+              - row "STAIRWELLS Entry Door — 2 2 ea 4 ea/h 1.1 $51.75 $79.44" [ref=e730]:
+                - cell "STAIRWELLS Entry" [ref=e731]
+                - cell "Door" [ref=e732]
+                - cell "—" [ref=e733]
+                - cell "2" [ref=e734]
+                - cell "2 ea" [ref=e735]
+                - cell "4 ea/h" [ref=e736]
+                - cell "1.1" [ref=e737]
+                - cell "$51.75" [ref=e738]
+                - cell "$79.44" [ref=e739]
+              - row "ELEVATORS Entry Door — 2 3 ea 4 ea/h 1.7 $77.63 $119.17" [ref=e740]:
+                - cell "ELEVATORS Entry" [ref=e741]
+                - cell "Door" [ref=e742]
+                - cell "—" [ref=e743]
+                - cell "2" [ref=e744]
+                - cell "3 ea" [ref=e745]
+                - cell "4 ea/h" [ref=e746]
+                - cell "1.7" [ref=e747]
+                - cell "$77.63" [ref=e748]
+                - cell "$119.17" [ref=e749]
+              - row "SERVICE ELEVATOR Entry Door — 2 1 ea 4 ea/h 0.6 $25.87 $39.72" [ref=e750]:
+                - cell "SERVICE ELEVATOR Entry" [ref=e751]
+                - cell "Door" [ref=e752]
+                - cell "—" [ref=e753]
+                - cell "2" [ref=e754]
+                - cell "1 ea" [ref=e755]
+                - cell "4 ea/h" [ref=e756]
+                - cell "0.6" [ref=e757]
+                - cell "$25.87" [ref=e758]
+                - cell "$39.72" [ref=e759]
+              - row "RESTROOMS East Entry Door — 2 2 ea 4 ea/h 1.1 $51.75 $79.44" [ref=e760]:
+                - cell "RESTROOMS East Entry" [ref=e761]
+                - cell "Door" [ref=e762]
+                - cell "—" [ref=e763]
+                - cell "2" [ref=e764]
+                - cell "2 ea" [ref=e765]
+                - cell "4 ea/h" [ref=e766]
+                - cell "1.1" [ref=e767]
+                - cell "$51.75" [ref=e768]
+                - cell "$79.44" [ref=e769]
+              - row "STAIRWELLS East Entry Door — 2 1 ea 4 ea/h 0.6 $25.87 $39.72" [ref=e770]:
+                - cell "STAIRWELLS East Entry" [ref=e771]
+                - cell "Door" [ref=e772]
+                - cell "—" [ref=e773]
+                - cell "2" [ref=e774]
+                - cell "1 ea" [ref=e775]
+                - cell "4 ea/h" [ref=e776]
+                - cell "0.6" [ref=e777]
+                - cell "$25.87" [ref=e778]
+                - cell "$39.72" [ref=e779]
+              - row "Exterior West Wall Window — 2 8 ea 6 ea/h 2.7 $207.00 $190.67" [ref=e780]:
+                - cell "Exterior West Wall" [ref=e781]
+                - cell "Window" [ref=e782]
+                - cell "—" [ref=e783]
+                - cell "2" [ref=e784]
+                - cell "8 ea" [ref=e785]
+                - cell "6 ea/h" [ref=e786]
+                - cell "2.7" [ref=e787]
+                - cell "$207.00" [ref=e788]
+                - cell "$190.67" [ref=e789]
+              - row "Exterior East Wall Window — 2 8 ea 6 ea/h 2.7 $207.00 $190.67" [ref=e790]:
+                - cell "Exterior East Wall" [ref=e791]
+                - cell "Window" [ref=e792]
+                - cell "—" [ref=e793]
+                - cell "2" [ref=e794]
+                - cell "8 ea" [ref=e795]
+                - cell "6 ea/h" [ref=e796]
+                - cell "2.7" [ref=e797]
+                - cell "$207.00" [ref=e798]
+                - cell "$190.67" [ref=e799]
+              - row "Base trim core area Trim — 2 280 lf 60 lf/h 9.3 $115.92 $667.33" [ref=e800]:
+                - cell "Base trim core area" [ref=e801]
+                - cell "Trim" [ref=e802]
+                - cell "—" [ref=e803]
+                - cell "2" [ref=e804]
+                - cell "280 lf" [ref=e805]
+                - cell "60 lf/h" [ref=e806]
+                - cell "9.3" [ref=e807]
+                - cell "$115.92" [ref=e808]
+                - cell "$667.33" [ref=e809]
+              - row "Base trim east area Trim — 2 220 lf 60 lf/h 7.3 $91.08 $524.33" [ref=e810]:
+                - cell "Base trim east area" [ref=e811]
+                - cell "Trim" [ref=e812]
+                - cell "—" [ref=e813]
+                - cell "2" [ref=e814]
+                - cell "220 lf" [ref=e815]
+                - cell "60 lf/h" [ref=e816]
+                - cell "7.3" [ref=e817]
+                - cell "$91.08" [ref=e818]
+                - cell "$524.33" [ref=e819]
+            - rowgroup [ref=e820]:
+              - row "Subtotal $5,406.69 $16,573.70" [ref=e821]:
+                - cell "Subtotal" [ref=e822]
+                - cell "$5,406.69" [ref=e823]
+                - cell "$16,573.70" [ref=e824]
+              - row "Overhead $2,198.04" [ref=e825]:
+                - cell "Overhead" [ref=e826]
+                - cell "$2,198.04" [ref=e827]
+              - row "Markup $4,835.69" [ref=e828]:
+                - cell "Markup" [ref=e829]
+                - cell "$4,835.69" [ref=e830]
+              - row "Grand Total $29,014.12" [ref=e831]:
+                - cell "Grand Total" [ref=e832]
+                - cell "$29,014.12" [ref=e833]
+  - button "Open Next.js Dev Tools" [ref=e153] [cursor=pointer]:
+    - img [ref=e154]
+  - alert [ref=e834]

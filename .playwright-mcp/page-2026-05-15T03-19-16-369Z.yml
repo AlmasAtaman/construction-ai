@@ -1,0 +1,488 @@
+- generic [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e56] [cursor=pointer]:
+    - img [ref=e57]
+  - alert [ref=e50]
+  - generic [ref=e103]:
+    - navigation [ref=e104]:
+      - link "P" [ref=e105] [cursor=pointer]:
+        - /url: /
+      - generic [ref=e107]:
+        - link "Projects" [ref=e108] [cursor=pointer]:
+          - /url: /
+          - img [ref=e109]
+        - link "Rates" [ref=e111] [cursor=pointer]:
+          - /url: /settings/rates
+          - img [ref=e112]
+        - link "Rules" [ref=e115] [cursor=pointer]:
+          - /url: /settings/rules
+          - img [ref=e116]
+        - link "Settings" [ref=e119] [cursor=pointer]:
+          - /url: /settings
+          - img [ref=e120]
+    - generic [ref=e123]:
+      - banner [ref=e124]:
+        - generic [ref=e126]:
+          - generic [ref=e127]:
+            - heading "IQ Buildings — Multi-Tenant Commercial" [level=1] [ref=e128]
+            - generic [ref=e129]: draft
+          - generic [ref=e130]: CTP Developers
+        - generic [ref=e131]:
+          - generic "Today's AI spend across all projects. Resets at midnight." [ref=e132]:
+            - img [ref=e133]
+            - generic [ref=e136]: AI today
+            - generic [ref=e137]: $0.09 / $20
+          - link "Specs" [ref=e138] [cursor=pointer]:
+            - /url: /projects/cmp6c9ov50000rfde0c7whl9b/specs
+            - button "Specs" [ref=e139]
+          - button "History" [ref=e140] [cursor=pointer]
+          - link "Bid review" [ref=e141] [cursor=pointer]:
+            - /url: /projects/cmp6c9ov50000rfde0c7whl9b/bid
+            - button "Bid review" [ref=e142]
+          - link "Generate Bid" [ref=e143] [cursor=pointer]:
+            - /url: /projects/cmp6c9ov50000rfde0c7whl9b/bid
+            - button "Generate Bid" [ref=e144]
+      - generic [ref=e145]:
+        - generic [ref=e146]:
+          - complementary [ref=e147]:
+            - heading "Pages" [level=3] [ref=e149]
+            - list [ref=e193]:
+              - listitem [ref=e194]:
+                - button "1 Page 1" [ref=e195] [cursor=pointer]:
+                  - generic [ref=e196]: "1"
+                  - generic [ref=e197]: Page 1
+              - listitem [ref=e198]:
+                - button "2 Page 2" [ref=e199] [cursor=pointer]:
+                  - generic [ref=e200]: "2"
+                  - generic [ref=e201]: Page 2
+              - listitem [ref=e202]:
+                - button "3 Page 3" [ref=e203] [cursor=pointer]:
+                  - generic [ref=e204]: "3"
+                  - generic [ref=e205]: Page 3
+              - listitem [ref=e206]:
+                - button "4 Page 4" [ref=e207] [cursor=pointer]:
+                  - generic [ref=e208]: "4"
+                  - generic [ref=e209]: Page 4
+              - listitem [ref=e210]:
+                - button "5 Page 5" [ref=e211] [cursor=pointer]:
+                  - generic [ref=e212]: "5"
+                  - generic [ref=e213]: Page 5
+              - listitem [ref=e214]:
+                - button "6 Page 6" [ref=e215] [cursor=pointer]:
+                  - generic [ref=e216]: "6"
+                  - generic [ref=e217]: Page 6
+              - listitem [ref=e218]:
+                - button "7 Page 7" [ref=e219] [cursor=pointer]:
+                  - generic [ref=e220]: "7"
+                  - generic [ref=e221]: Page 7
+              - listitem [ref=e222]:
+                - button "8 Page 8" [ref=e223] [cursor=pointer]:
+                  - generic [ref=e224]: "8"
+                  - generic [ref=e225]: Page 8
+              - listitem [ref=e226]:
+                - button "9 Page 9" [ref=e227] [cursor=pointer]:
+                  - generic [ref=e228]: "9"
+                  - generic [ref=e229]: Page 9
+              - listitem [ref=e230]:
+                - button "10 Page 10" [ref=e231] [cursor=pointer]:
+                  - generic [ref=e232]: "10"
+                  - generic [ref=e233]: Page 10
+              - listitem [ref=e234]:
+                - button "11 Page 11" [ref=e235] [cursor=pointer]:
+                  - generic [ref=e236]: "11"
+                  - generic [ref=e237]: Page 11
+              - listitem [ref=e238]:
+                - button "12 Page 12" [ref=e239] [cursor=pointer]:
+                  - generic [ref=e240]: "12"
+                  - generic [ref=e241]: Page 12
+            - generic [ref=e152]:
+              - generic [ref=e153]:
+                - heading "AI Takeoff" [level=3] [ref=e154]
+                - generic [ref=e155]: 9 kept · 22 pending
+              - button "Run AI Takeoff" [ref=e705] [cursor=pointer]:
+                - img [ref=e706]
+                - text: Run AI Takeoff
+          - generic [ref=e242]:
+            - button "Select (V)" [ref=e243] [cursor=pointer]:
+              - img [ref=e244]
+              - generic:
+                - text: Select
+                - generic: (V)
+            - button "Area (R)" [ref=e246] [cursor=pointer]:
+              - img [ref=e247]
+              - generic:
+                - text: Area
+                - generic: (R)
+            - button "Polygon (P)" [ref=e249] [cursor=pointer]:
+              - img [ref=e250]
+              - generic:
+                - text: Polygon
+                - generic: (P)
+            - button "Erase (E)" [ref=e252] [cursor=pointer]:
+              - img [ref=e253]
+              - generic:
+                - text: Erase
+                - generic: (E)
+          - main [ref=e160]
+          - complementary [ref=e170]:
+            - generic [ref=e171]:
+              - button "Queue 22" [ref=e1525] [cursor=pointer]:
+                - generic [ref=e173]:
+                  - text: Queue
+                  - generic [ref=e281]: "22"
+              - button "Chat" [active] [ref=e175] [cursor=pointer]:
+                - generic [ref=e176]: Chat
+            - generic [ref=e1528]:
+              - generic [ref=e1530]:
+                - paragraph [ref=e1531]: Talk to the takeoff
+                - paragraph [ref=e1532]: "Try one of these:"
+                - list [ref=e1533]:
+                  - listitem [ref=e1534]: "\"Change all bathroom walls to semi-gloss\""
+                  - listitem [ref=e1535]: "\"What's the total square footage?\""
+                  - listitem [ref=e1536]: "\"Exclude all corridor trim\""
+                  - listitem [ref=e1537]: "\"Set waste factor to 12%\""
+              - generic [ref=e1539]:
+                - textbox "Ask me to make changes…" [ref=e1540]
+                - button "Send" [disabled] [ref=e1541]
+        - generic [ref=e184]:
+          - button "Estimate Worksheet (9 surfaces)" [ref=e1526] [cursor=pointer]:
+            - generic [ref=e186]:
+              - img [ref=e187]
+              - generic [ref=e189]: Estimate Worksheet
+              - generic [ref=e190]: (9 surfaces)
+          - table [ref=e525]:
+            - rowgroup [ref=e526]:
+              - row "Room Type Paint Coats Qty Rate Hrs Material Labor" [ref=e527]:
+                - columnheader "Room" [ref=e528]
+                - columnheader "Type" [ref=e529]
+                - columnheader "Paint" [ref=e530]
+                - columnheader "Coats" [ref=e531]
+                - columnheader "Qty" [ref=e532]
+                - columnheader "Rate" [ref=e533]
+                - columnheader "Hrs" [ref=e534]
+                - columnheader "Material" [ref=e535]
+                - columnheader "Labor" [ref=e536]
+            - rowgroup [ref=e537]:
+              - row "RESTROOMS Wall — 2 1143 sqft 175 sqft/h 13.1 $323.31 $933.99" [ref=e1206]:
+                - cell "RESTROOMS" [ref=e1207]
+                - cell "Wall" [ref=e1208]
+                - cell "—" [ref=e1209]
+                - cell "2" [ref=e1210]
+                - cell "1143 sqft" [ref=e1211]
+                - cell "175 sqft/h" [ref=e1212]
+                - cell "13.1" [ref=e1213]
+                - cell "$323.31" [ref=e1214]
+                - cell "$933.99" [ref=e1215]
+              - row "STAIRWELLS Wall — 2 1134 sqft 175 sqft/h 13.0 $320.76 $926.64" [ref=e1216]:
+                - cell "STAIRWELLS" [ref=e1217]
+                - cell "Wall" [ref=e1218]
+                - cell "—" [ref=e1219]
+                - cell "2" [ref=e1220]
+                - cell "1134 sqft" [ref=e1221]
+                - cell "175 sqft/h" [ref=e1222]
+                - cell "13.0" [ref=e1223]
+                - cell "$320.76" [ref=e1224]
+                - cell "$926.64" [ref=e1225]
+              - row "ELEVATORS Wall — 2 1134 sqft 175 sqft/h 13.0 $320.76 $926.64" [ref=e1226]:
+                - cell "ELEVATORS" [ref=e1227]
+                - cell "Wall" [ref=e1228]
+                - cell "—" [ref=e1229]
+                - cell "2" [ref=e1230]
+                - cell "1134 sqft" [ref=e1231]
+                - cell "175 sqft/h" [ref=e1232]
+                - cell "13.0" [ref=e1233]
+                - cell "$320.76" [ref=e1234]
+                - cell "$926.64" [ref=e1235]
+              - row "SERVICE ELEVATOR Wall — 2 1134 sqft 175 sqft/h 13.0 $320.76 $926.64" [ref=e1236]:
+                - cell "SERVICE ELEVATOR" [ref=e1237]
+                - cell "Wall" [ref=e1238]
+                - cell "—" [ref=e1239]
+                - cell "2" [ref=e1240]
+                - cell "1134 sqft" [ref=e1241]
+                - cell "175 sqft/h" [ref=e1242]
+                - cell "13.0" [ref=e1243]
+                - cell "$320.76" [ref=e1244]
+                - cell "$926.64" [ref=e1245]
+              - row "Exterior West Wall — 2 504 sqft 175 sqft/h 5.8 $142.56 $411.84" [ref=e1246]:
+                - cell "Exterior West" [ref=e1247]
+                - cell "Wall" [ref=e1248]
+                - cell "—" [ref=e1249]
+                - cell "2" [ref=e1250]
+                - cell "504 sqft" [ref=e1251]
+                - cell "175 sqft/h" [ref=e1252]
+                - cell "5.8" [ref=e1253]
+                - cell "$142.56" [ref=e1254]
+                - cell "$411.84" [ref=e1255]
+              - row "Open Space West Wall — 2 1134 sqft 175 sqft/h 13.0 $320.76 $926.64" [ref=e1256]:
+                - cell "Open Space West" [ref=e1257]
+                - cell "Wall" [ref=e1258]
+                - cell "—" [ref=e1259]
+                - cell "2" [ref=e1260]
+                - cell "1134 sqft" [ref=e1261]
+                - cell "175 sqft/h" [ref=e1262]
+                - cell "13.0" [ref=e1263]
+                - cell "$320.76" [ref=e1264]
+                - cell "$926.64" [ref=e1265]
+              - row "Open Space Center Wall — 2 374 sqft 175 sqft/h 4.3 $105.79 $305.61" [ref=e1266]:
+                - cell "Open Space Center" [ref=e1267]
+                - cell "Wall" [ref=e1268]
+                - cell "—" [ref=e1269]
+                - cell "2" [ref=e1270]
+                - cell "374 sqft" [ref=e1271]
+                - cell "175 sqft/h" [ref=e1272]
+                - cell "4.3" [ref=e1273]
+                - cell "$105.79" [ref=e1274]
+                - cell "$305.61" [ref=e1275]
+              - row "STAIRWELLS East Wall — 2 420 sqft 175 sqft/h 4.8 $118.80 $343.20" [ref=e1276]:
+                - cell "STAIRWELLS East" [ref=e1277]
+                - cell "Wall" [ref=e1278]
+                - cell "—" [ref=e1279]
+                - cell "2" [ref=e1280]
+                - cell "420 sqft" [ref=e1281]
+                - cell "175 sqft/h" [ref=e1282]
+                - cell "4.8" [ref=e1283]
+                - cell "$118.80" [ref=e1284]
+                - cell "$343.20" [ref=e1285]
+              - row "RESTROOMS East Wall — 2 333 sqft 175 sqft/h 3.8 $94.19 $272.11" [ref=e1286]:
+                - cell "RESTROOMS East" [ref=e1287]
+                - cell "Wall" [ref=e1288]
+                - cell "—" [ref=e1289]
+                - cell "2" [ref=e1290]
+                - cell "333 sqft" [ref=e1291]
+                - cell "175 sqft/h" [ref=e1292]
+                - cell "3.8" [ref=e1293]
+                - cell "$94.19" [ref=e1294]
+                - cell "$272.11" [ref=e1295]
+              - row "OPEN SPACE PRIVATE Wall — 2 1170 sqft 175 sqft/h 13.4 $330.94 $956.06" [ref=e1296]:
+                - cell "OPEN SPACE PRIVATE" [ref=e1297]
+                - cell "Wall" [ref=e1298]
+                - cell "—" [ref=e1299]
+                - cell "2" [ref=e1300]
+                - cell "1170 sqft" [ref=e1301]
+                - cell "175 sqft/h" [ref=e1302]
+                - cell "13.4" [ref=e1303]
+                - cell "$330.94" [ref=e1304]
+                - cell "$956.06" [ref=e1305]
+              - row "SMALL OFFICES North Wall — 2 117 sqft 175 sqft/h 1.3 $33.09 $95.61" [ref=e1306]:
+                - cell "SMALL OFFICES North" [ref=e1307]
+                - cell "Wall" [ref=e1308]
+                - cell "—" [ref=e1309]
+                - cell "2" [ref=e1310]
+                - cell "117 sqft" [ref=e1311]
+                - cell "175 sqft/h" [ref=e1312]
+                - cell "1.3" [ref=e1313]
+                - cell "$33.09" [ref=e1314]
+                - cell "$95.61" [ref=e1315]
+              - row "COLUMN Area South Wall — 2 111 sqft 175 sqft/h 1.3 $31.40 $90.70" [ref=e1316]:
+                - cell "COLUMN Area South" [ref=e1317]
+                - cell "Wall" [ref=e1318]
+                - cell "—" [ref=e1319]
+                - cell "2" [ref=e1320]
+                - cell "111 sqft" [ref=e1321]
+                - cell "175 sqft/h" [ref=e1322]
+                - cell "1.3" [ref=e1323]
+                - cell "$31.40" [ref=e1324]
+                - cell "$90.70" [ref=e1325]
+              - row "RESTROOMS Ceiling — 2 1270 sqft 135 sqft/h 18.8 $359.23 $1,345.26" [ref=e1326]:
+                - cell "RESTROOMS" [ref=e1327]
+                - cell "Ceiling" [ref=e1328]
+                - cell "—" [ref=e1329]
+                - cell "2" [ref=e1330]
+                - cell "1270 sqft" [ref=e1331]
+                - cell "135 sqft/h" [ref=e1332]
+                - cell "18.8" [ref=e1333]
+                - cell "$359.23" [ref=e1334]
+                - cell "$1,345.26" [ref=e1335]
+              - row "STAIRWELLS Ceiling — 2 1260 sqft 135 sqft/h 18.7 $356.40 $1,334.67" [ref=e1336]:
+                - cell "STAIRWELLS" [ref=e1337]
+                - cell "Ceiling" [ref=e1338]
+                - cell "—" [ref=e1339]
+                - cell "2" [ref=e1340]
+                - cell "1260 sqft" [ref=e1341]
+                - cell "135 sqft/h" [ref=e1342]
+                - cell "18.7" [ref=e1343]
+                - cell "$356.40" [ref=e1344]
+                - cell "$1,334.67" [ref=e1345]
+              - row "ELEVATORS Ceiling — 2 1260 sqft 135 sqft/h 18.7 $356.40 $1,334.67" [ref=e1346]:
+                - cell "ELEVATORS" [ref=e1347]
+                - cell "Ceiling" [ref=e1348]
+                - cell "—" [ref=e1349]
+                - cell "2" [ref=e1350]
+                - cell "1260 sqft" [ref=e1351]
+                - cell "135 sqft/h" [ref=e1352]
+                - cell "18.7" [ref=e1353]
+                - cell "$356.40" [ref=e1354]
+                - cell "$1,334.67" [ref=e1355]
+              - row "SERVICE ELEVATOR Ceiling — 2 1260 sqft 135 sqft/h 18.7 $356.40 $1,334.67" [ref=e1356]:
+                - cell "SERVICE ELEVATOR" [ref=e1357]
+                - cell "Ceiling" [ref=e1358]
+                - cell "—" [ref=e1359]
+                - cell "2" [ref=e1360]
+                - cell "1260 sqft" [ref=e1361]
+                - cell "135 sqft/h" [ref=e1362]
+                - cell "18.7" [ref=e1363]
+                - cell "$356.40" [ref=e1364]
+                - cell "$1,334.67" [ref=e1365]
+              - row "Open Space West Ceiling — 2 1260 sqft 135 sqft/h 18.7 $356.40 $1,334.67" [ref=e1366]:
+                - cell "Open Space West" [ref=e1367]
+                - cell "Ceiling" [ref=e1368]
+                - cell "—" [ref=e1369]
+                - cell "2" [ref=e1370]
+                - cell "1260 sqft" [ref=e1371]
+                - cell "135 sqft/h" [ref=e1372]
+                - cell "18.7" [ref=e1373]
+                - cell "$356.40" [ref=e1374]
+                - cell "$1,334.67" [ref=e1375]
+              - row "Open Space Center Ceiling — 2 415 sqft 135 sqft/h 6.1 $117.39 $439.59" [ref=e1376]:
+                - cell "Open Space Center" [ref=e1377]
+                - cell "Ceiling" [ref=e1378]
+                - cell "—" [ref=e1379]
+                - cell "2" [ref=e1380]
+                - cell "415 sqft" [ref=e1381]
+                - cell "135 sqft/h" [ref=e1382]
+                - cell "6.1" [ref=e1383]
+                - cell "$117.39" [ref=e1384]
+                - cell "$439.59" [ref=e1385]
+              - row "STAIRWELLS East Ceiling — 2 467 sqft 135 sqft/h 6.9 $132.09 $494.67" [ref=e1386]:
+                - cell "STAIRWELLS East" [ref=e1387]
+                - cell "Ceiling" [ref=e1388]
+                - cell "—" [ref=e1389]
+                - cell "2" [ref=e1390]
+                - cell "467 sqft" [ref=e1391]
+                - cell "135 sqft/h" [ref=e1392]
+                - cell "6.9" [ref=e1393]
+                - cell "$132.09" [ref=e1394]
+                - cell "$494.67" [ref=e1395]
+              - row "RESTROOMS East Ceiling — 2 289 sqft 135 sqft/h 4.3 $81.75 $306.13" [ref=e1396]:
+                - cell "RESTROOMS East" [ref=e1397]
+                - cell "Ceiling" [ref=e1398]
+                - cell "—" [ref=e1399]
+                - cell "2" [ref=e1400]
+                - cell "289 sqft" [ref=e1401]
+                - cell "135 sqft/h" [ref=e1402]
+                - cell "4.3" [ref=e1403]
+                - cell "$81.75" [ref=e1404]
+                - cell "$306.13" [ref=e1405]
+              - row "OPEN SPACE PRIVATE Ceiling — 2 1300 sqft 135 sqft/h 19.3 $367.71 $1,377.04" [ref=e1406]:
+                - cell "OPEN SPACE PRIVATE" [ref=e1407]
+                - cell "Ceiling" [ref=e1408]
+                - cell "—" [ref=e1409]
+                - cell "2" [ref=e1410]
+                - cell "1300 sqft" [ref=e1411]
+                - cell "135 sqft/h" [ref=e1412]
+                - cell "19.3" [ref=e1413]
+                - cell "$367.71" [ref=e1414]
+                - cell "$1,377.04" [ref=e1415]
+              - row "RESTROOMS Entry Door — 2 2 ea 4 ea/h 1.1 $49.50 $79.44" [ref=e1416]:
+                - cell "RESTROOMS Entry" [ref=e1417]
+                - cell "Door" [ref=e1418]
+                - cell "—" [ref=e1419]
+                - cell "2" [ref=e1420]
+                - cell "2 ea" [ref=e1421]
+                - cell "4 ea/h" [ref=e1422]
+                - cell "1.1" [ref=e1423]
+                - cell "$49.50" [ref=e1424]
+                - cell "$79.44" [ref=e1425]
+              - row "STAIRWELLS Entry Door — 2 2 ea 4 ea/h 1.1 $49.50 $79.44" [ref=e1426]:
+                - cell "STAIRWELLS Entry" [ref=e1427]
+                - cell "Door" [ref=e1428]
+                - cell "—" [ref=e1429]
+                - cell "2" [ref=e1430]
+                - cell "2 ea" [ref=e1431]
+                - cell "4 ea/h" [ref=e1432]
+                - cell "1.1" [ref=e1433]
+                - cell "$49.50" [ref=e1434]
+                - cell "$79.44" [ref=e1435]
+              - row "ELEVATORS Entry Door — 2 3 ea 4 ea/h 1.7 $74.25 $119.17" [ref=e1436]:
+                - cell "ELEVATORS Entry" [ref=e1437]
+                - cell "Door" [ref=e1438]
+                - cell "—" [ref=e1439]
+                - cell "2" [ref=e1440]
+                - cell "3 ea" [ref=e1441]
+                - cell "4 ea/h" [ref=e1442]
+                - cell "1.7" [ref=e1443]
+                - cell "$74.25" [ref=e1444]
+                - cell "$119.17" [ref=e1445]
+              - row "SERVICE ELEVATOR Entry Door — 2 1 ea 4 ea/h 0.6 $24.75 $39.72" [ref=e1446]:
+                - cell "SERVICE ELEVATOR Entry" [ref=e1447]
+                - cell "Door" [ref=e1448]
+                - cell "—" [ref=e1449]
+                - cell "2" [ref=e1450]
+                - cell "1 ea" [ref=e1451]
+                - cell "4 ea/h" [ref=e1452]
+                - cell "0.6" [ref=e1453]
+                - cell "$24.75" [ref=e1454]
+                - cell "$39.72" [ref=e1455]
+              - row "RESTROOMS East Entry Door — 2 2 ea 4 ea/h 1.1 $49.50 $79.44" [ref=e1456]:
+                - cell "RESTROOMS East Entry" [ref=e1457]
+                - cell "Door" [ref=e1458]
+                - cell "—" [ref=e1459]
+                - cell "2" [ref=e1460]
+                - cell "2 ea" [ref=e1461]
+                - cell "4 ea/h" [ref=e1462]
+                - cell "1.1" [ref=e1463]
+                - cell "$49.50" [ref=e1464]
+                - cell "$79.44" [ref=e1465]
+              - row "STAIRWELLS East Entry Door — 2 1 ea 4 ea/h 0.6 $24.75 $39.72" [ref=e1466]:
+                - cell "STAIRWELLS East Entry" [ref=e1467]
+                - cell "Door" [ref=e1468]
+                - cell "—" [ref=e1469]
+                - cell "2" [ref=e1470]
+                - cell "1 ea" [ref=e1471]
+                - cell "4 ea/h" [ref=e1472]
+                - cell "0.6" [ref=e1473]
+                - cell "$24.75" [ref=e1474]
+                - cell "$39.72" [ref=e1475]
+              - row "Exterior West Wall Window — 2 8 ea 6 ea/h 2.7 $198.00 $190.67" [ref=e1476]:
+                - cell "Exterior West Wall" [ref=e1477]
+                - cell "Window" [ref=e1478]
+                - cell "—" [ref=e1479]
+                - cell "2" [ref=e1480]
+                - cell "8 ea" [ref=e1481]
+                - cell "6 ea/h" [ref=e1482]
+                - cell "2.7" [ref=e1483]
+                - cell "$198.00" [ref=e1484]
+                - cell "$190.67" [ref=e1485]
+              - row "Exterior East Wall Window — 2 8 ea 6 ea/h 2.7 $198.00 $190.67" [ref=e1486]:
+                - cell "Exterior East Wall" [ref=e1487]
+                - cell "Window" [ref=e1488]
+                - cell "—" [ref=e1489]
+                - cell "2" [ref=e1490]
+                - cell "8 ea" [ref=e1491]
+                - cell "6 ea/h" [ref=e1492]
+                - cell "2.7" [ref=e1493]
+                - cell "$198.00" [ref=e1494]
+                - cell "$190.67" [ref=e1495]
+              - row "Base trim core area Trim — 2 280 lf 60 lf/h 9.3 $110.88 $667.33" [ref=e1496]:
+                - cell "Base trim core area" [ref=e1497]
+                - cell "Trim" [ref=e1498]
+                - cell "—" [ref=e1499]
+                - cell "2" [ref=e1500]
+                - cell "280 lf" [ref=e1501]
+                - cell "60 lf/h" [ref=e1502]
+                - cell "9.3" [ref=e1503]
+                - cell "$110.88" [ref=e1504]
+                - cell "$667.33" [ref=e1505]
+              - row "Base trim east area Trim — 2 220 lf 60 lf/h 7.3 $87.12 $524.33" [ref=e1506]:
+                - cell "Base trim east area" [ref=e1507]
+                - cell "Trim" [ref=e1508]
+                - cell "—" [ref=e1509]
+                - cell "2" [ref=e1510]
+                - cell "220 lf" [ref=e1511]
+                - cell "60 lf/h" [ref=e1512]
+                - cell "7.3" [ref=e1513]
+                - cell "$87.12" [ref=e1514]
+                - cell "$524.33" [ref=e1515]
+            - rowgroup [ref=e688]:
+              - row "Subtotal $5,813.14 $18,426.98" [ref=e1516]:
+                - cell "Subtotal" [ref=e690]
+                - cell "$5,813.14" [ref=e1517]
+                - cell "$18,426.98" [ref=e1518]
+              - row "Overhead $2,424.01" [ref=e1519]:
+                - cell "Overhead" [ref=e694]
+                - cell "$2,424.01" [ref=e1520]
+              - row "Markup $5,332.83" [ref=e1521]:
+                - cell "Markup" [ref=e697]
+                - cell "$5,332.83" [ref=e1522]
+              - row "Grand Total $31,996.96" [ref=e1523]:
+                - cell "Grand Total" [ref=e700]
+                - cell "$31,996.96" [ref=e1524]

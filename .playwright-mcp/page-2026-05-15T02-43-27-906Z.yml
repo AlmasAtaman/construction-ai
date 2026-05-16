@@ -1,0 +1,21 @@
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e88] [cursor=pointer]:
+    - img [ref=e89]
+  - alert [ref=e197]
+  - generic [ref=e198]:
+    - banner [ref=e199]:
+      - generic [ref=e200]:
+        - link "P" [ref=e201] [cursor=pointer]:
+          - /url: /projects/cmp6b3ca90000zmhn3x0mfck4
+        - generic [ref=e202]:
+          - generic [ref=e203]: Specs analyzer
+          - link "Back to project workspace" [ref=e204] [cursor=pointer]:
+            - /url: /projects/cmp6b3ca90000zmhn3x0mfck4
+      - generic "Today's AI spend across all projects. Resets at midnight." [ref=e205]:
+        - generic [ref=e206]: "AI today:"
+        - generic [ref=e207]: $0.03 / $20
+    - main [ref=e208]:
+      - generic [ref=e210]:
+        - heading "Upload a specifications PDF" [level=2] [ref=e211]
+        - paragraph [ref=e212]: The AI reads CSI Division 09 90 00 and pulls out paint scope, finish schedules, flagged requirements, and exclusions.
+        - button "Choose a spec PDF" [ref=e214] [cursor=pointer]

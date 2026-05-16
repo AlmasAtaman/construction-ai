@@ -1,0 +1,531 @@
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e56] [cursor=pointer]:
+    - img [ref=e57]
+  - alert [ref=e50]
+  - generic [ref=e103]:
+    - navigation [ref=e104]:
+      - link "P" [ref=e105] [cursor=pointer]:
+        - /url: /
+      - generic [ref=e107]:
+        - link "Projects" [ref=e108] [cursor=pointer]:
+          - /url: /
+          - img [ref=e109]
+        - link "Rates" [ref=e111] [cursor=pointer]:
+          - /url: /settings/rates
+          - img [ref=e112]
+        - link "Rules" [ref=e115] [cursor=pointer]:
+          - /url: /settings/rules
+          - img [ref=e116]
+        - link "Settings" [ref=e119] [cursor=pointer]:
+          - /url: /settings
+          - img [ref=e120]
+    - generic [ref=e123]:
+      - banner [ref=e124]:
+        - generic [ref=e126]:
+          - generic [ref=e127]:
+            - heading "IQ Buildings — Multi-Tenant Commercial" [level=1] [ref=e128]
+            - generic [ref=e129]: draft
+          - generic [ref=e130]: CTP Developers
+        - generic [ref=e131]:
+          - generic "Today's AI spend across all projects. Resets at midnight." [ref=e132]:
+            - img [ref=e133]
+            - generic [ref=e136]: AI today
+            - generic [ref=e137]: $0.00 / $20
+          - link "Specs" [ref=e138] [cursor=pointer]:
+            - /url: /projects/cmp6c9ov50000rfde0c7whl9b/specs
+            - button "Specs" [ref=e139]
+          - button "History" [ref=e140] [cursor=pointer]
+          - link "Bid review" [ref=e141] [cursor=pointer]:
+            - /url: /projects/cmp6c9ov50000rfde0c7whl9b/bid
+            - button "Bid review" [ref=e142]
+          - link "Generate Bid" [ref=e143] [cursor=pointer]:
+            - /url: /projects/cmp6c9ov50000rfde0c7whl9b/bid
+            - button "Generate Bid" [ref=e144]
+      - generic [ref=e145]:
+        - generic [ref=e146]:
+          - complementary [ref=e147]:
+            - heading "Pages" [level=3] [ref=e149]
+            - list [ref=e193]:
+              - listitem [ref=e194]:
+                - button "1 Page 1" [ref=e195] [cursor=pointer]:
+                  - generic [ref=e196]: "1"
+                  - generic [ref=e197]: Page 1
+              - listitem [ref=e198]:
+                - button "2 Page 2" [ref=e199] [cursor=pointer]:
+                  - generic [ref=e200]: "2"
+                  - generic [ref=e201]: Page 2
+              - listitem [ref=e202]:
+                - button "3 Page 3" [ref=e203] [cursor=pointer]:
+                  - generic [ref=e204]: "3"
+                  - generic [ref=e205]: Page 3
+              - listitem [ref=e206]:
+                - button "4 Page 4" [ref=e207] [cursor=pointer]:
+                  - generic [ref=e208]: "4"
+                  - generic [ref=e209]: Page 4
+              - listitem [ref=e210]:
+                - button "5 Page 5" [ref=e211] [cursor=pointer]:
+                  - generic [ref=e212]: "5"
+                  - generic [ref=e213]: Page 5
+              - listitem [ref=e214]:
+                - button "6 Page 6" [ref=e215] [cursor=pointer]:
+                  - generic [ref=e216]: "6"
+                  - generic [ref=e217]: Page 6
+              - listitem [ref=e218]:
+                - button "7 Page 7" [ref=e219] [cursor=pointer]:
+                  - generic [ref=e220]: "7"
+                  - generic [ref=e221]: Page 7
+              - listitem [ref=e222]:
+                - button "8 Page 8" [ref=e223] [cursor=pointer]:
+                  - generic [ref=e224]: "8"
+                  - generic [ref=e225]: Page 8
+              - listitem [ref=e226]:
+                - button "9 Page 9" [ref=e227] [cursor=pointer]:
+                  - generic [ref=e228]: "9"
+                  - generic [ref=e229]: Page 9
+              - listitem [ref=e230]:
+                - button "10 Page 10" [ref=e231] [cursor=pointer]:
+                  - generic [ref=e232]: "10"
+                  - generic [ref=e233]: Page 10
+              - listitem [ref=e234]:
+                - button "11 Page 11" [ref=e235] [cursor=pointer]:
+                  - generic [ref=e236]: "11"
+                  - generic [ref=e237]: Page 11
+              - listitem [ref=e238]:
+                - button "12 Page 12" [ref=e239] [cursor=pointer]:
+                  - generic [ref=e240]: "12"
+                  - generic [ref=e241]: Page 12
+            - generic [ref=e152]:
+              - generic [ref=e153]:
+                - heading "AI Takeoff" [level=3] [ref=e154]
+                - generic [ref=e155]: 0 kept · 15 pending
+              - generic [ref=e156]:
+                - button "Analyzing…" [disabled] [ref=e702]: Analyzing…
+                - generic [ref=e704]: Reading your blueprint. About 30 seconds.
+          - generic [ref=e242]:
+            - button "Select (V)" [ref=e243] [cursor=pointer]:
+              - img [ref=e244]
+              - generic:
+                - text: Select
+                - generic: (V)
+            - button "Area (R)" [ref=e246] [cursor=pointer]:
+              - img [ref=e247]
+              - generic:
+                - text: Area
+                - generic: (R)
+            - button "Polygon (P)" [ref=e249] [cursor=pointer]:
+              - img [ref=e250]
+              - generic:
+                - text: Polygon
+                - generic: (P)
+            - button "Erase (E)" [ref=e252] [cursor=pointer]:
+              - img [ref=e253]
+              - generic:
+                - text: Erase
+                - generic: (E)
+          - main [ref=e160]
+          - complementary [ref=e170]:
+            - generic [ref=e171]:
+              - button "Queue 15" [ref=e280] [cursor=pointer]:
+                - generic [ref=e173]:
+                  - text: Queue
+                  - generic [ref=e281]: "15"
+              - button "Chat" [ref=e175] [cursor=pointer]:
+                - generic [ref=e176]: Chat
+            - generic [ref=e178]:
+              - generic [ref=e179]:
+                - generic [ref=e282]: 15 pending
+                - button "Accept 10 high" [ref=e283] [cursor=pointer]
+              - list [ref=e284]:
+                - listitem [ref=e285] [cursor=pointer]:
+                  - generic [ref=e287]:
+                    - generic [ref=e288]:
+                      - generic [ref=e290]: RESTROOMS
+                      - generic [ref=e291]: high
+                    - generic [ref=e292]:
+                      - generic [ref=e293]: Wall
+                      - generic [ref=e294]: ·
+                      - generic [ref=e295]: 520 lf
+                      - generic [ref=e296]: ·
+                      - generic [ref=e297]: drywall
+                  - generic [ref=e298]:
+                    - button "Accept" [ref=e299]
+                    - button "Reject" [ref=e300]
+                - listitem [ref=e301] [cursor=pointer]:
+                  - generic [ref=e303]:
+                    - generic [ref=e304]:
+                      - generic [ref=e306]: Open Office Area - Left
+                      - generic [ref=e307]: high
+                    - generic [ref=e308]:
+                      - generic [ref=e309]: Wall
+                      - generic [ref=e310]: ·
+                      - generic [ref=e311]: 1850 lf
+                      - generic [ref=e312]: ·
+                      - generic [ref=e313]: drywall
+                  - generic [ref=e314]:
+                    - button "Accept" [ref=e315]
+                    - button "Reject" [ref=e316]
+                - listitem [ref=e317] [cursor=pointer]:
+                  - generic [ref=e319]:
+                    - generic [ref=e320]:
+                      - generic [ref=e322]: STAIRWELLS/ELEVATORS Core
+                      - generic [ref=e323]: high
+                    - generic [ref=e324]:
+                      - generic [ref=e325]: Wall
+                      - generic [ref=e326]: ·
+                      - generic [ref=e327]: 780 lf
+                      - generic [ref=e328]: ·
+                      - generic [ref=e329]: CMU
+                  - generic [ref=e330]:
+                    - button "Accept" [ref=e331]
+                    - button "Reject" [ref=e332]
+                - listitem [ref=e333] [cursor=pointer]:
+                  - generic [ref=e335]:
+                    - generic [ref=e336]:
+                      - generic [ref=e338]: Open Office Area - Center
+                      - generic [ref=e339]: high
+                    - generic [ref=e340]:
+                      - generic [ref=e341]: Wall
+                      - generic [ref=e342]: ·
+                      - generic [ref=e343]: 1480 lf
+                      - generic [ref=e344]: ·
+                      - generic [ref=e345]: drywall
+                  - generic [ref=e346]:
+                    - button "Accept" [ref=e347]
+                    - button "Reject" [ref=e348]
+                - listitem [ref=e349] [cursor=pointer]:
+                  - generic [ref=e351]:
+                    - generic [ref=e352]:
+                      - generic [ref=e354]: Open Office Area - Right Center
+                      - generic [ref=e355]: high
+                    - generic [ref=e356]:
+                      - generic [ref=e357]: Wall
+                      - generic [ref=e358]: ·
+                      - generic [ref=e359]: 1250 lf
+                      - generic [ref=e360]: ·
+                      - generic [ref=e361]: drywall
+                  - generic [ref=e362]:
+                    - button "Accept" [ref=e363]
+                    - button "Reject" [ref=e364]
+                - listitem [ref=e365] [cursor=pointer]:
+                  - generic [ref=e367]:
+                    - generic [ref=e368]:
+                      - generic [ref=e370]: OPEN SPACE MODULE/COLUMN areas
+                      - generic [ref=e371]: high
+                    - generic [ref=e372]:
+                      - generic [ref=e373]: Wall
+                      - generic [ref=e374]: ·
+                      - generic [ref=e375]: 980 lf
+                      - generic [ref=e376]: ·
+                      - generic [ref=e377]: drywall
+                  - generic [ref=e378]:
+                    - button "Accept" [ref=e379]
+                    - button "Reject" [ref=e380]
+                - listitem [ref=e381] [cursor=pointer]:
+                  - generic [ref=e383]:
+                    - generic [ref=e384]:
+                      - generic [ref=e386]: Open Office Area - Left
+                      - generic [ref=e387]: high
+                    - generic [ref=e388]:
+                      - generic [ref=e389]: Ceiling
+                      - generic [ref=e390]: ·
+                      - generic [ref=e391]: 7800 sqft
+                      - generic [ref=e392]: ·
+                      - generic [ref=e393]: drywall
+                  - generic [ref=e394]:
+                    - button "Accept" [ref=e395]
+                    - button "Reject" [ref=e396]
+                - listitem [ref=e397] [cursor=pointer]:
+                  - generic [ref=e399]:
+                    - generic [ref=e400]:
+                      - generic [ref=e402]: Open Office Area - Center
+                      - generic [ref=e403]: high
+                    - generic [ref=e404]:
+                      - generic [ref=e405]: Ceiling
+                      - generic [ref=e406]: ·
+                      - generic [ref=e407]: 5200 sqft
+                      - generic [ref=e408]: ·
+                      - generic [ref=e409]: drywall
+                  - generic [ref=e410]:
+                    - button "Accept" [ref=e411]
+                    - button "Reject" [ref=e412]
+                - listitem [ref=e413] [cursor=pointer]:
+                  - generic [ref=e415]:
+                    - generic [ref=e416]:
+                      - generic [ref=e418]: Open Office Area - Right Center
+                      - generic [ref=e419]: high
+                    - generic [ref=e420]:
+                      - generic [ref=e421]: Ceiling
+                      - generic [ref=e422]: ·
+                      - generic [ref=e423]: 5600 sqft
+                      - generic [ref=e424]: ·
+                      - generic [ref=e425]: drywall
+                  - generic [ref=e426]:
+                    - button "Accept" [ref=e427]
+                    - button "Reject" [ref=e428]
+                - listitem [ref=e429] [cursor=pointer]:
+                  - generic [ref=e431]:
+                    - generic [ref=e432]:
+                      - generic [ref=e434]: Open Office Area - Right
+                      - generic [ref=e435]: high
+                    - generic [ref=e436]:
+                      - generic [ref=e437]: Ceiling
+                      - generic [ref=e438]: ·
+                      - generic [ref=e439]: 4200 sqft
+                      - generic [ref=e440]: ·
+                      - generic [ref=e441]: drywall
+                  - generic [ref=e442]:
+                    - button "Accept" [ref=e443]
+                    - button "Reject" [ref=e444]
+                - listitem [ref=e445] [cursor=pointer]:
+                  - generic [ref=e447]:
+                    - generic [ref=e448]:
+                      - generic [ref=e450]: RESTROOMS entrance
+                      - generic [ref=e451]: medium
+                    - generic [ref=e452]:
+                      - generic [ref=e453]: Door
+                      - generic [ref=e454]: ·
+                      - generic [ref=e455]: 3 ea
+                      - generic [ref=e456]: ·
+                      - generic [ref=e457]: wood
+                  - generic [ref=e458]:
+                    - button "Accept" [ref=e459]
+                    - button "Reject" [ref=e460]
+                - listitem [ref=e461] [cursor=pointer]:
+                  - generic [ref=e463]:
+                    - generic [ref=e464]:
+                      - generic [ref=e466]: Core access
+                      - generic [ref=e467]: medium
+                    - generic [ref=e468]:
+                      - generic [ref=e469]: Door
+                      - generic [ref=e470]: ·
+                      - generic [ref=e471]: 2 ea
+                      - generic [ref=e472]: ·
+                      - generic [ref=e473]: wood
+                  - generic [ref=e474]:
+                    - button "Accept" [ref=e475]
+                    - button "Reject" [ref=e476]
+                - listitem [ref=e477] [cursor=pointer]:
+                  - generic [ref=e479]:
+                    - generic [ref=e480]:
+                      - generic [ref=e482]: Exterior - Left side
+                      - generic [ref=e483]: medium
+                    - generic [ref=e484]:
+                      - generic [ref=e485]: Window
+                      - generic [ref=e486]: ·
+                      - generic [ref=e487]: 85 lf
+                      - generic [ref=e488]: ·
+                      - generic [ref=e489]: glass
+                  - generic [ref=e490]:
+                    - button "Accept" [ref=e491]
+                    - button "Reject" [ref=e492]
+                - listitem [ref=e493] [cursor=pointer]:
+                  - generic [ref=e495]:
+                    - generic [ref=e496]:
+                      - generic [ref=e498]: Exterior - Left side bottom
+                      - generic [ref=e499]: medium
+                    - generic [ref=e500]:
+                      - generic [ref=e501]: Window
+                      - generic [ref=e502]: ·
+                      - generic [ref=e503]: 85 lf
+                      - generic [ref=e504]: ·
+                      - generic [ref=e505]: glass
+                  - generic [ref=e506]:
+                    - button "Accept" [ref=e507]
+                    - button "Reject" [ref=e508]
+                - listitem [ref=e509] [cursor=pointer]:
+                  - generic [ref=e511]:
+                    - generic [ref=e512]:
+                      - generic [ref=e514]: Entire floor perimeter
+                      - generic [ref=e515]: medium
+                    - generic [ref=e516]:
+                      - generic [ref=e517]: Trim
+                      - generic [ref=e518]: ·
+                      - generic [ref=e519]: 2800 lf
+                      - generic [ref=e520]: ·
+                      - generic [ref=e521]: wood
+                  - generic [ref=e522]:
+                    - button "Accept" [ref=e523]
+                    - button "Reject" [ref=e524]
+        - generic [ref=e184]:
+          - button "Estimate Worksheet (0 surfaces)" [ref=e185] [cursor=pointer]:
+            - generic [ref=e186]:
+              - img [ref=e187]
+              - generic [ref=e189]: Estimate Worksheet
+              - generic [ref=e190]: (0 surfaces)
+          - table [ref=e525]:
+            - rowgroup [ref=e526]:
+              - row "Room Type Paint Coats Qty Rate Hrs Material Labor" [ref=e527]:
+                - columnheader "Room" [ref=e528]
+                - columnheader "Type" [ref=e529]
+                - columnheader "Paint" [ref=e530]
+                - columnheader "Coats" [ref=e531]
+                - columnheader "Qty" [ref=e532]
+                - columnheader "Rate" [ref=e533]
+                - columnheader "Hrs" [ref=e534]
+                - columnheader "Material" [ref=e535]
+                - columnheader "Labor" [ref=e536]
+            - rowgroup [ref=e537]:
+              - row "RESTROOMS Wall — 2 0 sqft 175 sqft/h 0.0 $0.00 $0.00" [ref=e538]:
+                - cell "RESTROOMS" [ref=e539]
+                - cell "Wall" [ref=e540]
+                - cell "—" [ref=e541]
+                - cell "2" [ref=e542]
+                - cell "0 sqft" [ref=e543]
+                - cell "175 sqft/h" [ref=e544]
+                - cell "0.0" [ref=e545]
+                - cell "$0.00" [ref=e546]
+                - cell "$0.00" [ref=e547]
+              - row "Open Office Area - Left Wall — 2 0 sqft 175 sqft/h 0.0 $0.00 $0.00" [ref=e548]:
+                - cell "Open Office Area - Left" [ref=e549]
+                - cell "Wall" [ref=e550]
+                - cell "—" [ref=e551]
+                - cell "2" [ref=e552]
+                - cell "0 sqft" [ref=e553]
+                - cell "175 sqft/h" [ref=e554]
+                - cell "0.0" [ref=e555]
+                - cell "$0.00" [ref=e556]
+                - cell "$0.00" [ref=e557]
+              - row "STAIRWELLS/ELEVATORS Core Wall — 2 0 sqft 175 sqft/h 0.0 $0.00 $0.00" [ref=e558]:
+                - cell "STAIRWELLS/ELEVATORS Core" [ref=e559]
+                - cell "Wall" [ref=e560]
+                - cell "—" [ref=e561]
+                - cell "2" [ref=e562]
+                - cell "0 sqft" [ref=e563]
+                - cell "175 sqft/h" [ref=e564]
+                - cell "0.0" [ref=e565]
+                - cell "$0.00" [ref=e566]
+                - cell "$0.00" [ref=e567]
+              - row "Open Office Area - Center Wall — 2 0 sqft 175 sqft/h 0.0 $0.00 $0.00" [ref=e568]:
+                - cell "Open Office Area - Center" [ref=e569]
+                - cell "Wall" [ref=e570]
+                - cell "—" [ref=e571]
+                - cell "2" [ref=e572]
+                - cell "0 sqft" [ref=e573]
+                - cell "175 sqft/h" [ref=e574]
+                - cell "0.0" [ref=e575]
+                - cell "$0.00" [ref=e576]
+                - cell "$0.00" [ref=e577]
+              - row "Open Office Area - Right Center Wall — 2 0 sqft 175 sqft/h 0.0 $0.00 $0.00" [ref=e578]:
+                - cell "Open Office Area - Right Center" [ref=e579]
+                - cell "Wall" [ref=e580]
+                - cell "—" [ref=e581]
+                - cell "2" [ref=e582]
+                - cell "0 sqft" [ref=e583]
+                - cell "175 sqft/h" [ref=e584]
+                - cell "0.0" [ref=e585]
+                - cell "$0.00" [ref=e586]
+                - cell "$0.00" [ref=e587]
+              - row "OPEN SPACE MODULE/COLUMN areas Wall — 2 0 sqft 175 sqft/h 0.0 $0.00 $0.00" [ref=e588]:
+                - cell "OPEN SPACE MODULE/COLUMN areas" [ref=e589]
+                - cell "Wall" [ref=e590]
+                - cell "—" [ref=e591]
+                - cell "2" [ref=e592]
+                - cell "0 sqft" [ref=e593]
+                - cell "175 sqft/h" [ref=e594]
+                - cell "0.0" [ref=e595]
+                - cell "$0.00" [ref=e596]
+                - cell "$0.00" [ref=e597]
+              - row "Open Office Area - Left Ceiling — 2 7800 sqft 135 sqft/h 115.6 $2,206.29 $8,262.22" [ref=e598]:
+                - cell "Open Office Area - Left" [ref=e599]
+                - cell "Ceiling" [ref=e600]
+                - cell "—" [ref=e601]
+                - cell "2" [ref=e602]
+                - cell "7800 sqft" [ref=e603]
+                - cell "135 sqft/h" [ref=e604]
+                - cell "115.6" [ref=e605]
+                - cell "$2,206.29" [ref=e606]
+                - cell "$8,262.22" [ref=e607]
+              - row "Open Office Area - Center Ceiling — 2 5200 sqft 135 sqft/h 77.0 $1,470.86 $5,508.15" [ref=e608]:
+                - cell "Open Office Area - Center" [ref=e609]
+                - cell "Ceiling" [ref=e610]
+                - cell "—" [ref=e611]
+                - cell "2" [ref=e612]
+                - cell "5200 sqft" [ref=e613]
+                - cell "135 sqft/h" [ref=e614]
+                - cell "77.0" [ref=e615]
+                - cell "$1,470.86" [ref=e616]
+                - cell "$5,508.15" [ref=e617]
+              - row "Open Office Area - Right Center Ceiling — 2 5600 sqft 135 sqft/h 83.0 $1,584.00 $5,931.85" [ref=e618]:
+                - cell "Open Office Area - Right Center" [ref=e619]
+                - cell "Ceiling" [ref=e620]
+                - cell "—" [ref=e621]
+                - cell "2" [ref=e622]
+                - cell "5600 sqft" [ref=e623]
+                - cell "135 sqft/h" [ref=e624]
+                - cell "83.0" [ref=e625]
+                - cell "$1,584.00" [ref=e626]
+                - cell "$5,931.85" [ref=e627]
+              - row "Open Office Area - Right Ceiling — 2 4200 sqft 135 sqft/h 62.2 $1,188.00 $4,448.89" [ref=e628]:
+                - cell "Open Office Area - Right" [ref=e629]
+                - cell "Ceiling" [ref=e630]
+                - cell "—" [ref=e631]
+                - cell "2" [ref=e632]
+                - cell "4200 sqft" [ref=e633]
+                - cell "135 sqft/h" [ref=e634]
+                - cell "62.2" [ref=e635]
+                - cell "$1,188.00" [ref=e636]
+                - cell "$4,448.89" [ref=e637]
+              - row "RESTROOMS entrance Door — 2 3 ea 4 ea/h 1.7 $74.25 $119.17" [ref=e638]:
+                - cell "RESTROOMS entrance" [ref=e639]
+                - cell "Door" [ref=e640]
+                - cell "—" [ref=e641]
+                - cell "2" [ref=e642]
+                - cell "3 ea" [ref=e643]
+                - cell "4 ea/h" [ref=e644]
+                - cell "1.7" [ref=e645]
+                - cell "$74.25" [ref=e646]
+                - cell "$119.17" [ref=e647]
+              - row "Core access Door — 2 2 ea 4 ea/h 1.1 $49.50 $79.44" [ref=e648]:
+                - cell "Core access" [ref=e649]
+                - cell "Door" [ref=e650]
+                - cell "—" [ref=e651]
+                - cell "2" [ref=e652]
+                - cell "2 ea" [ref=e653]
+                - cell "4 ea/h" [ref=e654]
+                - cell "1.1" [ref=e655]
+                - cell "$49.50" [ref=e656]
+                - cell "$79.44" [ref=e657]
+              - row "Exterior - Left side Window — 2 1 ea 6 ea/h 0.3 $24.75 $23.83" [ref=e658]:
+                - cell "Exterior - Left side" [ref=e659]
+                - cell "Window" [ref=e660]
+                - cell "—" [ref=e661]
+                - cell "2" [ref=e662]
+                - cell "1 ea" [ref=e663]
+                - cell "6 ea/h" [ref=e664]
+                - cell "0.3" [ref=e665]
+                - cell "$24.75" [ref=e666]
+                - cell "$23.83" [ref=e667]
+              - row "Exterior - Left side bottom Window — 2 1 ea 6 ea/h 0.3 $24.75 $23.83" [ref=e668]:
+                - cell "Exterior - Left side bottom" [ref=e669]
+                - cell "Window" [ref=e670]
+                - cell "—" [ref=e671]
+                - cell "2" [ref=e672]
+                - cell "1 ea" [ref=e673]
+                - cell "6 ea/h" [ref=e674]
+                - cell "0.3" [ref=e675]
+                - cell "$24.75" [ref=e676]
+                - cell "$23.83" [ref=e677]
+              - row "Entire floor perimeter Trim — 2 2800 lf 60 lf/h 93.3 $1,108.80 $6,673.33" [ref=e678]:
+                - cell "Entire floor perimeter" [ref=e679]
+                - cell "Trim" [ref=e680]
+                - cell "—" [ref=e681]
+                - cell "2" [ref=e682]
+                - cell "2800 lf" [ref=e683]
+                - cell "60 lf/h" [ref=e684]
+                - cell "93.3" [ref=e685]
+                - cell "$1,108.80" [ref=e686]
+                - cell "$6,673.33" [ref=e687]
+            - rowgroup [ref=e688]:
+              - row "Subtotal $7,731.19 $31,070.72" [ref=e689]:
+                - cell "Subtotal" [ref=e690]
+                - cell "$7,731.19" [ref=e691]
+                - cell "$31,070.72" [ref=e692]
+              - row "Overhead $3,880.19" [ref=e693]:
+                - cell "Overhead" [ref=e694]
+                - cell "$3,880.19" [ref=e695]
+              - row "Markup $8,536.42" [ref=e696]:
+                - cell "Markup" [ref=e697]
+                - cell "$8,536.42" [ref=e698]
+              - row "Grand Total $51,218.53" [ref=e699]:
+                - cell "Grand Total" [ref=e700]
+                - cell "$51,218.53" [ref=e701]

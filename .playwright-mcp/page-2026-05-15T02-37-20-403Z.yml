@@ -1,0 +1,70 @@
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e36] [cursor=pointer]:
+    - img [ref=e37]
+  - alert [ref=e30]
+  - generic [ref=e63]:
+    - banner [ref=e64]:
+      - generic [ref=e65]:
+        - link "Back to dashboard" [ref=e66] [cursor=pointer]:
+          - /url: /
+          - text: P
+        - generic [ref=e67]:
+          - generic [ref=e68]: Memorial Hospital — Wing C
+          - generic [ref=e69]: Acme General Contractors
+        - generic [ref=e70]: draft
+      - generic [ref=e71]:
+        - generic "Today's AI spend across all projects. Resets at midnight." [ref=e72]:
+          - generic [ref=e73]: "AI today:"
+          - generic [ref=e74]: $0.00 / $20
+        - link "Specs" [ref=e75] [cursor=pointer]:
+          - /url: /projects/cmp6b3ca90000zmhn3x0mfck4/specs
+          - button "Specs" [ref=e76]
+        - button "History" [ref=e77] [cursor=pointer]
+        - link "Generate Bid" [ref=e78] [cursor=pointer]:
+          - /url: /projects/cmp6b3ca90000zmhn3x0mfck4/bid
+          - button "Generate Bid" [ref=e79]
+    - generic [ref=e80]:
+      - generic [ref=e81]:
+        - complementary [ref=e82]:
+          - heading "Pages" [level=3] [ref=e84]
+          - list [ref=e126]:
+            - listitem [ref=e127]:
+              - button "Page 1" [ref=e128] [cursor=pointer]
+            - listitem [ref=e129]:
+              - button "Page 2" [ref=e130] [cursor=pointer]
+            - listitem [ref=e131]:
+              - button "Page 3" [ref=e132] [cursor=pointer]
+          - generic [ref=e87]:
+            - heading "AI Takeoff" [level=3] [ref=e88]
+            - button "Run AI Takeoff" [ref=e91] [cursor=pointer]
+          - generic [ref=e92]:
+            - heading "Layers" [level=3] [ref=e93]
+            - paragraph [ref=e94]: Show or hide walls, ceilings, trim, doors, and windows.
+        - main [ref=e95]:
+          - generic [ref=e133]:
+            - button "V" [ref=e134] [cursor=pointer]:
+              - img [ref=e135]
+              - generic [ref=e137]: V
+            - button "R" [ref=e138] [cursor=pointer]:
+              - img [ref=e139]
+              - generic [ref=e141]: R
+            - button "P" [ref=e142] [cursor=pointer]:
+              - img [ref=e143]
+              - generic [ref=e145]: P
+            - button "E" [ref=e146] [cursor=pointer]:
+              - img [ref=e147]
+              - generic [ref=e149]: E
+        - complementary [ref=e105]:
+          - heading "Detection Queue" [level=3] [ref=e107]
+          - paragraph [ref=e109]: Surfaces the AI finds will appear here. You can accept or reject each one.
+          - heading "Chat" [level=3] [ref=e111]
+          - generic [ref=e113]:
+            - paragraph [ref=e115]: Ask me to make changes in plain English — for example, “change all bathroom walls to semi-gloss” or “what's the total square footage?”
+            - generic [ref=e117]:
+              - textbox "Ask me to make changes…" [ref=e118]
+              - button "Send" [disabled] [ref=e119]
+      - generic [ref=e120]:
+        - button "Estimate Worksheet Hide" [ref=e121] [cursor=pointer]:
+          - generic [ref=e122]: Estimate Worksheet
+          - generic [ref=e123]: Hide
+        - generic [ref=e125]: Your line-item estimate will appear here once you have surfaces.

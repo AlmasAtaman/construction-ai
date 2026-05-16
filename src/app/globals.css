@@ -1,0 +1,167 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * PainterDesk design tokens — modeled after Bluebeam Revu / Procore /
+ * PlanSwift / STACK. Industrial blue + safety orange accent on an off-white
+ * canvas. No gradients, no glassmorphism, no light font weights.
+ */
+
+@layer base {
+  :root {
+    /* Surfaces */
+    --canvas: 220 14% 96%;        /* #F5F6F8 — workspace bg */
+    --panel: 0 0% 100%;            /* white — sidebars, cards */
+    --panel-2: 220 14% 98%;        /* #F8F9FB — subtle layering */
+    --rail: 220 14% 12%;           /* #1A1D24 — dark left rail */
+    --rail-fg: 220 9% 78%;
+    --rail-fg-active: 0 0% 100%;
+
+    /* Lines */
+    --line: 217 10% 87%;           /* #D8DCE0 */
+    --line-2: 217 14% 92%;         /* lighter rule */
+
+    /* Text */
+    --ink: 222 22% 17%;            /* #1F2937 near-black */
+    --ink-2: 215 16% 36%;          /* #475569 subtle */
+    --ink-3: 215 14% 52%;          /* muted */
+
+    /* Brand — Procore link blue / Bluebeam signature */
+    --brand: 211 100% 44%;         /* #006DDF */
+    --brand-hover: 213 87% 39%;
+    --brand-soft: 211 100% 95%;
+    --brand-on: 0 0% 100%;
+
+    /* Safety-orange CTA (Bluebeam / Buildertrend signature) */
+    --accent: 18 80% 54%;          /* #E8742C */
+    --accent-hover: 18 76% 47%;
+    --accent-soft: 18 88% 95%;
+
+    /* Semantic */
+    --success: 137 86% 28%;        /* #0B8626 */
+    --warning: 47 67% 50%;
+    --danger: 359 67% 51%;         /* #D62C2F */
+
+    /* Surface-type swatches (overlays + queue chips) */
+    --surface-wall: 217 91% 60%;
+    --surface-ceiling: 269 75% 60%;
+    --surface-trim: 142 71% 45%;
+    --surface-door: 25 95% 53%;
+    --surface-window: 45 93% 47%;
+
+    --radius-sm: 4px;
+    --radius: 6px;
+    --radius-lg: 8px;
+
+    /* Shadcn-style aliases kept for components that still reference them */
+    --background: var(--canvas);
+    --foreground: var(--ink);
+    --primary: var(--brand);
+    --primary-foreground: var(--brand-on);
+    --secondary: 220 14% 96%;
+    --secondary-foreground: var(--ink);
+    --muted: 220 14% 96%;
+    --muted-foreground: var(--ink-3);
+    --accent-foreground: 0 0% 100%;
+    --destructive: var(--danger);
+    --destructive-foreground: 0 0% 100%;
+    --border: var(--line);
+    --input: var(--line);
+    --ring: var(--brand);
+    --card: var(--panel);
+    --card-foreground: var(--ink);
+  }
+
+  * {
+    border-color: hsl(var(--line));
+  }
+
+  html, body, #__next {
+    height: 100%;
+  }
+
+  body {
+    background-color: hsl(var(--canvas));
+    color: hsl(var(--ink));
+    font-feature-settings: "rlig" 1, "calt" 1, "cv11" 1, "ss01" 1;
+    font-family: ui-sans-serif, system-ui, "Segoe UI", "Inter",
+      "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  /* Numbers should always be tabular for tables and totals */
+  .num, .tabular-nums, td.num {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+
+  /* Strong, never-light headers */
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: hsl(var(--ink));
+  }
+}
+
+@layer components {
+  /* Reusable surface-type color swatches (10x10 dots in queue, etc.) */
+  .swatch-wall    { background-color: hsl(var(--surface-wall)); }
+  .swatch-ceiling { background-color: hsl(var(--surface-ceiling)); }
+  .swatch-trim    { background-color: hsl(var(--surface-trim)); }
+  .swatch-door    { background-color: hsl(var(--surface-door)); }
+  .swatch-window  { background-color: hsl(var(--surface-window)); }
+
+  /* Spreadsheet-style table — zebra rows, dense, monospaced numbers */
+  .sheet {
+    width: 100%;
+    font-size: 13px;
+  }
+  .sheet th {
+    text-align: left;
+    font-weight: 600;
+    color: hsl(var(--ink-2));
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 8px 12px;
+    background: hsl(var(--panel-2));
+    border-bottom: 1px solid hsl(var(--line));
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  .sheet td {
+    padding: 7px 12px;
+    border-bottom: 1px solid hsl(var(--line-2));
+    height: 34px;
+    vertical-align: middle;
+  }
+  .sheet tbody tr:nth-child(even) {
+    background: hsl(var(--panel-2));
+  }
+  .sheet tbody tr:hover {
+    background: hsl(var(--brand-soft));
+  }
+
+  /* Status pills */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border: 1px solid transparent;
+  }
+  .pill-draft     { background: #F1F5F9; color: #334155; border-color: #E2E8F0; }
+  .pill-active    { background: #DBEAFE; color: #1E40AF; border-color: #BFDBFE; }
+  .pill-sent      { background: #DCFCE7; color: #166534; border-color: #BBF7D0; }
+  .pill-high      { background: #DCFCE7; color: #15803D; border-color: #86EFAC; }
+  .pill-medium    { background: #FEF3C7; color: #92400E; border-color: #FDE68A; }
+  .pill-low       { background: #FEE2E2; color: #B91C1C; border-color: #FECACA; }
+}

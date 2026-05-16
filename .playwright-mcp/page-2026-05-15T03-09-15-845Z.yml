@@ -1,0 +1,47 @@
+- generic [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e56] [cursor=pointer]:
+    - img [ref=e57]
+  - alert [ref=e50]
+  - generic [ref=e60]:
+    - navigation [ref=e61]:
+      - link "P" [ref=e62] [cursor=pointer]:
+        - /url: /
+      - generic [ref=e64]:
+        - link "Projects" [ref=e65] [cursor=pointer]:
+          - /url: /
+          - img [ref=e66]
+        - link "Rates" [ref=e68] [cursor=pointer]:
+          - /url: /settings/rates
+          - img [ref=e69]
+        - link "Rules" [ref=e72] [cursor=pointer]:
+          - /url: /settings/rules
+          - img [ref=e73]
+        - link "Settings" [ref=e76] [cursor=pointer]:
+          - /url: /settings
+          - img [ref=e77]
+    - generic [ref=e80]:
+      - banner [ref=e81]:
+        - generic [ref=e83]:
+          - heading "New project" [level=1] [ref=e85]
+          - generic [ref=e86]: Set up a new bid
+      - main [ref=e87]:
+        - generic [ref=e88]:
+          - link "← Back to projects" [ref=e89] [cursor=pointer]:
+            - /url: /
+          - generic [ref=e90]:
+            - generic [ref=e91]:
+              - generic [ref=e92]:
+                - generic [ref=e93]: Project name *
+                - textbox "Project name *" [active] [ref=e94]:
+                  - /placeholder: e.g. Memorial Hospital — Wing C
+                - paragraph [ref=e95]: Building name, address, or job number works best.
+              - generic [ref=e96]:
+                - text: Client name (optional)
+                - textbox "Client name (optional)" [ref=e97]:
+                  - /placeholder: e.g. Acme General Contractors
+                - paragraph [ref=e98]: The GC or owner this bid will be sent to.
+            - generic [ref=e99]:
+              - link "Cancel" [ref=e100] [cursor=pointer]:
+                - /url: /
+                - button "Cancel" [ref=e101]
+              - button "Create project" [ref=e102] [cursor=pointer]

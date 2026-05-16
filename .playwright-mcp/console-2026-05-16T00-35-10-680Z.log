@@ -1,0 +1,5 @@
+[    1050ms] [WARNING] useTranslation: DISMISS is not available @ https://duckduckgo.com/dist/wpm.main.6dea9e1a82f6fe099364.js:0
+[    2731ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://external-content.duckduckgo.com/ip3/www.edmonton.ca.ico:0
+[    2734ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://external-content.duckduckgo.com/ip3/app.bchydro.com.ico:0
+[    2794ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://external-content.duckduckgo.com/ip3/www.ppa.com.ph.ico:0
+[    4168ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://external-content.duckduckgo.com/ip3/themillenniumcentre.ca.ico:0

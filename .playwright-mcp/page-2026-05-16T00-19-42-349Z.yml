@@ -1,0 +1,60 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e3]:
+      - link "P" [ref=e4] [cursor=pointer]:
+        - /url: /
+      - generic [ref=e6]:
+        - link "Projects" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - img [ref=e8]
+        - link "Rates" [ref=e10] [cursor=pointer]:
+          - /url: /settings/rates
+          - img [ref=e11]
+        - link "Rules" [ref=e14] [cursor=pointer]:
+          - /url: /settings/rules
+          - img [ref=e15]
+        - link "Settings" [ref=e18] [cursor=pointer]:
+          - /url: /settings
+          - img [ref=e19]
+    - generic [ref=e22]:
+      - banner [ref=e23]:
+        - generic [ref=e25]:
+          - heading "Projects" [level=1] [ref=e27]
+          - generic [ref=e28]: Active bids and proposals
+        - generic [ref=e29]:
+          - searchbox "Search projects…" [ref=e30]
+          - generic "Today's AI spend across all projects. Resets at midnight." [ref=e31]:
+            - img [ref=e32]
+            - generic [ref=e35]: AI today
+            - generic [ref=e36]: $0.00 / $20
+          - link "New project" [ref=e37] [cursor=pointer]:
+            - /url: /projects/new
+            - button "New project" [ref=e38]
+      - main [ref=e39]:
+        - table [ref=e42]:
+          - rowgroup [ref=e43]:
+            - row "Project Client Status Plans Surfaces Updated" [ref=e44]:
+              - columnheader "Project" [ref=e45]
+              - columnheader "Client" [ref=e46]
+              - columnheader "Status" [ref=e47]
+              - columnheader "Plans" [ref=e48]
+              - columnheader "Surfaces" [ref=e49]
+              - columnheader "Updated" [ref=e50]
+              - columnheader [ref=e51]
+          - rowgroup [ref=e52]:
+            - row "Phase 5 Test — draft 1 5 May 15, 2026 Open" [ref=e53]:
+              - cell "Phase 5 Test" [ref=e54]:
+                - link "Phase 5 Test" [ref=e55] [cursor=pointer]:
+                  - /url: /projects/cmp7kymjj005m5vpus1cwhtqe
+              - cell "—" [ref=e56]
+              - cell "draft" [ref=e57]:
+                - generic [ref=e58]: draft
+              - cell "1" [ref=e59]
+              - cell "5" [ref=e60]
+              - cell "May 15, 2026" [ref=e61]
+              - cell "Open" [ref=e62]:
+                - link "Open" [ref=e63] [cursor=pointer]:
+                  - /url: /projects/cmp7kymjj005m5vpus1cwhtqe
+                  - button "Open" [ref=e64]
+  - button "Open Next.js Dev Tools" [ref=e70] [cursor=pointer]:
+    - img [ref=e71]

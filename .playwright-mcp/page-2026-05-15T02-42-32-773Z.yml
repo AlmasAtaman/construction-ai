@@ -1,0 +1,24 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - link "P PainterDesk" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e5]: P
+        - heading "PainterDesk" [level=1] [ref=e6]
+    - main [ref=e7]:
+      - generic [ref=e8]:
+        - link "← Back to settings" [ref=e9] [cursor=pointer]:
+          - /url: /settings
+        - heading "Painter rules" [level=2] [ref=e10]
+        - paragraph [ref=e11]: Standing instructions for the AI. One rule per line, in plain English. The AI follows these on every project.
+        - generic [ref=e12]:
+          - strong [ref=e13]: "Examples:"
+          - list [ref=e14]:
+            - listitem [ref=e15]: Always use net deduction for commercial bids.
+            - listitem [ref=e16]: Always use 12% waste factor for interior work.
+            - listitem [ref=e17]: Doors and frames are always semi-gloss enamel.
+        - generic [ref=e18]:
+          - textbox "Always use net deduction for commercial bids." [ref=e19]
+          - button "Save painter rules" [ref=e21] [cursor=pointer]
+  - button "Open Next.js Dev Tools" [ref=e27] [cursor=pointer]:
+    - img [ref=e28]

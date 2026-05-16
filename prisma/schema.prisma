@@ -1,0 +1,195 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Project {
+  id              String    @id @default(cuid())
+  name            String
+  clientName      String?
+  status          String    @default("draft")
+  measurementMode String    @default("net")
+  wasteFactor     Float     @default(0.10)
+  markup          Float     @default(0.20)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  plans           Plan[]
+  specs           Spec[]
+  surfaces        Surface[]
+  chatMessages    ChatMessage[]
+  bidVersions     BidVersion[]
+  auditEntries    AuditEntry[]
+}
+
+model Plan {
+  id        String     @id @default(cuid())
+  projectId String
+  project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  filename  String
+  filePath  String
+  pageCount Int
+  createdAt DateTime   @default(now())
+  pages     PlanPage[]
+}
+
+model PlanPage {
+  id          String    @id @default(cuid())
+  planId      String
+  plan        Plan      @relation(fields: [planId], references: [id], onDelete: Cascade)
+  pageNumber  Int
+  imagePath   String?
+  width       Int?
+  height      Int?
+  scaleRatio  Float?
+  aiProcessed Boolean   @default(false)
+  surfaces    Surface[]
+}
+
+model Surface {
+  id            String   @id @default(cuid())
+  projectId     String
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  planPageId    String
+  planPage      PlanPage @relation(fields: [planPageId], references: [id], onDelete: Cascade)
+  type          String
+  paintType     String?
+  coats         Int      @default(2)
+  substrate     String?
+  roomLabel     String?
+  polygon       String
+  squareFootage Float?
+  linearFootage Float?
+  count         Int?
+  confidence    Float
+  status        String   @default("proposed")
+  source        String
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Spec {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  filename  String
+  filePath  String
+  aiSummary String?
+  flags     String?
+  createdAt DateTime @default(now())
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  role      String
+  content   String
+  toolCalls String?
+  createdAt DateTime @default(now())
+}
+
+model BidVersion {
+  id               String   @id @default(cuid())
+  projectId        String
+  project          Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  versionNumber    Int
+  totalMaterial    Float
+  totalLabor       Float
+  totalOverhead    Float
+  totalMarkup      Float
+  grandTotal       Float
+  lineItems        String
+  generatedPdfPath String?
+  createdAt        DateTime @default(now())
+}
+
+model AuditEntry {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  action    String
+  source    String
+  before    String?
+  after     String?
+  createdAt DateTime @default(now())
+}
+
+model PainterRule {
+  id        String   @id @default(cuid())
+  category  String
+  rule      String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model ToolChestItem {
+  id             String   @id @default(cuid())
+  name           String
+  category       String
+  paintType      String
+  coats          Int
+  productionRate Float
+  wasteFactor    Float
+  laborRate      Float
+  paintCost      Float
+  notes          String?
+  createdAt      DateTime @default(now())
+}
+
+model LaborRate {
+  id          String  @id @default(cuid())
+  surfaceType String
+  unit        String
+  rate        Float
+  hourlyCost  Float
+  notes       String?
+}
+
+model PaintProduct {
+  id              String  @id @default(cuid())
+  brand           String
+  sku             String
+  name            String
+  finish          String
+  coverageSqftGal Float
+  pricePerGal     Float
+  notes           String?
+}
+
+model ApiUsage {
+  id            String   @id @default(cuid())
+  endpoint      String
+  model         String
+  inputTokens   Int
+  outputTokens  Int
+  estimatedCost Float
+  createdAt     DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model RateLimitCounter {
+  id      String   @id @default(cuid())
+  key     String   @unique
+  count   Int      @default(0)
+  resetAt DateTime
+
+  @@index([key])
+}
+
+model AiCache {
+  id        String   @id @default(cuid())
+  cacheKey  String   @unique
+  endpoint  String
+  response  String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([cacheKey])
+  @@index([expiresAt])
+}

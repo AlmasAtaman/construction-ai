@@ -1,0 +1,554 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - link "DuckDuckGo home" [ref=e7] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e9]: DuckDuckGo
+          - generic [ref=e15]:
+            - combobox "Search privately" [ref=e17]: simple commercial floor plan with labeled room dimensions filetype:pdf
+            - button "search" [ref=e19] [cursor=pointer]:
+              - img [ref=e20]
+        - generic [ref=e22]:
+          - generic [ref=e23]:
+            - generic [ref=e25]:
+              - banner [ref=e26]:
+                - img [ref=e27]
+                - paragraph [ref=e28]: Upgrade to our browser.
+              - generic [ref=e29]:
+                - generic [ref=e30]:
+                  - img [ref=e31]
+                  - generic [ref=e32]:
+                    - img [ref=e33]
+                    - img [ref=e34]
+                - paragraph [ref=e35]:
+                  - generic [ref=e36]:
+                    - text: Try the
+                    - strong [ref=e37]: DuckDuckGo Browser.
+                    - text: Fast. Free. Private.
+                - link "Download Browser" [ref=e38] [cursor=pointer]:
+                  - /url: https://duckduckgo.com/windows?origin=funnel_browser_searchresults__popover
+                  - img [ref=e39]
+                  - generic [ref=e41]: Download Browser
+              - paragraph [ref=e44]:
+                - generic [ref=e45]: Free
+            - button [ref=e47] [cursor=pointer]:
+              - img [ref=e48]
+          - button "Open menu" [ref=e50] [cursor=pointer]:
+            - generic [ref=e51]: Open menu
+            - img [ref=e52]
+      - navigation [ref=e58]:
+        - list [ref=e59]:
+          - listitem [ref=e60]:
+            - link "All" [ref=e61] [cursor=pointer]:
+              - /url: /?q=simple+commercial+floor+plan+with+labeled+room+dimensions+filetype%3Apdf&ia=web
+              - img [ref=e62]
+              - text: All
+          - listitem [ref=e64]:
+            - link "Images" [ref=e65] [cursor=pointer]:
+              - /url: /?q=simple+commercial+floor+plan+with+labeled+room+dimensions+filetype%3Apdf&ia=images&iax=images
+          - listitem [ref=e66]:
+            - link "Videos" [ref=e67] [cursor=pointer]:
+              - /url: /?q=simple+commercial+floor+plan+with+labeled+room+dimensions+filetype%3Apdf&ia=videos&iax=videos
+          - listitem [ref=e68]:
+            - link "News" [ref=e69] [cursor=pointer]:
+              - /url: /?q=simple+commercial+floor+plan+with+labeled+room+dimensions+filetype%3Apdf&ia=news&iar=news
+          - listitem [ref=e70]:
+            - generic [ref=e71]:
+              - generic [ref=e72] [cursor=pointer]:
+                - generic [ref=e74]: More
+                - img [ref=e75]: ▼
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - link "Maps":
+                          - /url: /?q=simple+commercial+floor+plan+with+labeled+room+dimensions+filetype%3Apdf&iaxm=maps
+                  - generic:
+                    - generic:
+                      - generic:
+                        - link "Shopping":
+                          - /url: /?q=simple+commercial+floor+plan+with+labeled+room+dimensions+filetype%3Apdf&ia=shopping&iax=shopping
+        - list [ref=e77]:
+          - listitem [ref=e78]:
+            - link "Search Assist" [ref=e81] [cursor=pointer]:
+              - /url: /?q=simple+commercial+floor+plan+with+labeled+room+dimensions+filetype%3Apdf&ia=web&assist=true
+              - img [ref=e82]
+              - generic [ref=e85]: Search Assist
+          - listitem [ref=e86]:
+            - link "Duck.ai" [ref=e88] [cursor=pointer]:
+              - /url: /?q=simple+commercial+floor+plan+with+labeled+room+dimensions+filetype%3Apdf&ia=chat
+              - img [ref=e89]
+              - text: Duck.ai
+          - listitem [ref=e92]:
+            - button "Search Settings ✀" [ref=e94] [cursor=pointer]:
+              - img [ref=e95]
+              - generic [ref=e97]: Search Settings
+              - generic [ref=e100]: ✀
+    - generic [ref=e105]:
+      - navigation [ref=e107]:
+        - generic [ref=e110] [cursor=pointer]:
+          - generic [ref=e118]: Protected
+          - img [ref=e119]: ▼
+        - generic [ref=e123] [cursor=pointer]:
+          - generic [ref=e126]:
+            - switch "✓" [ref=e127]: ✓
+            - generic [ref=e129]: Canada (en)
+          - img [ref=e130]: ▼
+        - generic [ref=e134] [cursor=pointer]:
+          - generic [ref=e135]: "Safe search: moderate"
+          - img [ref=e136]: ▼
+        - generic [ref=e140] [cursor=pointer]:
+          - generic [ref=e141]: Any time
+          - img [ref=e142]: ▼
+      - generic [ref=e145]:
+        - list [ref=e146]:
+          - listitem [ref=e147]:
+            - article [ref=e148] [cursor=pointer]:
+              - button [ref=e150]:
+                - img [ref=e151]
+              - link "Capterra https://www.capterra.com › Blueprints › Free-List" [ref=e157]:
+                - /url: https://duckduckgo.com/y.js?ad_domain=capterra.com&ad_provider=bingv7aa&ad_type=txad&click_metadata=9Fv35qDReoRuJ3xcMV0QOyPAw8iRTwGZGuHVDTzcqoe443KUge7zqJp7BX9S7QSJN_ck1cqV6M6mCyfOk7dsEChnrHjek_oxdZ_9lIFjycnCp3VOuAXqk8A3nLNdofkZQoOYpXfawCXKvwQPBcResBWa%2DCRCArcNA2GC4beSf8Y.T6B9NbGVsdA5NX2PnjHEJg&eddgt=x9DzyYkO5%2DOhKHktJBw_NA%3D%3D&rut=e830ae6df63abfaf16d0e84286ba2f71930ba61fe6fa0c18cfb788a8fbbde272&u3=https%3A%2F%2Fwww.bing.com%2Faclick%3Fld%3De8he4rPCqTwUAoS%2D367Kq79jVUCUzhHBt78DpwHC2RvF5_REpA%2DE%2DQwqqUCajHdyzHZXxyTC9%2DaZ_Z3euve%2DXTplzosatCxnyPN_xijCRLr_WhRPwKLf_mVBp78BABcESOCKoIaj6YR4hA7XQ0ktckXLzK7_b64pCnSCHTvdRupu%2D_Ik2RhlCGKN6F0DffMK6Y2DU5WtzBn1DvJAovwCvYiQzyAOK8sslTlTMrQXg8igF_shTnNSBOY4qFW02l6qshEykl7haoXORnEXXf5IaqdCDdsqTmn%2DFt7kIqQjaFM0cmfrMPlhDk0LGi_eXjVeZlCDNLDgCkNHCfdJBaU6wnFeL4NxTgUitf0lgt5r093ZzLXLlRiRnY8dY9br8xVflAADu1KRSLGGaiiuRSmN7XXqRhMNCeY6UtChpNwBmH7LwnyojIZeeM5JqBR4o1EIKHiAKANghgX9uHnk5VH7BKRgBA2WRMfB2haMKoh3wfxj2RhYp2%2DxCa0phC1COXQzubo3rvDoUS8AYAy5VKC3Zi3s6m7v6JsiLXpvb2dbM04iyM6LUW3ODYi41JcVfAqWPndYXaattlRZHX1HNRGkTJEJB1yuk3_0lDXPReI4AF9ScfDVEB1TnxJseDmlTVntXiDY3xEaLZ4aI_VFzhAYVweWoCfF4puASiA85qMDnLB7gaKZ4VJ1DZEQigfKvaZZx9ghVHXPSLVCa2nfIxx%2D6i4INfI%2Da7iSou5r349hUh5fbw7O2tyZzxWUJ92mv4h9njT5_dzq0nEes8jkhbaD%2DVsNYVW1k%26u%3DaHR0cHMlM2ElMmYlMmZ3d3cuY2FwdGVycmEuY29tJTJmbXNuY2xpY2slM2Z1cmwlM2Rjb25zdHJ1Y3Rpb24tbWFuYWdlbWVudC1zb2Z0d2FyZSUyNmhlYWRsaW5lJTNkQmx1ZXByaW50cyUyNTIwVG9vbHMlMjZjb21wYXJlX3NscCUzZHRydWUlMjZwdHlwZSUzZGJpbmclMjZhY2NvdW50X2NhbXBhaWduX2lkJTNkNjk4MTM3NTc5JTI2YWNjb3VudF9hZGdyb3VwX2lkJTNkMTI0OTA0NjUxMTg1NDI3OCUyNnRhcmdldCUzZGJ1aWxkJTI1MjBhJTI1MjBibHVlcHJpbnQlMjZhZF9pZCUzZCUyNm1hdGNodHlwZSUzZHAlMjZ1dG1fc291cmNlJTNkcHMtYmluZyUyNnV0bV9tZWRpdW0lM2RwcGMlMjZ1dG1fY2FtcGFpZ24lM2QlM2ExJTNhQ0FQJTNhMiUzYUNPTSUzYTMlM2FBbGwlM2E0JTNhSU5UTCUzYTUlM2FCQVUlM2E2JTNhU09GJTNhNyUzYURlc2t0b3AlM2E4JTNhQlIlM2E5JTNhQ29uc3RydWN0aW9uX01hbmFnZW1lbnQlMjZuZXR3b3JrJTNkbyUyNm1zY2xraWQlM2QyYTMxZmY1MmIyYTkxZDYxYTg0ZDk1NTUwOTE2YzMyZA%26rlid%3D2a31ff52b2a91d61a84d95550916c32d&vqd=4-133030635900939614130818235459002185934&iurl=%7B1%7DIG%3D8EE1A5B7BC0F41FFA063E93543B64511%26CID%3D1B6F153CD10B69BD389A0267D0DE6883%26ID%3DDevEx%2C5039.1
+                - img [ref=e160]
+                - generic [ref=e161]:
+                  - paragraph [ref=e162]: Capterra
+                  - paragraph [ref=e163]:
+                    - generic [ref=e164]: https://www.capterra.com
+                    - generic [ref=e165]: › Blueprints › Free-List
+              - heading "Top 10 Blueprints Tools - Free List of the Top Products Ad" [level=2] [ref=e167]:
+                - link "Top 10 Blueprints Tools - Free List of the Top Products" [ref=e168]:
+                  - /url: https://duckduckgo.com/y.js?ad_domain=capterra.com&ad_provider=bingv7aa&ad_type=txad&click_metadata=9Fv35qDReoRuJ3xcMV0QOyPAw8iRTwGZGuHVDTzcqoe443KUge7zqJp7BX9S7QSJN_ck1cqV6M6mCyfOk7dsEChnrHjek_oxdZ_9lIFjycnCp3VOuAXqk8A3nLNdofkZQoOYpXfawCXKvwQPBcResBWa%2DCRCArcNA2GC4beSf8Y.T6B9NbGVsdA5NX2PnjHEJg&eddgt=x9DzyYkO5%2DOhKHktJBw_NA%3D%3D&rut=e830ae6df63abfaf16d0e84286ba2f71930ba61fe6fa0c18cfb788a8fbbde272&u3=https%3A%2F%2Fwww.bing.com%2Faclick%3Fld%3De8he4rPCqTwUAoS%2D367Kq79jVUCUzhHBt78DpwHC2RvF5_REpA%2DE%2DQwqqUCajHdyzHZXxyTC9%2DaZ_Z3euve%2DXTplzosatCxnyPN_xijCRLr_WhRPwKLf_mVBp78BABcESOCKoIaj6YR4hA7XQ0ktckXLzK7_b64pCnSCHTvdRupu%2D_Ik2RhlCGKN6F0DffMK6Y2DU5WtzBn1DvJAovwCvYiQzyAOK8sslTlTMrQXg8igF_shTnNSBOY4qFW02l6qshEykl7haoXORnEXXf5IaqdCDdsqTmn%2DFt7kIqQjaFM0cmfrMPlhDk0LGi_eXjVeZlCDNLDgCkNHCfdJBaU6wnFeL4NxTgUitf0lgt5r093ZzLXLlRiRnY8dY9br8xVflAADu1KRSLGGaiiuRSmN7XXqRhMNCeY6UtChpNwBmH7LwnyojIZeeM5JqBR4o1EIKHiAKANghgX9uHnk5VH7BKRgBA2WRMfB2haMKoh3wfxj2RhYp2%2DxCa0phC1COXQzubo3rvDoUS8AYAy5VKC3Zi3s6m7v6JsiLXpvb2dbM04iyM6LUW3ODYi41JcVfAqWPndYXaattlRZHX1HNRGkTJEJB1yuk3_0lDXPReI4AF9ScfDVEB1TnxJseDmlTVntXiDY3xEaLZ4aI_VFzhAYVweWoCfF4puASiA85qMDnLB7gaKZ4VJ1DZEQigfKvaZZx9ghVHXPSLVCa2nfIxx%2D6i4INfI%2Da7iSou5r349hUh5fbw7O2tyZzxWUJ92mv4h9njT5_dzq0nEes8jkhbaD%2DVsNYVW1k%26u%3DaHR0cHMlM2ElMmYlMmZ3d3cuY2FwdGVycmEuY29tJTJmbXNuY2xpY2slM2Z1cmwlM2Rjb25zdHJ1Y3Rpb24tbWFuYWdlbWVudC1zb2Z0d2FyZSUyNmhlYWRsaW5lJTNkQmx1ZXByaW50cyUyNTIwVG9vbHMlMjZjb21wYXJlX3NscCUzZHRydWUlMjZwdHlwZSUzZGJpbmclMjZhY2NvdW50X2NhbXBhaWduX2lkJTNkNjk4MTM3NTc5JTI2YWNjb3VudF9hZGdyb3VwX2lkJTNkMTI0OTA0NjUxMTg1NDI3OCUyNnRhcmdldCUzZGJ1aWxkJTI1MjBhJTI1MjBibHVlcHJpbnQlMjZhZF9pZCUzZCUyNm1hdGNodHlwZSUzZHAlMjZ1dG1fc291cmNlJTNkcHMtYmluZyUyNnV0bV9tZWRpdW0lM2RwcGMlMjZ1dG1fY2FtcGFpZ24lM2QlM2ExJTNhQ0FQJTNhMiUzYUNPTSUzYTMlM2FBbGwlM2E0JTNhSU5UTCUzYTUlM2FCQVUlM2E2JTNhU09GJTNhNyUzYURlc2t0b3AlM2E4JTNhQlIlM2E5JTNhQ29uc3RydWN0aW9uX01hbmFnZW1lbnQlMjZuZXR3b3JrJTNkbyUyNm1zY2xraWQlM2QyYTMxZmY1MmIyYTkxZDYxYTg0ZDk1NTUwOTE2YzMyZA%26rlid%3D2a31ff52b2a91d61a84d95550916c32d&vqd=4-133030635900939614130818235459002185934&iurl=%7B1%7DIG%3D8EE1A5B7BC0F41FFA063E93543B64511%26CID%3D1B6F153CD10B69BD389A0267D0DE6883%26ID%3DDevEx%2C5039.1
+                - button "Ad" [ref=e171]
+              - generic [ref=e174]:
+                - link "Easily Find The Blueprints Tools You're Looking For w/ Our Comparison Grid. No Matter Your Mission, Get The Right Blueprints Tools To Accomplish It." [ref=e175]:
+                  - /url: https://duckduckgo.com/y.js?ad_domain=capterra.com&ad_provider=bingv7aa&ad_type=txad&click_metadata=9Fv35qDReoRuJ3xcMV0QOyPAw8iRTwGZGuHVDTzcqoe443KUge7zqJp7BX9S7QSJN_ck1cqV6M6mCyfOk7dsEChnrHjek_oxdZ_9lIFjycnCp3VOuAXqk8A3nLNdofkZQoOYpXfawCXKvwQPBcResBWa%2DCRCArcNA2GC4beSf8Y.T6B9NbGVsdA5NX2PnjHEJg&eddgt=x9DzyYkO5%2DOhKHktJBw_NA%3D%3D&rut=e830ae6df63abfaf16d0e84286ba2f71930ba61fe6fa0c18cfb788a8fbbde272&u3=https%3A%2F%2Fwww.bing.com%2Faclick%3Fld%3De8he4rPCqTwUAoS%2D367Kq79jVUCUzhHBt78DpwHC2RvF5_REpA%2DE%2DQwqqUCajHdyzHZXxyTC9%2DaZ_Z3euve%2DXTplzosatCxnyPN_xijCRLr_WhRPwKLf_mVBp78BABcESOCKoIaj6YR4hA7XQ0ktckXLzK7_b64pCnSCHTvdRupu%2D_Ik2RhlCGKN6F0DffMK6Y2DU5WtzBn1DvJAovwCvYiQzyAOK8sslTlTMrQXg8igF_shTnNSBOY4qFW02l6qshEykl7haoXORnEXXf5IaqdCDdsqTmn%2DFt7kIqQjaFM0cmfrMPlhDk0LGi_eXjVeZlCDNLDgCkNHCfdJBaU6wnFeL4NxTgUitf0lgt5r093ZzLXLlRiRnY8dY9br8xVflAADu1KRSLGGaiiuRSmN7XXqRhMNCeY6UtChpNwBmH7LwnyojIZeeM5JqBR4o1EIKHiAKANghgX9uHnk5VH7BKRgBA2WRMfB2haMKoh3wfxj2RhYp2%2DxCa0phC1COXQzubo3rvDoUS8AYAy5VKC3Zi3s6m7v6JsiLXpvb2dbM04iyM6LUW3ODYi41JcVfAqWPndYXaattlRZHX1HNRGkTJEJB1yuk3_0lDXPReI4AF9ScfDVEB1TnxJseDmlTVntXiDY3xEaLZ4aI_VFzhAYVweWoCfF4puASiA85qMDnLB7gaKZ4VJ1DZEQigfKvaZZx9ghVHXPSLVCa2nfIxx%2D6i4INfI%2Da7iSou5r349hUh5fbw7O2tyZzxWUJ92mv4h9njT5_dzq0nEes8jkhbaD%2DVsNYVW1k%26u%3DaHR0cHMlM2ElMmYlMmZ3d3cuY2FwdGVycmEuY29tJTJmbXNuY2xpY2slM2Z1cmwlM2Rjb25zdHJ1Y3Rpb24tbWFuYWdlbWVudC1zb2Z0d2FyZSUyNmhlYWRsaW5lJTNkQmx1ZXByaW50cyUyNTIwVG9vbHMlMjZjb21wYXJlX3NscCUzZHRydWUlMjZwdHlwZSUzZGJpbmclMjZhY2NvdW50X2NhbXBhaWduX2lkJTNkNjk4MTM3NTc5JTI2YWNjb3VudF9hZGdyb3VwX2lkJTNkMTI0OTA0NjUxMTg1NDI3OCUyNnRhcmdldCUzZGJ1aWxkJTI1MjBhJTI1MjBibHVlcHJpbnQlMjZhZF9pZCUzZCUyNm1hdGNodHlwZSUzZHAlMjZ1dG1fc291cmNlJTNkcHMtYmluZyUyNnV0bV9tZWRpdW0lM2RwcGMlMjZ1dG1fY2FtcGFpZ24lM2QlM2ExJTNhQ0FQJTNhMiUzYUNPTSUzYTMlM2FBbGwlM2E0JTNhSU5UTCUzYTUlM2FCQVUlM2E2JTNhU09GJTNhNyUzYURlc2t0b3AlM2E4JTNhQlIlM2E5JTNhQ29uc3RydWN0aW9uX01hbmFnZW1lbnQlMjZuZXR3b3JrJTNkbyUyNm1zY2xraWQlM2QyYTMxZmY1MmIyYTkxZDYxYTg0ZDk1NTUwOTE2YzMyZA%26rlid%3D2a31ff52b2a91d61a84d95550916c32d&vqd=4-133030635900939614130818235459002185934&iurl=%7B1%7DIG%3D8EE1A5B7BC0F41FFA063E93543B64511%26CID%3D1B6F153CD10B69BD389A0267D0DE6883%26ID%3DDevEx%2C5039.1
+                - 'link "Types: Contract Management, Subcontractor Management" [ref=e177]':
+                  - /url: https://duckduckgo.com/y.js?ad_domain=capterra.com&ad_provider=bingv7aa&ad_type=txad&click_metadata=9Fv35qDReoRuJ3xcMV0QOyPAw8iRTwGZGuHVDTzcqoe443KUge7zqJp7BX9S7QSJN_ck1cqV6M6mCyfOk7dsEChnrHjek_oxdZ_9lIFjycnCp3VOuAXqk8A3nLNdofkZQoOYpXfawCXKvwQPBcResBWa%2DCRCArcNA2GC4beSf8Y.T6B9NbGVsdA5NX2PnjHEJg&eddgt=x9DzyYkO5%2DOhKHktJBw_NA%3D%3D&rut=e830ae6df63abfaf16d0e84286ba2f71930ba61fe6fa0c18cfb788a8fbbde272&u3=https%3A%2F%2Fwww.bing.com%2Faclick%3Fld%3De8he4rPCqTwUAoS%2D367Kq79jVUCUzhHBt78DpwHC2RvF5_REpA%2DE%2DQwqqUCajHdyzHZXxyTC9%2DaZ_Z3euve%2DXTplzosatCxnyPN_xijCRLr_WhRPwKLf_mVBp78BABcESOCKoIaj6YR4hA7XQ0ktckXLzK7_b64pCnSCHTvdRupu%2D_Ik2RhlCGKN6F0DffMK6Y2DU5WtzBn1DvJAovwCvYiQzyAOK8sslTlTMrQXg8igF_shTnNSBOY4qFW02l6qshEykl7haoXORnEXXf5IaqdCDdsqTmn%2DFt7kIqQjaFM0cmfrMPlhDk0LGi_eXjVeZlCDNLDgCkNHCfdJBaU6wnFeL4NxTgUitf0lgt5r093ZzLXLlRiRnY8dY9br8xVflAADu1KRSLGGaiiuRSmN7XXqRhMNCeY6UtChpNwBmH7LwnyojIZeeM5JqBR4o1EIKHiAKANghgX9uHnk5VH7BKRgBA2WRMfB2haMKoh3wfxj2RhYp2%2DxCa0phC1COXQzubo3rvDoUS8AYAy5VKC3Zi3s6m7v6JsiLXpvb2dbM04iyM6LUW3ODYi41JcVfAqWPndYXaattlRZHX1HNRGkTJEJB1yuk3_0lDXPReI4AF9ScfDVEB1TnxJseDmlTVntXiDY3xEaLZ4aI_VFzhAYVweWoCfF4puASiA85qMDnLB7gaKZ4VJ1DZEQigfKvaZZx9ghVHXPSLVCa2nfIxx%2D6i4INfI%2Da7iSou5r349hUh5fbw7O2tyZzxWUJ92mv4h9njT5_dzq0nEes8jkhbaD%2DVsNYVW1k%26u%3DaHR0cHMlM2ElMmYlMmZ3d3cuY2FwdGVycmEuY29tJTJmbXNuY2xpY2slM2Z1cmwlM2Rjb25zdHJ1Y3Rpb24tbWFuYWdlbWVudC1zb2Z0d2FyZSUyNmhlYWRsaW5lJTNkQmx1ZXByaW50cyUyNTIwVG9vbHMlMjZjb21wYXJlX3NscCUzZHRydWUlMjZwdHlwZSUzZGJpbmclMjZhY2NvdW50X2NhbXBhaWduX2lkJTNkNjk4MTM3NTc5JTI2YWNjb3VudF9hZGdyb3VwX2lkJTNkMTI0OTA0NjUxMTg1NDI3OCUyNnRhcmdldCUzZGJ1aWxkJTI1MjBhJTI1MjBibHVlcHJpbnQlMjZhZF9pZCUzZCUyNm1hdGNodHlwZSUzZHAlMjZ1dG1fc291cmNlJTNkcHMtYmluZyUyNnV0bV9tZWRpdW0lM2RwcGMlMjZ1dG1fY2FtcGFpZ24lM2QlM2ExJTNhQ0FQJTNhMiUzYUNPTSUzYTMlM2FBbGwlM2E0JTNhSU5UTCUzYTUlM2FCQVUlM2E2JTNhU09GJTNhNyUzYURlc2t0b3AlM2E4JTNhQlIlM2E5JTNhQ29uc3RydWN0aW9uX01hbmFnZW1lbnQlMjZuZXR3b3JrJTNkbyUyNm1zY2xraWQlM2QyYTMxZmY1MmIyYTkxZDYxYTg0ZDk1NTUwOTE2YzMyZA%26rlid%3D2a31ff52b2a91d61a84d95550916c32d&vqd=4-133030635900939614130818235459002185934&iurl=%7B1%7DIG%3D8EE1A5B7BC0F41FFA063E93543B64511%26CID%3D1B6F153CD10B69BD389A0267D0DE6883%26ID%3DDevEx%2C5039.1
+              - list [ref=e180]:
+                - listitem [ref=e181]:
+                  - link "Top 10 Drawing Software" [ref=e182]:
+                    - /url: https://duckduckgo.com/y.js?ad_domain=capterra.com&ad_provider=bingv7aa&ad_type=txad&click_metadata=_9tLsGErW39LHzNB6jgNAV82RftmpTyKnKIqtIbaBFhUu9kwFHQCAXrGmCPZqvcpf6Ol2aRmzkctgL6KuZ5_1b6ontOkvXcdEZFWDjffn%2DKijeijoc2NoJruXHXQEkE3A2t1DvPQM4NupqnhXbgPOQ.%2D2yVvf6AqoAZ2JSVzYc7_g&eddgt=x9DzyYkO5%2DOhKHktJBw_NA%3D%3D&rut=1d76ba730ac2caa7816c61fb3b7525d0e3cf281ded4d56d23400f2cb9ea0c955&u3=https%3A%2F%2Fwww.bing.com%2Faclick%3Fld%3De88hfr7KFwAyyWN_1QrjLudDVUCUzawtWlOB4ygfX4vmMvKSEXZkDBqUe1qLS3Bx4qZKF_kTsfk0DSnsC4T3HBaSpwR_QarFhwH5BRKlCDBvMEleuB2H2a1npF2RbKIRujmRSbB_UvwhDa8m5dyrH6KItjL8DNcMwEqc2j5M3186%2DY3ifwtcNcnnMJw3wK5NBgvtnVuyy2kWWrrgBNupLMPYRbycUVZDkJya8HjjGhYY%2Da6bQVW0iIlVn_bKiJTccZSPerh72S6IvsfdMScc8Io9rNkonOQfKnRhAKTY1SvBdHVV6JkaX51o_Wa7RZuXEFBcyi_%2D%2D7slerd5NU_rrI9N4oGahXaqa4UNWR4ckufU1QaxyL58cHuzSgssZuqMIlTRSDZeG8ZMs35EizThuMkd67AgEFjdt3CVURKAJVDlyRMv4mZ_ID4fHFviMMw25WuNRbic00WWz72jVrhyVRCw3sSdGgUkErkNzol65ycJ2JpyyFQe0TcjoTZOvyunt9jKiWNbx75YDk3AYAxM1xePTKQLF_umtHjhNYcdoRfW1dxHqAc8Bxz6uiB9_reGVFKXz_KPX_7RWfaLv8TKW1Temh0Z1MnuZn6HyicXSZhoGDuy0IbrwmzrG2tAz%2DaKkBFPEBvdggl5BoQOTss99maHYr6pYwbzxwJR2Q0r8h4Gh9IvkQcnAIrU_600O2R70FAbV80OSOY%2DDFIbzKCuCRh8iq8o44ZFMxyJvKYL27vozNbBqIARbdR5wtQCNA%2DLpmKaQPezT495lG4tSLoyYA_i2DXgg%26u%3DaHR0cHMlM2ElMmYlMmZ3d3cuY2FwdGVycmEuY29tJTJmbXNuY2xpY2slM2Z1cmwlM2Rjb25zdHJ1Y3Rpb24tbWFuYWdlbWVudC1zb2Z0d2FyZSUyNmhlYWRsaW5lJTNkY29uc3RydWN0aW9uJTI1MjBkcmF3aW5nJTI1MjBzb2Z0d2FyZSUyNmNvbXBhcmVfc2xwJTNkdHJ1ZSUyNnB0eXBlJTNkYmluZyUyNm1zY2xraWQlM2RjZWNmYjBhNjQ1NGIxMDVjNTdkZmRhYTFmZWY0YjI3OSUyNmFjY291bnRfY2FtcGFpZ25faWQlM2Q2OTgxMzc1NzklMjZhY2NvdW50X2FkZ3JvdXBfaWQlM2QxMjQ5MDQ2NTExODU0Mjc4JTI2dGFyZ2V0JTNkYnVpbGQlMjUyMGElMjUyMGJsdWVwcmludCUyNmFkX2lkJTNkJTI2bWF0Y2h0eXBlJTNkcCUyNnV0bV9zb3VyY2UlM2Rwcy1iaW5nJTI2dXRtX21lZGl1bSUzZHBwYyUyNnV0bV9jYW1wYWlnbiUzZCUzYTElM2FDQVAlM2EyJTNhQ09NJTNhMyUzYUFsbCUzYTQlM2FJTlRMJTNhNSUzYUJBVSUzYTYlM2FTT0YlM2E3JTNhRGVza3RvcCUzYTglM2FCUiUzYTklM2FDb25zdHJ1Y3Rpb25fTWFuYWdlbWVudCUyNm5ldHdvcmslM2Rv%26rlid%3Dcecfb0a6454b105c57dfdaa1fef4b279&vqd=4-229668330511992070469166374190386674581&iurl=%7B1%7DIG%3D8EE1A5B7BC0F41FFA063E93543B64511%26CID%3D1B6F153CD10B69BD389A0267D0DE6883%26ID%3DDevEx%2C5044.1
+                - listitem [ref=e183]:
+                  - text: ‧
+                  - link "Construction Estimating" [ref=e184]:
+                    - /url: https://duckduckgo.com/y.js?ad_domain=capterra.com&ad_provider=bingv7aa&ad_type=txad&click_metadata=d%2DyBg5W7xHIEjLsze9CcCmrzTRyKjBedL0%2DSEE7Q0MYpdc6noo_6akZU2vxngQzwSC9UUo5%2D2ijxPE6qu2ju4FdCu1yVgPE8KBGdsK34D7sYYT9z_BtO5dW3iis22hjsCy6Cz8nsB2gSxbSJt4uOOA.AQ6jUIjbAQm0KihoazORwA&eddgt=x9DzyYkO5%2DOhKHktJBw_NA%3D%3D&rut=ec71eab99e59e57ed62262c5b2df4e8698e2339e8ad92a62d881323691b2e2b0&u3=https%3A%2F%2Fwww.bing.com%2Faclick%3Fld%3De8JsC_y88DzTjMWquw39DWHzVUCUxtJtc354dqWT2jNkIs5N%2DQM7SiJ1OTfSR21c%2DZ_aLW6THNvf8umJKtwN6y5IaEWkIBWhZq4d6ClwqguT%2DkqOevhGU%2D8W1xoSq3dlvIztMi%2Dv1VAHSBWd_wBn8oAel_zj15NxI_LdaYMdtEBubObqCg6odGJoIodJoLDyKtPk6I3VyIoyFqrHAZfnd_DST2%2D9YnuMnA%2D9ctGL_zfran6cQ%2DiyIGM9TyOHD6ywX%2DiKBUajNWkoS9CcQEd2aeMAOqr5K0Ij5t8PKAU_K6pnwGLniqpUkFzfB8r2RSioD%2D36%2DmpEANFj40aYJpwOdzjlSYvlpiZp9heltxmU4lQv3Zee8IZxOs7jnMxzEoGiByjRs0DcVvTmxJpXZKpDFJfw3Tu79twLwicXi62g1_RG22f2eE3wglXFQJayITCHDXGz9N7MrEbicPCO3_M2qlvmDN24T1enYZUV88_pg9o14j8T6k81HUcxS7iMrm%2D3ky2kNXN2yq3sFZQEygo6idCEU%2DZzRBKN22p_9GJewCCaofgYNvPzM3dh5fHdUionQ9H9S0LTILfFkRuXi2Ze0C0QJ1nDRifGljk0B1sel0KvpEitYP1SDTjXx9lnzeJxFwqhnohoF2ubU80nFyZaj_yzp8%2DUg2fvgEcFK3Rvl9uJJJ7e38yi5WefGNHgvTS9axAE7blS0SUjI810DIUzhs_wpTlgolfKXpQXgzlVeUL12PVeZ59Q_T%2D7EB6PK6eYt_noI9P4JaG_zd0Fvpm8m7U2qfQgY%26u%3DaHR0cHMlM2ElMmYlMmZ3d3cuY2FwdGVycmEuY29tJTJmbXNuY2xpY2slM2Z1cmwlM2Rjb25zdHJ1Y3Rpb24tZXN0aW1hdGluZy1zb2Z0d2FyZSUyNmNvbXBhcmVfc2xwJTNkdHJ1ZSUyNmhlYWRsaW5lJTNkQ29uc3RydWN0aW9uJTI1MjBFc3RpbWF0aW5nJTI1MjBTb2Z0d2FyZSUyNnB0eXBlJTNkYmluZyUyNmFjY291bnRfY2FtcGFpZ25faWQlM2Q2OTgxMzc1NzklMjZhY2NvdW50X2FkZ3JvdXBfaWQlM2QxMjQ5MDQ2NTExODU0Mjc4JTI2dGFyZ2V0JTNkYnVpbGQlMjUyMGElMjUyMGJsdWVwcmludCUyNmFkX2lkJTNkJTI2bWF0Y2h0eXBlJTNkcCUyNnV0bV9zb3VyY2UlM2Rwcy1iaW5nJTI2dXRtX21lZGl1bSUzZHBwYyUyNm1zY2xraWQlM2RkMmQ1MWVlMjEzZjYxYzBlNTI1Nzc0ZTVhODQ5MTBkZCUyNmFjY291bnRfY2FtcGFpZ25faWQlM2Q2OTgxMzc1NzklMjZhY2NvdW50X2FkZ3JvdXBfaWQlM2QxMjQ5MDQ2NTExODU0Mjc4JTI2dGFyZ2V0JTNkYnVpbGQlMjUyMGElMjUyMGJsdWVwcmludCUyNmFkX2lkJTNkJTI2bWF0Y2h0eXBlJTNkcCUyNnV0bV9zb3VyY2UlM2Rwcy1iaW5nJTI2dXRtX21lZGl1bSUzZHBwYyUyNnV0bV9jYW1wYWlnbiUzZCUzYTElM2FDQVAlM2EyJTNhQ09NJTNhMyUzYUFsbCUzYTQlM2FJTlRMJTNhNSUzYUJBVSUzYTYlM2FTT0YlM2E3JTNhRGVza3RvcCUzYTglM2FCUiUzYTklM2FDb25zdHJ1Y3Rpb25fTWFuYWdlbWVudCUyNm5ldHdvcmslM2Rv%26rlid%3Dd2d51ee213f61c0e525774e5a84910dd&vqd=4-297828471149352210290191151911840120895&iurl=%7B1%7DIG%3D8EE1A5B7BC0F41FFA063E93543B64511%26CID%3D1B6F153CD10B69BD389A0267D0DE6883%26ID%3DDevEx%2C5046.1
+                - listitem [ref=e185]:
+                  - text: ‧
+                  - link "Top Floor Plan Drawing..." [ref=e186]:
+                    - /url: https://duckduckgo.com/y.js?ad_domain=capterra.com&ad_provider=bingv7aa&ad_type=txad&click_metadata=HSdS8FqAeAk4zln8JmO8PBt4oTbljRtneEXKcSDeSWi%2DcjBVJ5TA90ezpC3xqQhz5U7az4F_k27KjjQ72Ei09Jbftkf9tF7kBBgqBOJO_ppMrMpM8RNjtTuovH7NgYIjRUaXDshpeTldJc3WU6pmTQ.dyEqW1qq8pnCE2RWsV8usA&eddgt=x9DzyYkO5%2DOhKHktJBw_NA%3D%3D&rut=cd9ea202612fdc08bb49c74e56876bc0a5a579deec718e55774acdb786ca5e5b&u3=https%3A%2F%2Fwww.bing.com%2Faclick%3Fld%3De8wdC6XhJhhuChpKs9S578JDVUCUwsHlBcRMGDoYw_l7D_vl0fKcita9%2DwYNV1_EWBRiUNgtd9uynXXU2BeN0tqClLL2D17y9p38C9lHpEzjYHF_2U4aTpC9juRh5rRO1_U1MGWeQ6p4DzMq9QZDEIxh4WlpdcTqH8X7iyhKnqV5RfhjhGcsCWDQdBzbeOmlQb3uImNYhgeuuPGr98HTZBa_OU8VKMmltuDCDI3sf5dAoDCDWU4zjuSmdI9lwML5VBxP4b%2DkyDiMyjTysGgrTfQcsycsDIdNHYxu9o07%2DBLYpNGBBquhGpyOt1dwGwlmRiuvjitpJUSQ81EOz%2DmmcNF1pRb3jQGWc6c2L9%2DyPXixgiaJaflR82mvkDBa7h3hcMECdTwvEkOyft2Zbn6GQ55_ynPXW798QnmndcV0i8NfaWJn5L5sDhLDyCZxGAOQ9aBgO8JKTyPbDKdSzvddxAT6XWzQnB42pzlvn0KibnUJL33hbV5h%2DVSkZ07ht1iLVrHGK5Pb2IwZGK9YZb55f%2DY5V7kTNke6VLvxOIrK%2DOhdDf1MLvLyTW%2Dwt3PwZPvg6S6TBbR7Xx_jI8z6uGMhJYV3M0IFVVegIHpdt4TVPST%2DR7mEXxx03P7pzK8WMmP0taHWSs0IV_KV1zbwpcWbWszABpZLGGm32lYT6umHOl%2DaiqdQwmlee1fSmFFmeCwlBm_Bix%2D6hQ1TrM_DUFesZOlkWV2fUScS66a5k1lZP85KTZMC_yQtcNu%2DJIVohQO_JBsjs%2DR9sFzy8ZWd7gqkPHRlc9NFc%26u%3DaHR0cHMlM2ElMmYlMmZ3d3cuY2FwdGVycmEuY29tJTJmbXNuY2xpY2slM2Z1cmwlM2Rjb25zdHJ1Y3Rpb24tbWFuYWdlbWVudC1zb2Z0d2FyZSUyNmhlYWRsaW5lJTNkZmxvb3IlMjUyMHBsYW4lMjUyMGRyYXdpbmclMjUyMHRvb2xzJTI2Y29tcGFyZV9zbHAlM2R0cnVlJTI2cHR5cGUlM2RiaW5nJTI2bXNjbGtpZCUzZGU2YjlhZTA3NjIwNTFiZmQ2MGEzYzQwMGQ5YmFjNWMxJTI2YWNjb3VudF9jYW1wYWlnbl9pZCUzZDY5ODEzNzU3OSUyNmFjY291bnRfYWRncm91cF9pZCUzZDEyNDkwNDY1MTE4NTQyNzglMjZ0YXJnZXQlM2RidWlsZCUyNTIwYSUyNTIwYmx1ZXByaW50JTI2YWRfaWQlM2QlMjZtYXRjaHR5cGUlM2RwJTI2dXRtX3NvdXJjZSUzZHBzLWJpbmclMjZ1dG1fbWVkaXVtJTNkcHBjJTI2dXRtX2NhbXBhaWduJTNkJTNhMSUzYUNBUCUzYTIlM2FDT00lM2EzJTNhQWxsJTNhNCUzYUlOVEwlM2E1JTNhQkFVJTNhNiUzYVNPRiUzYTclM2FEZXNrdG9wJTNhOCUzYUJSJTNhOSUzYUNvbnN0cnVjdGlvbl9NYW5hZ2VtZW50JTI2bmV0d29yayUzZG8%26rlid%3De6b9ae0762051bfd60a3c400d9bac5c1&vqd=4-45769548722940923498222040794638315061&iurl=%7B1%7DIG%3D8EE1A5B7BC0F41FFA063E93543B64511%26CID%3D1B6F153CD10B69BD389A0267D0DE6883%26ID%3DDevEx%2C5048.1
+                - listitem [ref=e187]:
+                  - text: ‧
+                  - link "Top 10 Salon & Spa..." [ref=e188]:
+                    - /url: https://duckduckgo.com/y.js?ad_domain=capterra.com&ad_provider=bingv7aa&ad_type=txad&click_metadata=GMVp7XuG5HMwfsG7iJbuDJLn0LJsTE2cNdXsNzuh0l_EXMHSi1ZS38vZHzR5XAcQjWpZU%2D2rQtfyXW9ECrfpMauGB8VE35ourpr5TTZwp0nTHYpnvban8R7yMWuivsBuHqQSI69k4zMMIhOJDYpIkg.ezjyR8OvZ8d3yj_XvztpQQ&eddgt=x9DzyYkO5%2DOhKHktJBw_NA%3D%3D&rut=62f28064518d506b6240b33c1d61c8434eab51804ff963181967ee35a6e42f24&u3=https%3A%2F%2Fwww.bing.com%2Faclick%3Fld%3De8l2deAWp5AOxK0PEQIKH60zVUCUx1pKJhtsreNbEB7ZqaID%2DMjyxGc%2D4j6BXMDe0L7HT8sjgACDg_LGUvHLbBYzU6Ch0HR26ZCXqoaOn51otf8i%2DhIkmXjh_dz0fSSeUnvGu8RwJxdKEbGVv5Nv5Q9IyYLvujPddWTfUxRonrxS8_M%2DhdBOluiSxhlpzMLdQuUV5Rs2X46HoI3ugz0m8jAQZ7cnI3VZ4%2DI%2D_15TTEHP5ZJuf1GPuPMnmDUWNrvYpsf0dbTIGv_vY7u1ALiT3xA%2DQkpSzgb1YrDx%2D1UI0cje2ETBo%2DGwfUvLVJUnyf11Cct64Gw_PaWSm3BmuK8M035ZRp8k1HPX10GdVGNGqfz%2DOUnCCwttbtu6cWOLZXnYmF7T32GocAJGgfYj3wVzBML6YvKmKXKBKrjkE_IY864CjaF5EG4TxgkmV4ZUg_w4QCshzkeGtTsGZpAopKHcvNSlBYp7cqIagFdSv7nj6oDjDgXTMslekeqRAHCKzrPZ9uSIDT7wB_1t9MkFahBBxobwJwgmeMQtjEVK2U4CYPrR%2D%2DxPO0xFmlUsqVDwmF1MOLp0bXv4j85HfK8ey_cDr%2DrvIBG2z6tvigCD6v_CuR14ikcwQB1IGHEvlC5im68B1B5h%2Dmdi75ffwZRDYBlfiIu4tZG5UAsCZWd%2DRIydvxtrQ4SfcELyH7r6z7WKjI67bdyTmBUF5yGDyUsJ_DJpfHVFUxbPHG%2DPHCa_s4qX1f8eULrmdnIJaCkd7FkZb9HMEHst2gowV1YKNSzesCSf5r6Qnxk6Q%26u%3DaHR0cHMlM2ElMmYlMmZ3d3cuY2FwdGVycmEuY29tJTJmbXNuY2xpY2slM2Z1cmwlM2RzYWxvbi1zb2Z0d2FyZSUyNmhlYWRsaW5lJTNkc2Fsb24lMjUyMGFuZCUyNTIwc3BhJTI1MjBzb2Z0d2FyZSUyNmNvbXBhcmVfc2xwJTNkdHJ1ZSUyNnB0eXBlJTNkYmluZyUyNm1zY2xraWQlM2QyYzNjOGQ0MDYxZmIxMGE4YjBhOWU3NDdkYTQ0ZmRmYSUyNmFjY291bnRfY2FtcGFpZ25faWQlM2Q2OTgxMzc1NzklMjZhY2NvdW50X2FkZ3JvdXBfaWQlM2QxMjQ5MDQ2NTExODU0Mjc4JTI2dGFyZ2V0JTNkYnVpbGQlMjUyMGElMjUyMGJsdWVwcmludCUyNmFkX2lkJTNkJTI2bWF0Y2h0eXBlJTNkcCUyNnV0bV9zb3VyY2UlM2Rwcy1iaW5nJTI2dXRtX21lZGl1bSUzZHBwYyUyNnV0bV9jYW1wYWlnbiUzZCUzYTElM2FDQVAlM2EyJTNhQ09NJTNhMyUzYUFsbCUzYTQlM2FJTlRMJTNhNSUzYUJBVSUzYTYlM2FTT0YlM2E3JTNhRGVza3RvcCUzYTglM2FCUiUzYTklM2FDb25zdHJ1Y3Rpb25fTWFuYWdlbWVudCUyNm5ldHdvcmslM2Rv%26rlid%3D2c3c8d4061fb10a8b0a9e747da44fdfa&vqd=4-181777583612573998677240544202988574716&iurl=%7B1%7DIG%3D8EE1A5B7BC0F41FFA063E93543B64511%26CID%3D1B6F153CD10B69BD389A0267D0DE6883%26ID%3DDevEx%2C5050.1
+          - listitem [ref=e189]:
+            - article [ref=e190] [cursor=pointer]:
+              - button [ref=e192]:
+                - img [ref=e193]
+              - link "SmartDraw https://www.smartdraw.com" [ref=e199]:
+                - /url: https://duckduckgo.com/y.js?ad_domain=smartdraw.com&ad_provider=bingv7aa&ad_type=txad&click_metadata=HVC0oy_6GHTob74vz4WzJqDdWJZlFGpGWRJsyHUKex3pXNMs13tJwcPofv5w%2DsrGAZ9GMMgZ6labVuKTnMxsgHj6iQQeV4K4vX1sBqLXh9s_UwPXSA7pL3AvYieRVkItZUZDq9Pz7xOsTvFSn5i9rzyF7Slnw%2D9YNCxU4yXoqu8.o9M7Ocdufu5iN2jQbvm7Bg&eddgt=x9DzyYkO5%2DOhKHktJBw_NA%3D%3D&rut=ccbe5262e535c650410a8bdb32145d5919b2eac64d52c67de43ba8dccd16d707&u3=https%3A%2F%2Fwww.bing.com%2Faclick%3Fld%3De8z%2D8PaMQ4%2D%2DWAsa9hZMtVbzVUCUxhctAn775MgHJMtUfk2Bgs7tic%2DVLdQnUQzKpXRBiw8JVPN3a75d1D5Y51gWPyVzNIMT06P8dK%2DbZTl%2DRdAclcj%2DikUIufW28X5grb3GxoMSnIoD81shlJsJXW35k%2D0ctHiHAwi7IzuGRppfJJS0_55yz2pbXOS5ZsZxSqU0NxomEGAHEXdC3EgDWu60leseverLJq3XE_8moghlBUjdETui10bFXTxct9PfXfw4TXBteMJSRLzocMT61t6BXFLiq1m4wbxeOO316OLMdIpO_zFqs4Ylk07nHIDF1tMv1kXjb2wjbOhY%2DId5KMm3ZdGC8iQRJuddJPx21dk1pvxzX5U6BLEHPmgz%2DONw5K%2DWcfCpb_dhFSKWG4XE4BSoRG6CWMv6uN1vKk8Pmi1m7I9FWf2u3GjpvS8gSPhdKI5S4Um5fLRDmhPSAuyHl_OuhNvR6vBKcrPAdQeAYYktNDOQMr7kVNSalDMKE7brH8ZdBen1iA3QsCFVQGzH6AH7xOc3yS5FSFhd%2DXBK%2DFZWSGPyDhFkeuwU0k7LhNOLGPE4BR5qZTmZCanyhVni9tnjzbhmUIIYUZa8X4Zp91BMYHwNcl9HZZy0Q1_KumJArVTZ5BbwDK54cqPZaty6GZxv_ab%2DqLFFDn1s2EvzR9xlHUlPUjSNXfXfj%2DLGJW0rXHmmx70o8Nm78hGRznr7jHZjZ57N9d39VHFmKzYEGj452HZi08AX85Vl_clXn4in30KnzgoGrRTBOlfuHtqsxmEEE_R5M%26u%3DaHR0cHMlM2ElMmYlMmZ3d3cuc21hcnRkcmF3LmNvbSUyZmZsb29yLXBsYW4lMmZidWlsZGluZy1wbGFuLXNvZnR3YXJlLmh0bSUzZmlkJTNkMzgxODE1JTI2bXNjbGtpZCUzZDI1MDJjY2FmZjEyNjEwYzViZDVmYTZhODRhOTllZWE5%26rlid%3D2502ccaff12610c5bd5fa6a84a99eea9&vqd=4-19063323948324961222944365173579844599&iurl=%7B1%7DIG%3D8EE1A5B7BC0F41FFA063E93543B64511%26CID%3D1B6F153CD10B69BD389A0267D0DE6883%26ID%3DDevEx%2C5053.1
+                - img [ref=e202]
+                - generic [ref=e203]:
+                  - paragraph [ref=e204]: SmartDraw
+                  - paragraph [ref=e205]:
+                    - generic [ref=e206]: https://www.smartdraw.com
+              - heading "Commercial Floor Plan Maker - Free Commercial Floor Plans Ad" [level=2] [ref=e208]:
+                - link "Commercial Floor Plan Maker - Free Commercial Floor Plans" [ref=e209]:
+                  - /url: https://duckduckgo.com/y.js?ad_domain=smartdraw.com&ad_provider=bingv7aa&ad_type=txad&click_metadata=HVC0oy_6GHTob74vz4WzJqDdWJZlFGpGWRJsyHUKex3pXNMs13tJwcPofv5w%2DsrGAZ9GMMgZ6labVuKTnMxsgHj6iQQeV4K4vX1sBqLXh9s_UwPXSA7pL3AvYieRVkItZUZDq9Pz7xOsTvFSn5i9rzyF7Slnw%2D9YNCxU4yXoqu8.o9M7Ocdufu5iN2jQbvm7Bg&eddgt=x9DzyYkO5%2DOhKHktJBw_NA%3D%3D&rut=ccbe5262e535c650410a8bdb32145d5919b2eac64d52c67de43ba8dccd16d707&u3=https%3A%2F%2Fwww.bing.com%2Faclick%3Fld%3De8z%2D8PaMQ4%2D%2DWAsa9hZMtVbzVUCUxhctAn775MgHJMtUfk2Bgs7tic%2DVLdQnUQzKpXRBiw8JVPN3a75d1D5Y51gWPyVzNIMT06P8dK%2DbZTl%2DRdAclcj%2DikUIufW28X5grb3GxoMSnIoD81shlJsJXW35k%2D0ctHiHAwi7IzuGRppfJJS0_55yz2pbXOS5ZsZxSqU0NxomEGAHEXdC3EgDWu60leseverLJq3XE_8moghlBUjdETui10bFXTxct9PfXfw4TXBteMJSRLzocMT61t6BXFLiq1m4wbxeOO316OLMdIpO_zFqs4Ylk07nHIDF1tMv1kXjb2wjbOhY%2DId5KMm3ZdGC8iQRJuddJPx21dk1pvxzX5U6BLEHPmgz%2DONw5K%2DWcfCpb_dhFSKWG4XE4BSoRG6CWMv6uN1vKk8Pmi1m7I9FWf2u3GjpvS8gSPhdKI5S4Um5fLRDmhPSAuyHl_OuhNvR6vBKcrPAdQeAYYktNDOQMr7kVNSalDMKE7brH8ZdBen1iA3QsCFVQGzH6AH7xOc3yS5FSFhd%2DXBK%2DFZWSGPyDhFkeuwU0k7LhNOLGPE4BR5qZTmZCanyhVni9tnjzbhmUIIYUZa8X4Zp91BMYHwNcl9HZZy0Q1_KumJArVTZ5BbwDK54cqPZaty6GZxv_ab%2DqLFFDn1s2EvzR9xlHUlPUjSNXfXfj%2DLGJW0rXHmmx70o8Nm78hGRznr7jHZjZ57N9d39VHFmKzYEGj452HZi08AX85Vl_clXn4in30KnzgoGrRTBOlfuHtqsxmEEE_R5M%26u%3DaHR0cHMlM2ElMmYlMmZ3d3cuc21hcnRkcmF3LmNvbSUyZmZsb29yLXBsYW4lMmZidWlsZGluZy1wbGFuLXNvZnR3YXJlLmh0bSUzZmlkJTNkMzgxODE1JTI2bXNjbGtpZCUzZDI1MDJjY2FmZjEyNjEwYzViZDVmYTZhODRhOTllZWE5%26rlid%3D2502ccaff12610c5bd5fa6a84a99eea9&vqd=4-19063323948324961222944365173579844599&iurl=%7B1%7DIG%3D8EE1A5B7BC0F41FFA063E93543B64511%26CID%3D1B6F153CD10B69BD389A0267D0DE6883%26ID%3DDevEx%2C5053.1
+                - button "Ad" [ref=e212]
+              - generic [ref=e215]:
+                - link "Easily Create Commercial Floor Plans With SmartDraw's Intuitive Floor Plan Software. Use SmartDraw's Commercial Floor Plan Creator Now Free." [ref=e216]:
+                  - /url: https://duckduckgo.com/y.js?ad_domain=smartdraw.com&ad_provider=bingv7aa&ad_type=txad&click_metadata=HVC0oy_6GHTob74vz4WzJqDdWJZlFGpGWRJsyHUKex3pXNMs13tJwcPofv5w%2DsrGAZ9GMMgZ6labVuKTnMxsgHj6iQQeV4K4vX1sBqLXh9s_UwPXSA7pL3AvYieRVkItZUZDq9Pz7xOsTvFSn5i9rzyF7Slnw%2D9YNCxU4yXoqu8.o9M7Ocdufu5iN2jQbvm7Bg&eddgt=x9DzyYkO5%2DOhKHktJBw_NA%3D%3D&rut=ccbe5262e535c650410a8bdb32145d5919b2eac64d52c67de43ba8dccd16d707&u3=https%3A%2F%2Fwww.bing.com%2Faclick%3Fld%3De8z%2D8PaMQ4%2D%2DWAsa9hZMtVbzVUCUxhctAn775MgHJMtUfk2Bgs7tic%2DVLdQnUQzKpXRBiw8JVPN3a75d1D5Y51gWPyVzNIMT06P8dK%2DbZTl%2DRdAclcj%2DikUIufW28X5grb3GxoMSnIoD81shlJsJXW35k%2D0ctHiHAwi7IzuGRppfJJS0_55yz2pbXOS5ZsZxSqU0NxomEGAHEXdC3EgDWu60leseverLJq3XE_8moghlBUjdETui10bFXTxct9PfXfw4TXBteMJSRLzocMT61t6BXFLiq1m4wbxeOO316OLMdIpO_zFqs4Ylk07nHIDF1tMv1kXjb2wjbOhY%2DId5KMm3ZdGC8iQRJuddJPx21dk1pvxzX5U6BLEHPmgz%2DONw5K%2DWcfCpb_dhFSKWG4XE4BSoRG6CWMv6uN1vKk8Pmi1m7I9FWf2u3GjpvS8gSPhdKI5S4Um5fLRDmhPSAuyHl_OuhNvR6vBKcrPAdQeAYYktNDOQMr7kVNSalDMKE7brH8ZdBen1iA3QsCFVQGzH6AH7xOc3yS5FSFhd%2DXBK%2DFZWSGPyDhFkeuwU0k7LhNOLGPE4BR5qZTmZCanyhVni9tnjzbhmUIIYUZa8X4Zp91BMYHwNcl9HZZy0Q1_KumJArVTZ5BbwDK54cqPZaty6GZxv_ab%2DqLFFDn1s2EvzR9xlHUlPUjSNXfXfj%2DLGJW0rXHmmx70o8Nm78hGRznr7jHZjZ57N9d39VHFmKzYEGj452HZi08AX85Vl_clXn4in30KnzgoGrRTBOlfuHtqsxmEEE_R5M%26u%3DaHR0cHMlM2ElMmYlMmZ3d3cuc21hcnRkcmF3LmNvbSUyZmZsb29yLXBsYW4lMmZidWlsZGluZy1wbGFuLXNvZnR3YXJlLmh0bSUzZmlkJTNkMzgxODE1JTI2bXNjbGtpZCUzZDI1MDJjY2FmZjEyNjEwYzViZDVmYTZhODRhOTllZWE5%26rlid%3D2502ccaff12610c5bd5fa6a84a99eea9&vqd=4-19063323948324961222944365173579844599&iurl=%7B1%7DIG%3D8EE1A5B7BC0F41FFA063E93543B64511%26CID%3D1B6F153CD10B69BD389A0267D0DE6883%26ID%3DDevEx%2C5053.1
+                  - generic [ref=e217]: Easily Create Commercial Floor Plans With SmartDraw's Intuitive Floor Plan Software. Use SmartDraw's Commercial Floor Plan Creator Now Free.
+                - 'link "Types: Floor Plans & CAD, Org Charts, Flowcharts & Process Maps" [ref=e219]':
+                  - /url: https://duckduckgo.com/y.js?ad_domain=smartdraw.com&ad_provider=bingv7aa&ad_type=txad&click_metadata=HVC0oy_6GHTob74vz4WzJqDdWJZlFGpGWRJsyHUKex3pXNMs13tJwcPofv5w%2DsrGAZ9GMMgZ6labVuKTnMxsgHj6iQQeV4K4vX1sBqLXh9s_UwPXSA7pL3AvYieRVkItZUZDq9Pz7xOsTvFSn5i9rzyF7Slnw%2D9YNCxU4yXoqu8.o9M7Ocdufu5iN2jQbvm7Bg&eddgt=x9DzyYkO5%2DOhKHktJBw_NA%3D%3D&rut=ccbe5262e535c650410a8bdb32145d5919b2eac64d52c67de43ba8dccd16d707&u3=https%3A%2F%2Fwww.bing.com%2Faclick%3Fld%3De8z%2D8PaMQ4%2D%2DWAsa9hZMtVbzVUCUxhctAn775MgHJMtUfk2Bgs7tic%2DVLdQnUQzKpXRBiw8JVPN3a75d1D5Y51gWPyVzNIMT06P8dK%2DbZTl%2DRdAclcj%2DikUIufW28X5grb3GxoMSnIoD81shlJsJXW35k%2D0ctHiHAwi7IzuGRppfJJS0_55yz2pbXOS5ZsZxSqU0NxomEGAHEXdC3EgDWu60leseverLJq3XE_8moghlBUjdETui10bFXTxct9PfXfw4TXBteMJSRLzocMT61t6BXFLiq1m4wbxeOO316OLMdIpO_zFqs4Ylk07nHIDF1tMv1kXjb2wjbOhY%2DId5KMm3ZdGC8iQRJuddJPx21dk1pvxzX5U6BLEHPmgz%2DONw5K%2DWcfCpb_dhFSKWG4XE4BSoRG6CWMv6uN1vKk8Pmi1m7I9FWf2u3GjpvS8gSPhdKI5S4Um5fLRDmhPSAuyHl_OuhNvR6vBKcrPAdQeAYYktNDOQMr7kVNSalDMKE7brH8ZdBen1iA3QsCFVQGzH6AH7xOc3yS5FSFhd%2DXBK%2DFZWSGPyDhFkeuwU0k7LhNOLGPE4BR5qZTmZCanyhVni9tnjzbhmUIIYUZa8X4Zp91BMYHwNcl9HZZy0Q1_KumJArVTZ5BbwDK54cqPZaty6GZxv_ab%2DqLFFDn1s2EvzR9xlHUlPUjSNXfXfj%2DLGJW0rXHmmx70o8Nm78hGRznr7jHZjZ57N9d39VHFmKzYEGj452HZi08AX85Vl_clXn4in30KnzgoGrRTBOlfuHtqsxmEEE_R5M%26u%3DaHR0cHMlM2ElMmYlMmZ3d3cuc21hcnRkcmF3LmNvbSUyZmZsb29yLXBsYW4lMmZidWlsZGluZy1wbGFuLXNvZnR3YXJlLmh0bSUzZmlkJTNkMzgxODE1JTI2bXNjbGtpZCUzZDI1MDJjY2FmZjEyNjEwYzViZDVmYTZhODRhOTllZWE5%26rlid%3D2502ccaff12610c5bd5fa6a84a99eea9&vqd=4-19063323948324961222944365173579844599&iurl=%7B1%7DIG%3D8EE1A5B7BC0F41FFA063E93543B64511%26CID%3D1B6F153CD10B69BD389A0267D0DE6883%26ID%3DDevEx%2C5053.1
+          - listitem [ref=e220]:
+            - article [ref=e221] [cursor=pointer]:
+              - button [ref=e223]:
+                - img [ref=e224]
+              - generic [ref=e228]:
+                - link "Search domain edmonton.ca" [ref=e230]:
+                  - /url: /?q=simple%20commercial%20floor%20plan%20with%20labeled%20room%20dimensions%20filetype%3Apdf+site:www.edmonton.ca
+                  - img [ref=e232]
+                - generic [ref=e233]:
+                  - paragraph [ref=e234]: City of Edmonton
+                  - link "https://www.edmonton.ca › sites › default › files › public-files › Sample_Floor_Plan_Retail_General_Projects.pdf?cb=1765239958" [ref=e235]:
+                    - /url: https://www.edmonton.ca/sites/default/files/public-files/Sample_Floor_Plan_Retail_General_Projects.pdf?cb=1765239958
+                    - paragraph [ref=e237]:
+                      - generic [ref=e238]: https://www.edmonton.ca
+                      - generic [ref=e239]: › sites › default › files › public-files › Sample_Floor_Plan_Retail_General_Projects.pdf?cb=1765239958
+              - heading "PDF Sample Floor Plan Retail or General Projects - City of Edmonton" [level=2] [ref=e241]:
+                - link "PDF Sample Floor Plan Retail or General Projects - City of Edmonton" [ref=e242]:
+                  - /url: https://www.edmonton.ca/sites/default/files/public-files/Sample_Floor_Plan_Retail_General_Projects.pdf?cb=1765239958
+                  - generic [ref=e243]:
+                    - generic [ref=e244]: PDF
+                    - text: Sample Floor Plan Retail or General Projects - City of Edmonton
+              - generic [ref=e249]: Fire extinguisher location Business Name Unit dimensions Provide building structure information and unit floor area @monton Title Sample Floor Plan Retail or General Projects
+          - listitem [ref=e250]:
+            - article [ref=e251] [cursor=pointer]:
+              - button [ref=e253]:
+                - img [ref=e254]
+              - generic [ref=e258]:
+                - link "Search domain maricopa.gov" [ref=e260]:
+                  - /url: /?q=simple%20commercial%20floor%20plan%20with%20labeled%20room%20dimensions%20filetype%3Apdf+site:www.maricopa.gov
+                  - img [ref=e262]
+                - generic [ref=e263]:
+                  - paragraph [ref=e264]: Maricopa County
+                  - link "https://www.maricopa.gov › DocumentCenter › View › 7469 › Sample-Floor-Plan-PDF" [ref=e265]:
+                    - /url: https://www.maricopa.gov/DocumentCenter/View/7469/Sample-Floor-Plan-PDF
+                    - paragraph [ref=e267]:
+                      - generic [ref=e268]: https://www.maricopa.gov
+                      - generic [ref=e269]: › DocumentCenter › View › 7469 › Sample-Floor-Plan-PDF
+              - heading "Floor Plan with all rooms, plumbing fixtures, doors, windows and ..." [level=2] [ref=e271]:
+                - link "Floor Plan with all rooms, plumbing fixtures, doors, windows and ..." [ref=e272]:
+                  - /url: https://www.maricopa.gov/DocumentCenter/View/7469/Sample-Floor-Plan-PDF
+                  - generic [ref=e273]: Floor Plan with all rooms, plumbing fixtures, doors, windows and ...
+              - generic [ref=e278]: Floor Plan with all rooms, plumbing fixtures, doors, windows and dimensions or scale clearly labeled
+          - listitem [ref=e279]:
+            - article [ref=e280] [cursor=pointer]:
+              - button [ref=e282]:
+                - img [ref=e283]
+              - generic [ref=e287]:
+                - link "Search domain totalcommercial.com" [ref=e289]:
+                  - /url: /?q=simple%20commercial%20floor%20plan%20with%20labeled%20room%20dimensions%20filetype%3Apdf+site:totalcommercial.com
+                  - img [ref=e291]
+                - generic [ref=e292]:
+                  - paragraph [ref=e293]: TotalCommercial.com
+                  - link "https://totalcommercial.com › attachment › 118179 › Floor plan Outlined and Labeled.pdf" [ref=e294]:
+                    - /url: https://totalcommercial.com/attachment/118179/Floor%20plan%20Outlined%20and%20Labeled.pdf
+                    - paragraph [ref=e296]:
+                      - generic [ref=e297]: https://totalcommercial.com
+                      - generic [ref=e298]: › attachment › 118179 › Floor plan Outlined and Labeled.pdf
+              - heading "PDF nClosetOfficeBack PorchFirewallAdditional Sound Barrier Typ." [level=2] [ref=e300]:
+                - link "PDF nClosetOfficeBack PorchFirewallAdditional Sound Barrier Typ." [ref=e301]:
+                  - /url: https://totalcommercial.com/attachment/118179/Floor%20plan%20Outlined%20and%20Labeled.pdf
+                  - generic [ref=e302]:
+                    - generic [ref=e303]: PDF
+                    - text: nClosetOfficeBack PorchFirewallAdditional Sound Barrier Typ.
+              - generic [ref=e307]: —0 11'- 10/- '-3 '-10 '-3 11'- 1'- 4 4" 10' 12'- 7
+          - listitem [ref=e308]:
+            - article [ref=e309] [cursor=pointer]:
+              - button [ref=e311]:
+                - img [ref=e312]
+              - generic [ref=e316]:
+                - link "Search domain cdnsm5-hosted.civiclive.com" [ref=e318]:
+                  - /url: /?q=simple%20commercial%20floor%20plan%20with%20labeled%20room%20dimensions%20filetype%3Apdf+site:cdnsm5-hosted.civiclive.com
+                  - img [ref=e320]
+                - generic [ref=e321]:
+                  - paragraph [ref=e322]: cdnsm5-hosted.civiclive.com
+                  - link "https://cdnsm5-hosted.civiclive.com › UserFiles › Servers › Server_16494932 › File › Services › Business License › Commercial Business_License_floor_plan Example.pdf" [ref=e323]:
+                    - /url: https://cdnsm5-hosted.civiclive.com/UserFiles/Servers/Server_16494932/File/Services/Business%20License/Commercial%20Business_License_floor_plan%20Example.pdf
+                    - paragraph [ref=e325]:
+                      - generic [ref=e326]: https://cdnsm5-hosted.civiclive.com
+                      - generic [ref=e327]: › UserFiles › Servers › Server_16494932 › File › Services › Business License › Commercial Business_License_floor_plan Example.pdf
+              - heading "PDF Sample Commercial Floor Plan" [level=2] [ref=e329]:
+                - link "PDF Sample Commercial Floor Plan" [ref=e330]:
+                  - /url: https://cdnsm5-hosted.civiclive.com/UserFiles/Servers/Server_16494932/File/Services/Business%20License/Commercial%20Business_License_floor_plan%20Example.pdf
+                  - generic [ref=e331]:
+                    - generic [ref=e332]: PDF
+                    - text: Sample Commercial Floor Plan
+              - generic [ref=e337]: "Sample Commercial Floor Plan L:/temp/building/handout/commercial floor plan.vsd Business Name: Type of Business: Total Area of Tenant Space: Previous Business Use: *for minimum dimensions see attached barrier free restroom detail"
+          - listitem [ref=e338]:
+            - article [ref=e339] [cursor=pointer]:
+              - button [ref=e341]:
+                - img [ref=e342]
+              - generic [ref=e346]:
+                - link "Search domain listsimple.com" [ref=e348]:
+                  - /url: /?q=simple%20commercial%20floor%20plan%20with%20labeled%20room%20dimensions%20filetype%3Apdf+site:www.listsimple.com
+                  - img [ref=e350]
+                - generic [ref=e351]:
+                  - paragraph [ref=e352]: ListSimple
+                  - link "https://www.listsimple.com › documents › ListSimple_Sample_Floorplans_Calgary.pdf" [ref=e353]:
+                    - /url: https://www.listsimple.com/documents/ListSimple_Sample_Floorplans_Calgary.pdf
+                    - paragraph [ref=e355]:
+                      - generic [ref=e356]: https://www.listsimple.com
+                      - generic [ref=e357]: › documents › ListSimple_Sample_Floorplans_Calgary.pdf
+              - heading "PDF Room Dimensions 123 Example Drive - listsimple.com" [level=2] [ref=e359]:
+                - link "PDF Room Dimensions 123 Example Drive - listsimple.com" [ref=e360]:
+                  - /url: https://www.listsimple.com/documents/ListSimple_Sample_Floorplans_Calgary.pdf
+                  - generic [ref=e361]:
+                    - generic [ref=e362]: PDF
+                    - text: Room Dimensions 123 Example Drive - listsimple.com
+              - generic [ref=e366]: "Disclaimer: To be used only for the marketing of the subject property, and only by the client listed below and/or other parties directly connected to the marketing/sale process. May not be published, distributed or used for other purposes. Basic illustration of the estimated/approximate interior layout. Precise accuracy & scale not guaranteed. Not appropriate for any kind of architectural ..."
+          - listitem [ref=e367]:
+            - article [ref=e368] [cursor=pointer]:
+              - button [ref=e370]:
+                - img [ref=e371]
+              - generic [ref=e375]:
+                - link "Search domain ppa.com.ph" [ref=e377]:
+                  - /url: /?q=simple%20commercial%20floor%20plan%20with%20labeled%20room%20dimensions%20filetype%3Apdf+site:www.ppa.com.ph
+                  - img [ref=e379]
+                - generic [ref=e380]:
+                  - paragraph [ref=e381]: Philippine Ports Authority
+                  - link "https://www.ppa.com.ph › sites › default › files › itb_docs › M201_07262017_000091_BIDDOC.pdf" [ref=e382]:
+                    - /url: https://www.ppa.com.ph/sites/default/files/itb_docs/M201_07262017_000091_BIDDOC.pdf
+                    - paragraph [ref=e384]:
+                      - generic [ref=e385]: https://www.ppa.com.ph
+                      - generic [ref=e386]: › sites › default › files › itb_docs › M201_07262017_000091_BIDDOC.pdf
+              - heading "PDF Floor Plan - Ppa" [level=2] [ref=e388]:
+                - link "PDF Floor Plan - Ppa" [ref=e389]:
+                  - /url: https://www.ppa.com.ph/sites/default/files/itb_docs/M201_07262017_000091_BIDDOC.pdf
+                  - generic [ref=e390]:
+                    - generic [ref=e391]: PDF
+                    - text: Floor Plan - Ppa
+              - generic [ref=e396]: SCHEMATIC DIAGRAM OF STEEL TRUSS PUBLIC COMFORT ROOM TYPICAL ROOF BEAM DETAIL AND SECTION 19
+          - listitem [ref=e397]:
+            - article [ref=e398] [cursor=pointer]:
+              - button [ref=e400]:
+                - img [ref=e401]
+              - generic [ref=e405]:
+                - link "Search domain rcenggstudios.com" [ref=e407]:
+                  - /url: /?q=simple%20commercial%20floor%20plan%20with%20labeled%20room%20dimensions%20filetype%3Apdf+site:rcenggstudios.com
+                  - img [ref=e409]
+                - generic [ref=e410]:
+                  - paragraph [ref=e411]: rcenggstudios.com
+                  - link "https://rcenggstudios.com › wp-content › uploads › 2025 › 03 › Shop-plan-1.pdf" [ref=e412]:
+                    - /url: https://rcenggstudios.com/wp-content/uploads/2025/03/Shop-plan-1.pdf
+                    - paragraph [ref=e414]:
+                      - generic [ref=e415]: https://rcenggstudios.com
+                      - generic [ref=e416]: › wp-content › uploads › 2025 › 03 › Shop-plan-1.pdf
+              - heading "PDF GROUND FLOOR AND FIRST FLOOR PLAN - rcenggstudios.com" [level=2] [ref=e418]:
+                - link "PDF GROUND FLOOR AND FIRST FLOOR PLAN - rcenggstudios.com" [ref=e419]:
+                  - /url: https://rcenggstudios.com/wp-content/uploads/2025/03/Shop-plan-1.pdf
+                  - generic [ref=e420]:
+                    - generic [ref=e421]: PDF
+                    - text: GROUND FLOOR AND FIRST FLOOR PLAN - rcenggstudios.com
+              - generic [ref=e426]: In Ground floor 4 shops and 4 shops in first floor with commercial building type .A commercial building is used for business purposes, designed to accommodate offices, retail stores, restaurants, or other commercial enterprises.
+          - listitem [ref=e427]:
+            - article [ref=e428] [cursor=pointer]:
+              - button [ref=e430]:
+                - img [ref=e431]
+              - generic [ref=e435]:
+                - link "Search domain app.bchydro.com" [ref=e437]:
+                  - /url: /?q=simple%20commercial%20floor%20plan%20with%20labeled%20room%20dimensions%20filetype%3Apdf+site:app.bchydro.com
+                  - img [ref=e439]
+                - generic [ref=e440]:
+                  - paragraph [ref=e441]: BC Hydro
+                  - link "https://app.bchydro.com › content › dam › BCHydro › customer-portal › documents › distribution › info-packages › Electrical-Room-Layout.pdf" [ref=e442]:
+                    - /url: https://app.bchydro.com/content/dam/BCHydro/customer-portal/documents/distribution/info-packages/Electrical-Room-Layout.pdf
+                    - paragraph [ref=e444]:
+                      - generic [ref=e445]: https://app.bchydro.com
+                      - generic [ref=e446]: › content › dam › BCHydro › customer-portal › documents › distribution › info-packages › Electrical-Room-Layout.pdf
+              - heading "PDF Electrical Room Drawing (June 23, 2023)" [level=2] [ref=e448]:
+                - link "PDF Electrical Room Drawing (June 23, 2023)" [ref=e449]:
+                  - /url: https://app.bchydro.com/content/dam/BCHydro/customer-portal/documents/distribution/info-packages/Electrical-Room-Layout.pdf
+                  - generic [ref=e450]:
+                    - generic [ref=e451]: PDF
+                    - text: Electrical Room Drawing (June 23, 2023)
+              - generic [ref=e456]: For more detailed information, please refer to our Distribution Technical Standards and Guides on bchydro.com 2023-06-23 Electrical Room (Plan View) Example Example of Required Information The material and information shown in this document are intended for informational purposes only, and we'll be updating it from time to time.
+          - listitem [ref=e457]:
+            - article [ref=e458] [cursor=pointer]:
+              - button [ref=e460]:
+                - img [ref=e461]
+              - generic [ref=e465]:
+                - link "Search domain vipcommercial.com" [ref=e467]:
+                  - /url: /?q=simple%20commercial%20floor%20plan%20with%20labeled%20room%20dimensions%20filetype%3Apdf+site:www.vipcommercial.com
+                  - img [ref=e469]
+                - generic [ref=e470]:
+                  - paragraph [ref=e471]: vipcommercial.com
+                  - link "www.vipcommercial.com › media › files › listings › 278 › ps_file_00000679.pdf" [ref=e472]:
+                    - /url: http://www.vipcommercial.com/media/files/listings/278/ps_file_00000679.pdf
+                    - paragraph [ref=e474]:
+                      - text: www.vipcommercial.com
+                      - generic [ref=e475]: › media › files › listings › 278 › ps_file_00000679.pdf
+              - heading "PDF Floor Plan Labeled - vipcommercial.com" [level=2] [ref=e477]:
+                - link "PDF Floor Plan Labeled - vipcommercial.com" [ref=e478]:
+                  - /url: http://www.vipcommercial.com/media/files/listings/278/ps_file_00000679.pdf
+                  - generic [ref=e479]:
+                    - generic [ref=e480]: PDF
+                    - text: Floor Plan Labeled - vipcommercial.com
+              - generic [ref=e485]: Floor Plan Labeled
+          - listitem [ref=e486]:
+            - article [ref=e487] [cursor=pointer]:
+              - button [ref=e489]:
+                - img [ref=e490]
+              - generic [ref=e494]:
+                - link "Search domain themillenniumcentre.ca" [ref=e496]:
+                  - /url: /?q=simple%20commercial%20floor%20plan%20with%20labeled%20room%20dimensions%20filetype%3Apdf+site:themillenniumcentre.ca
+                  - img [ref=e498]
+                - generic [ref=e499]:
+                  - paragraph [ref=e500]: themillenniumcentre.ca
+                  - link "https://themillenniumcentre.ca › wp-content › uploads › 2024 › 02 › The-Millennium-Centre-Main-Floor-Plan-Labeled.pdf" [ref=e501]:
+                    - /url: https://themillenniumcentre.ca/wp-content/uploads/2024/02/The-Millennium-Centre-Main-Floor-Plan-Labeled.pdf
+                    - paragraph [ref=e503]:
+                      - generic [ref=e504]: https://themillenniumcentre.ca
+                      - generic [ref=e505]: › wp-content › uploads › 2024 › 02 › The-Millennium-Centre-Main-Floor-Plan-Labeled.pdf
+              - heading "PDF The Millennium Centre - Main Floor Plan (Labeled)" [level=2] [ref=e507]:
+                - link "PDF The Millennium Centre - Main Floor Plan (Labeled)" [ref=e508]:
+                  - /url: https://themillenniumcentre.ca/wp-content/uploads/2024/02/The-Millennium-Centre-Main-Floor-Plan-Labeled.pdf
+                  - generic [ref=e509]:
+                    - generic [ref=e510]: PDF
+                    - text: The Millennium Centre - Main Floor Plan (Labeled)
+              - generic [ref=e515]: Main Floor Plan Stage Area Bar Area
+          - listitem [ref=e516]:
+            - generic [ref=e524]:
+              - generic [ref=e525]:
+                - generic [ref=e527]:
+                  - text: Generate answer for
+                  - strong [ref=e528]: simple commercial floor plan with labeled room dimensions filetype:pdf
+                - generic [ref=e529]:
+                  - button "Learn More About Assist" [ref=e530] [cursor=pointer]:
+                    - img [ref=e531]
+                  - button "Assist Settings" [ref=e534] [cursor=pointer]:
+                    - img [ref=e535]
+              - button "Assist" [ref=e537] [cursor=pointer]:
+                - img [ref=e538]
+                - text: Search Assist
+        - button "More results" [ref=e543] [cursor=pointer]
+    - list [ref=e546]:
+      - button "Close menu" [ref=e547] [cursor=pointer]:
+        - generic [ref=e548]: Close menu
+        - img [ref=e549]
+      - list [ref=e551]:
+        - listitem [ref=e552]: Search
+        - listitem [ref=e553]:
+          - link "Homepage" [ref=e554] [cursor=pointer]:
+            - /url: https://start.duckduckgo.com/
+        - listitem [ref=e555]:
+          - link "Themes" [ref=e556] [cursor=pointer]:
+            - /url: /settings#appearance
+        - listitem [ref=e557]:
+          - link "Settings" [ref=e558] [cursor=pointer]:
+            - /url: /settings
+      - list [ref=e559]:
+        - listitem [ref=e560]: Share Feedback
+        - listitem [ref=e561]:
+          - generic [ref=e564]:
+            - button "Positive feedback" [ref=e565] [cursor=pointer]:
+              - img [ref=e566]
+            - button "Negative feedback" [ref=e569] [cursor=pointer]:
+              - img [ref=e570]
+      - list [ref=e573]:
+        - listitem [ref=e574]: Downloads
+        - listitem [ref=e575]:
+          - link "iOS Browser" [ref=e576] [cursor=pointer]:
+            - /url: https://apps.apple.com/app/duckduckgo-private-browser/id663592361?platform=iphone&pt=866401&mt=8&ct=serp-atb-serp
+        - listitem [ref=e577]:
+          - link "Android Browser" [ref=e578] [cursor=pointer]:
+            - /url: https://play.google.com/store/apps/details?id=com.duckduckgo.mobile.android&referrer=utm_campaign%3Dserp-atb-serp%26origin%3Dfunnel_playstore_searchresults
+        - listitem [ref=e579]:
+          - link "Mac Browser" [ref=e580] [cursor=pointer]:
+            - /url: /mac?origin=funnel_browser_searchresults
+        - listitem [ref=e581]:
+          - link "Windows Browser" [ref=e582] [cursor=pointer]:
+            - /url: /windows?origin=funnel_browser_searchresults
+        - listitem [ref=e583]: Browser Extensions
+      - list [ref=e584]:
+        - listitem [ref=e585]: More From DuckDuckGo
+        - listitem [ref=e586]:
+          - generic [ref=e589]:
+            - button "Dismiss promotion" [ref=e590] [cursor=pointer]:
+              - img [ref=e591]
+            - generic [ref=e593]:
+              - paragraph [ref=e595]:
+                - img [ref=e596]
+                - text: Upgrade to our Private Browser
+              - paragraph [ref=e607]: Fast. Secure. Free.
+            - link "Download Browser" [ref=e608] [cursor=pointer]:
+              - /url: /windows
+              - img [ref=e609]
+              - text: Download Browser
+        - listitem [ref=e611]:
+          - link "DuckDuckGo Subscription" [ref=e612] [cursor=pointer]:
+            - /url: /pro?origin=funnel_pro_searchresults
+        - listitem [ref=e613]:
+          - link "Duck.ai" [ref=e614] [cursor=pointer]:
+            - /url: https://duck.ai
+        - listitem [ref=e615]:
+          - link "Email Protection" [ref=e616] [cursor=pointer]:
+            - /url: /email
+        - listitem [ref=e617]:
+          - link "Newsletter" [ref=e618] [cursor=pointer]:
+            - /url: /newsletter
+        - listitem [ref=e619]:
+          - link "Blog" [ref=e620] [cursor=pointer]:
+            - /url: /blog
+        - listitem [ref=e621]:
+          - link "Podcast" [ref=e622] [cursor=pointer]:
+            - /url: https://insideduckduckgo.substack.com/?showWelcome=true
+        - listitem [ref=e623]:
+          - link "Collaborations" [ref=e624] [cursor=pointer]:
+            - /url: /collaborations
+      - list [ref=e625]:
+        - listitem [ref=e626]: Learn More
+        - listitem [ref=e627]:
+          - link "What’s New" [ref=e628] [cursor=pointer]:
+            - /url: /updates
+        - listitem [ref=e629]:
+          - link "Compare Privacy" [ref=e630] [cursor=pointer]:
+            - /url: /compare-privacy
+        - listitem [ref=e631]:
+          - link "About Our Browser" [ref=e632] [cursor=pointer]:
+            - /url: /app
+        - listitem [ref=e633]:
+          - link "About DuckDuckGo" [ref=e634] [cursor=pointer]:
+            - /url: /about
+      - list [ref=e635]:
+        - listitem [ref=e636]: Other Resources
+        - listitem [ref=e637]:
+          - link "Help" [ref=e638] [cursor=pointer]:
+            - /url: /duckduckgo-help-pages
+        - listitem [ref=e639]:
+          - link "Community" [ref=e640] [cursor=pointer]:
+            - /url: https://www.reddit.com/r/duckduckgo/
+        - listitem [ref=e641]:
+          - link "Careers" [ref=e642] [cursor=pointer]:
+            - /url: /careers
+        - listitem [ref=e643]:
+          - link "Privacy Policy" [ref=e644] [cursor=pointer]:
+            - /url: /privacy
+        - listitem [ref=e645]:
+          - link "Terms of Service" [ref=e646] [cursor=pointer]:
+            - /url: /terms
+        - listitem [ref=e647]:
+          - link "Press Kit" [ref=e648] [cursor=pointer]:
+            - /url: /press
+        - listitem [ref=e649]:
+          - link "Advertise on Search" [ref=e650] [cursor=pointer]:
+            - /url: /duckduckgo-help-pages/company/advertise-on-duckduckgo-search
+  - generic [ref=e654]:
+    - generic [ref=e656]:
+      - img [ref=e657]
+      - generic [ref=e667]:
+        - heading "Introducing DuckDuckGo Collaborations" [level=3] [ref=e668]
+        - paragraph [ref=e669]: Expertly crafted products for people who give a duck about privacy.
+      - link "See More" [ref=e670] [cursor=pointer]:
+        - /url: https://duckduckgo.com/collaborations
+    - generic [ref=e672]:
+      - generic [ref=e673]:
+        - heading "Learn More" [level=3] [ref=e674]
+        - list [ref=e675]:
+          - listitem [ref=e676]:
+            - link "What's New" [ref=e677] [cursor=pointer]:
+              - /url: https://duckduckgo.com/updates
+          - listitem [ref=e678]:
+            - link "About Browser" [ref=e679] [cursor=pointer]:
+              - /url: https://duckduckgo.com/app
+          - listitem [ref=e680]:
+            - link "Compare Privacy" [ref=e681] [cursor=pointer]:
+              - /url: https://duckduckgo.com/compare-privacy
+          - listitem [ref=e682]:
+            - link "Help Pages" [ref=e683] [cursor=pointer]:
+              - /url: https://duckduckgo.com/duckduckgo-help-pages/
+      - generic [ref=e684]:
+        - heading "Get More" [level=3] [ref=e685]
+        - list [ref=e686]:
+          - listitem [ref=e687]:
+            - link "Subscription" [ref=e688] [cursor=pointer]:
+              - /url: https://duckduckgo.com/pro
+          - listitem [ref=e689]:
+            - link "Email Protection" [ref=e690] [cursor=pointer]:
+              - /url: https://duckduckgo.com/email
+          - listitem [ref=e691]:
+            - generic [ref=e692]:
+              - link "Podcast" [ref=e694] [cursor=pointer]:
+                - /url: https://insideduckduckgo.substack.com/?showWelcome=true
+              - generic [ref=e695]:
+                - text: "&"
+                - link "Newsletter" [ref=e696] [cursor=pointer]:
+                  - /url: https://duckduckgo.com/newsletter
+          - listitem [ref=e697]:
+            - link "Collaborations" [ref=e698] [cursor=pointer]:
+              - /url: https://duckduckgo.com/collaborations
+  - button "Share Feedback" [ref=e703] [cursor=pointer]

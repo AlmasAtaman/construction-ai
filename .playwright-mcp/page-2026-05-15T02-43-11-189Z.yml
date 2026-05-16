@@ -1,0 +1,158 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "Back to dashboard" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - text: P
+        - generic [ref=e6]:
+          - generic [ref=e7]: Memorial Hospital — Wing C
+          - generic [ref=e8]: Acme General Contractors
+        - generic [ref=e9]: draft
+      - generic [ref=e10]:
+        - generic "Today's AI spend across all projects. Resets at midnight." [ref=e11]:
+          - generic [ref=e12]: "AI today:"
+          - generic [ref=e13]: $0.03 / $20
+        - link "Specs" [ref=e14] [cursor=pointer]:
+          - /url: /projects/cmp6b3ca90000zmhn3x0mfck4/specs
+          - button "Specs" [ref=e15]
+        - button "History" [ref=e16] [cursor=pointer]
+        - link "Generate Bid" [ref=e17] [cursor=pointer]:
+          - /url: /projects/cmp6b3ca90000zmhn3x0mfck4/bid
+          - button "Generate Bid" [ref=e18]
+    - generic [ref=e19]:
+      - generic [ref=e20]:
+        - complementary [ref=e21]:
+          - heading "Pages" [level=3] [ref=e23]
+          - list [ref=e25]:
+            - listitem [ref=e26]:
+              - button "Page 1" [ref=e27] [cursor=pointer]
+            - listitem [ref=e28]:
+              - button "Page 2" [ref=e29] [cursor=pointer]
+            - listitem [ref=e30]:
+              - button "Page 3" [ref=e31] [cursor=pointer]
+          - generic [ref=e32]:
+            - heading "AI Takeoff" [level=3] [ref=e33]
+            - button "Run AI Takeoff" [ref=e36] [cursor=pointer]
+          - generic [ref=e37]:
+            - heading "Layers" [level=3] [ref=e38]
+            - paragraph [ref=e39]: Show or hide walls, ceilings, trim, doors, and windows.
+        - main [ref=e40]:
+          - generic [ref=e41]:
+            - button "V" [ref=e42] [cursor=pointer]:
+              - img [ref=e43]
+              - generic [ref=e45]: V
+            - button "R" [ref=e46] [cursor=pointer]:
+              - img [ref=e47]
+              - generic [ref=e49]: R
+            - button "P" [ref=e50] [cursor=pointer]:
+              - img [ref=e51]
+              - generic [ref=e53]: P
+            - button "E" [ref=e54] [cursor=pointer]:
+              - img [ref=e55]
+              - generic [ref=e57]: E
+        - complementary [ref=e62]:
+          - heading "Detection Queue" [level=3] [ref=e64]
+          - generic [ref=e97]:
+            - paragraph [ref=e99]: 1 pending surface
+            - list [ref=e100]:
+              - listitem [ref=e101] [cursor=pointer]:
+                - generic [ref=e103]:
+                  - generic [ref=e104]:
+                    - generic [ref=e106]: Trim
+                    - generic [ref=e107]: low
+                  - generic [ref=e108]: Corridor
+                  - generic [ref=e109]: 64 lf
+                - generic [ref=e110]:
+                  - button "Accept" [ref=e111]
+                  - button "Reject" [ref=e112]
+          - heading "Chat" [level=3] [ref=e68]
+          - generic [ref=e70]:
+            - generic [ref=e71]:
+              - generic [ref=e115]: Change all bathroom walls to semi-gloss
+              - generic [ref=e117]:
+                - generic [ref=e118]: Done. Change 2 walls in rooms matching "Bathroom" to semi-gloss.
+                - generic [ref=e120]:
+                  - text: Change 2 walls in rooms matching "Bathroom" to semi-gloss
+                  - generic [ref=e121]: (2 affected)
+              - generic [ref=e124]: What's the total square footage?
+              - generic [ref=e126]:
+                - generic [ref=e127]: You have 460 square feet across 4 surfaces.
+                - generic [ref=e129]: Queried 4 matching surfaces
+            - generic [ref=e74]:
+              - textbox "Ask me to make changes…" [ref=e75]
+              - button "Send" [disabled] [ref=e76]
+      - generic [ref=e77]:
+        - button "Estimate Worksheet Hide" [ref=e78] [cursor=pointer]:
+          - generic [ref=e79]: Estimate Worksheet
+          - generic [ref=e80]: Hide
+        - table [ref=e130]:
+          - rowgroup [ref=e131]:
+            - row "Room Type Paint Coats Area / Length Prod. rate Labor hrs Material Labor" [ref=e132]:
+              - columnheader "Room" [ref=e133]
+              - columnheader "Type" [ref=e134]
+              - columnheader "Paint" [ref=e135]
+              - columnheader "Coats" [ref=e136]
+              - columnheader "Area / Length" [ref=e137]
+              - columnheader "Prod. rate" [ref=e138]
+              - columnheader "Labor hrs" [ref=e139]
+              - columnheader "Material" [ref=e140]
+              - columnheader "Labor" [ref=e141]
+          - rowgroup [ref=e142]:
+            - row "Bathroom 101 wall — 2 220 sqft 175.0 sqft/hr 2.51 $62.23 $179.77" [ref=e143]:
+              - cell "Bathroom 101" [ref=e144]
+              - cell "wall" [ref=e145]
+              - cell "—" [ref=e146]
+              - cell "2" [ref=e147]
+              - cell "220 sqft" [ref=e148]
+              - cell "175.0 sqft/hr" [ref=e149]
+              - cell "2.51" [ref=e150]
+              - cell "$62.23" [ref=e151]
+              - cell "$179.77" [ref=e152]
+            - row "Bathroom 102 wall — 2 240 sqft 175.0 sqft/hr 2.74 $67.89 $196.11" [ref=e153]:
+              - cell "Bathroom 102" [ref=e154]
+              - cell "wall" [ref=e155]
+              - cell "—" [ref=e156]
+              - cell "2" [ref=e157]
+              - cell "240 sqft" [ref=e158]
+              - cell "175.0 sqft/hr" [ref=e159]
+              - cell "2.74" [ref=e160]
+              - cell "$67.89" [ref=e161]
+              - cell "$196.11" [ref=e162]
+            - row "Corridor trim — 2 64 lf 60.0 lf/hr 2.13 $25.34 $138.67" [ref=e163]:
+              - cell "Corridor" [ref=e164]
+              - cell "trim" [ref=e165]
+              - cell "—" [ref=e166]
+              - cell "2" [ref=e167]
+              - cell "64 lf" [ref=e168]
+              - cell "60.0 lf/hr" [ref=e169]
+              - cell "2.13" [ref=e170]
+              - cell "$25.34" [ref=e171]
+              - cell "$138.67" [ref=e172]
+            - row "Corridor door — 2 1 ea 3.6 ea/hr 0.56 $24.75 $39.72" [ref=e173]:
+              - cell "Corridor" [ref=e174]
+              - cell "door" [ref=e175]
+              - cell "—" [ref=e176]
+              - cell "2" [ref=e177]
+              - cell "1 ea" [ref=e178]
+              - cell "3.6 ea/hr" [ref=e179]
+              - cell "0.56" [ref=e180]
+              - cell "$24.75" [ref=e181]
+              - cell "$39.72" [ref=e182]
+          - rowgroup [ref=e183]:
+            - row "Subtotal $180.21 $554.27" [ref=e184]:
+              - cell "Subtotal" [ref=e185]
+              - cell "$180.21" [ref=e186]
+              - cell "$554.27" [ref=e187]
+            - row "Overhead $73.45" [ref=e188]:
+              - cell "Overhead" [ref=e189]
+              - cell "$73.45" [ref=e190]
+            - row "Markup $161.59" [ref=e191]:
+              - cell "Markup" [ref=e192]
+              - cell "$161.59" [ref=e193]
+            - row "Grand Total $969.52" [ref=e194]:
+              - cell "Grand Total" [ref=e195]
+              - cell "$969.52" [ref=e196]
+  - button "Open Next.js Dev Tools" [ref=e88] [cursor=pointer]:
+    - img [ref=e89]
+  - alert [ref=e197]

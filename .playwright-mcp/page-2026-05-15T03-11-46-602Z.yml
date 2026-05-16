@@ -1,0 +1,142 @@
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e56] [cursor=pointer]:
+    - img [ref=e57]
+  - alert [ref=e50]
+  - generic [ref=e103]:
+    - navigation [ref=e104]:
+      - link "P" [ref=e105] [cursor=pointer]:
+        - /url: /
+      - generic [ref=e107]:
+        - link "Projects" [ref=e108] [cursor=pointer]:
+          - /url: /
+          - img [ref=e109]
+        - link "Rates" [ref=e111] [cursor=pointer]:
+          - /url: /settings/rates
+          - img [ref=e112]
+        - link "Rules" [ref=e115] [cursor=pointer]:
+          - /url: /settings/rules
+          - img [ref=e116]
+        - link "Settings" [ref=e119] [cursor=pointer]:
+          - /url: /settings
+          - img [ref=e120]
+    - generic [ref=e123]:
+      - banner [ref=e124]:
+        - generic [ref=e126]:
+          - generic [ref=e127]:
+            - heading "IQ Buildings — Multi-Tenant Commercial" [level=1] [ref=e128]
+            - generic [ref=e129]: draft
+          - generic [ref=e130]: CTP Developers
+        - generic [ref=e131]:
+          - generic "Today's AI spend across all projects. Resets at midnight." [ref=e132]:
+            - img [ref=e133]
+            - generic [ref=e136]: AI today
+            - generic [ref=e137]: $0.00 / $20
+          - link "Specs" [ref=e138] [cursor=pointer]:
+            - /url: /projects/cmp6c9ov50000rfde0c7whl9b/specs
+            - button "Specs" [ref=e139]
+          - button "History" [ref=e140] [cursor=pointer]
+          - link "Bid review" [ref=e141] [cursor=pointer]:
+            - /url: /projects/cmp6c9ov50000rfde0c7whl9b/bid
+            - button "Bid review" [ref=e142]
+          - link "Generate Bid" [ref=e143] [cursor=pointer]:
+            - /url: /projects/cmp6c9ov50000rfde0c7whl9b/bid
+            - button "Generate Bid" [ref=e144]
+      - generic [ref=e145]:
+        - generic [ref=e146]:
+          - complementary [ref=e147]:
+            - heading "Pages" [level=3] [ref=e149]
+            - list [ref=e193]:
+              - listitem [ref=e194]:
+                - button "1 Page 1" [ref=e195] [cursor=pointer]:
+                  - generic [ref=e196]: "1"
+                  - generic [ref=e197]: Page 1
+              - listitem [ref=e198]:
+                - button "2 Page 2" [ref=e199] [cursor=pointer]:
+                  - generic [ref=e200]: "2"
+                  - generic [ref=e201]: Page 2
+              - listitem [ref=e202]:
+                - button "3 Page 3" [ref=e203] [cursor=pointer]:
+                  - generic [ref=e204]: "3"
+                  - generic [ref=e205]: Page 3
+              - listitem [ref=e206]:
+                - button "4 Page 4" [ref=e207] [cursor=pointer]:
+                  - generic [ref=e208]: "4"
+                  - generic [ref=e209]: Page 4
+              - listitem [ref=e210]:
+                - button "5 Page 5" [ref=e211] [cursor=pointer]:
+                  - generic [ref=e212]: "5"
+                  - generic [ref=e213]: Page 5
+              - listitem [ref=e214]:
+                - button "6 Page 6" [ref=e215] [cursor=pointer]:
+                  - generic [ref=e216]: "6"
+                  - generic [ref=e217]: Page 6
+              - listitem [ref=e218]:
+                - button "7 Page 7" [ref=e219] [cursor=pointer]:
+                  - generic [ref=e220]: "7"
+                  - generic [ref=e221]: Page 7
+              - listitem [ref=e222]:
+                - button "8 Page 8" [ref=e223] [cursor=pointer]:
+                  - generic [ref=e224]: "8"
+                  - generic [ref=e225]: Page 8
+              - listitem [ref=e226]:
+                - button "9 Page 9" [ref=e227] [cursor=pointer]:
+                  - generic [ref=e228]: "9"
+                  - generic [ref=e229]: Page 9
+              - listitem [ref=e230]:
+                - button "10 Page 10" [ref=e231] [cursor=pointer]:
+                  - generic [ref=e232]: "10"
+                  - generic [ref=e233]: Page 10
+              - listitem [ref=e234]:
+                - button "11 Page 11" [ref=e235] [cursor=pointer]:
+                  - generic [ref=e236]: "11"
+                  - generic [ref=e237]: Page 11
+              - listitem [ref=e238]:
+                - button "12 Page 12" [ref=e239] [cursor=pointer]:
+                  - generic [ref=e240]: "12"
+                  - generic [ref=e241]: Page 12
+            - generic [ref=e152]:
+              - generic [ref=e153]:
+                - heading "AI Takeoff" [level=3] [ref=e154]
+                - generic [ref=e155]: 0 kept · 0 pending
+              - generic [ref=e156]:
+                - button "Analyzing…" [disabled] [ref=e267]: Analyzing…
+                - generic [ref=e269]: Reading your blueprint. About 30 seconds.
+          - generic [ref=e242]:
+            - button "Select (V)" [ref=e243] [cursor=pointer]:
+              - img [ref=e244]
+              - generic:
+                - text: Select
+                - generic: (V)
+            - button "Area (R)" [ref=e246] [cursor=pointer]:
+              - img [ref=e247]
+              - generic:
+                - text: Area
+                - generic: (R)
+            - button "Polygon (P)" [ref=e249] [cursor=pointer]:
+              - img [ref=e250]
+              - generic:
+                - text: Polygon
+                - generic: (P)
+            - button "Erase (E)" [ref=e252] [cursor=pointer]:
+              - img [ref=e253]
+              - generic:
+                - text: Erase
+                - generic: (E)
+          - main [ref=e160]
+          - complementary [ref=e170]:
+            - generic [ref=e171]:
+              - button "Queue" [ref=e172] [cursor=pointer]:
+                - generic [ref=e173]: Queue
+              - button "Chat" [ref=e175] [cursor=pointer]:
+                - generic [ref=e176]: Chat
+            - generic [ref=e178]:
+              - img [ref=e180]
+              - paragraph [ref=e182]: No pending surfaces.
+              - paragraph [ref=e183]: Run AI Takeoff to find walls, ceilings, trim, and openings.
+        - generic [ref=e184]:
+          - button "Estimate Worksheet (0 surfaces)" [ref=e185] [cursor=pointer]:
+            - generic [ref=e186]:
+              - img [ref=e187]
+              - generic [ref=e189]: Estimate Worksheet
+              - generic [ref=e190]: (0 surfaces)
+          - generic [ref=e192]: Line items will appear here once you accept or draw surfaces.

@@ -1,0 +1,23 @@
+{
+  "source": "US VA Building 28 RRTP — Renovation of First Floor East, St. Cloud VA Medical Center",
+  "url": "http://www.mdm-construction.com/wp-content/uploads/36C26321R0124-0005006-Drawings-3-of-4.pdf",
+  "notes": "Each room below carries an explicit 'NN SF' floor-area callout printed directly on the floor plan drawing. The AI's room labels may include extra adjacent words (e.g. 'CORRIDOR CE-5' or 'CE-5 CORRIDOR'); fuzzy matching against the room code OR the room-type keyword is acceptable. We're scoring CEILING / FLOOR area only, not walls — wall area depends on partition heights which aren't printed.",
+  "assumedCeilingHeightFt": 9,
+  "pages": [
+    {
+      "pageNumber": 1,
+      "label": "First Floor East Plan",
+      "rooms": [
+        { "label": "LOW VOLTAGE 169 / OXYGEN ROOM", "matchKeys": ["169", "voltage", "oxygen"], "trueFloorAreaSqft": 21 },
+        { "label": "STORAGE 134A", "matchKeys": ["134a", "storage"], "trueFloorAreaSqft": 16 },
+        { "label": "CORRIDOR CE-5", "matchKeys": ["ce-5", "ce5"], "trueFloorAreaSqft": 557 },
+        { "label": "CORRIDOR CE-3", "matchKeys": ["ce-3", "ce3"], "trueFloorAreaSqft": 706 },
+        { "label": "CORRIDOR CE-4", "matchKeys": ["ce-4", "ce4"], "trueFloorAreaSqft": 250 },
+        { "label": "CORRIDOR CE-2", "matchKeys": ["ce-2", "ce2"], "trueFloorAreaSqft": 411 },
+        { "label": "CONNECTING CORRIDOR T1", "matchKeys": ["t1", "connecting"], "trueFloorAreaSqft": 270 },
+        { "label": "LINK CORRIDOR", "matchKeys": ["link"], "trueFloorAreaSqft": 189 },
+        { "label": "ELEVATOR LOBBY", "matchKeys": ["lobby", "elevator"], "trueFloorAreaSqft": 640 }
+      ]
+    }
+  ]
+}

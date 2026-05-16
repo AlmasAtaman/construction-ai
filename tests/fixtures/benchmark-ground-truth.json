@@ -1,0 +1,24 @@
+{
+  "source": "ListSimple Sample Floorplans Calgary - 123 Example Drive",
+  "url": "https://www.listsimple.com/documents/ListSimple_Sample_Floorplans_Calgary.pdf",
+  "assumedCeilingHeightFt": 9,
+  "pages": [
+    {
+      "pageNumber": 1,
+      "label": "MAIN",
+      "rooms": [
+        { "label": "Entrance", "widthFt": 18.917, "heightFt": 5.417, "interior": true },
+        { "label": "Living", "widthFt": 10.917, "heightFt": 13.667, "interior": true },
+        { "label": "Formal Dining", "widthFt": 9.917, "heightFt": 10.917, "interior": true },
+        { "label": "Kitchen", "widthFt": 13.0, "heightFt": 16.167, "interior": true },
+        { "label": "Family Room", "widthFt": 12.583, "heightFt": 14.833, "interior": true },
+        { "label": "Bathroom 2P", "widthFt": 4.917, "heightFt": 4.917, "interior": true },
+        { "label": "Den", "widthFt": 10.0, "heightFt": 8.0, "interior": true },
+        { "label": "Laundry/Mud Room", "widthFt": 8.583, "heightFt": 8.417, "interior": true },
+        { "label": "Attached Garage", "widthFt": 21.417, "heightFt": 20.333, "interior": false, "note": "Painters usually skip the garage." },
+        { "label": "Covered Porch", "widthFt": 4.75, "heightFt": 16.667, "interior": false, "note": "Exterior — not part of interior paint scope." },
+        { "label": "Deck", "widthFt": 20.0, "heightFt": 15.667, "interior": false, "note": "Exterior — not part of interior paint scope." }
+      ]
+    }
+  ]
+}
