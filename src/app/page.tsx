@@ -6,22 +6,9 @@ import { UsageWarningBanner } from "@/components/usage/UsageWarningBanner";
 import { GlobalCommandPalette } from "@/components/command/GlobalCommandPalette";
 import { AppShell, TopBar } from "@/components/nav/AppShell";
 import { Input } from "@/components/ui/input";
+import { ProjectRow } from "@/components/projects/ProjectRow";
 
 export const dynamic = "force-dynamic";
-
-function formatDate(d: Date): string {
-  return d.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
-function statusTone(status: string): "draft" | "active" | "sent" {
-  if (status === "active") return "active";
-  if (status === "sent") return "sent";
-  return "draft";
-}
 
 export default async function DashboardPage() {
   const projects = await db.project.findMany({
@@ -69,47 +56,12 @@ export default async function DashboardPage() {
                     <th className="text-right">Plans</th>
                     <th className="text-right">Rooms</th>
                     <th className="text-right">Updated</th>
-                    <th></th>
+                    <th className="w-[44px]"></th>
                   </tr>
                 </thead>
                 <tbody>
                   {projects.map((p) => (
-                    <tr key={p.id}>
-                      <td>
-                        <Link
-                          href={`/projects/${p.id}`}
-                          className="font-medium text-[hsl(var(--ink))] hover:text-[hsl(var(--brand))]"
-                        >
-                          {p.name}
-                        </Link>
-                      </td>
-                      <td className="text-[hsl(var(--ink-2))]">
-                        {p.clientName ?? "—"}
-                      </td>
-                      <td>
-                        <span
-                          className={`pill pill-${statusTone(p.status)}`}
-                        >
-                          {p.status}
-                        </span>
-                      </td>
-                      <td className="text-right num text-[hsl(var(--ink-2))]">
-                        {p._count.plans}
-                      </td>
-                      <td className="text-right num text-[hsl(var(--ink-2))]">
-                        {p._count.surfaces}
-                      </td>
-                      <td className="text-right text-[hsl(var(--ink-3))]">
-                        {formatDate(p.updatedAt)}
-                      </td>
-                      <td className="text-right">
-                        <Link href={`/projects/${p.id}`}>
-                          <Button size="sm" variant="secondary">
-                            Open
-                          </Button>
-                        </Link>
-                      </td>
-                    </tr>
+                    <ProjectRow key={p.id} project={p} />
                   ))}
                 </tbody>
               </table>
