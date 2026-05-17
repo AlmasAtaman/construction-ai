@@ -38,17 +38,31 @@ export async function POST(req: Request) {
     );
   }
 
+  // Load all surfaces with a room label once; the previous implementation
+  // ran a per-entry `contains` query on `fs.room.split(" ")[0]`, which
+  // turned "Bathroom 201" into "Bathroom" and silently over-applied that
+  // entry's paint to every bathroom in the project. We now match on the
+  // full room label, trimmed and case-insensitive. If a finish-schedule
+  // row has no confident match we skip it — better to apply nothing than
+  // overwrite the wrong surfaces in a money document.
+  const allSurfaces = await db.surface.findMany({
+    where: {
+      projectId: parsed.data.projectId,
+      roomLabel: { not: null },
+    },
+    select: { id: true, roomLabel: true },
+  });
+
   let updated = 0;
-  // For each finish schedule entry, update surfaces whose roomLabel matches.
   for (const fs of analysis.finishSchedule ?? []) {
     if (!fs.room) continue;
-    const surfaces = await db.surface.findMany({
-      where: {
-        projectId: parsed.data.projectId,
-        roomLabel: { contains: fs.room.split(" ")[0] },
-      },
-    });
-    for (const s of surfaces) {
+    const target = fs.room.trim().toLowerCase();
+    if (!target) continue;
+    const matches = allSurfaces.filter(
+      (s) => (s.roomLabel ?? "").trim().toLowerCase() === target,
+    );
+    if (matches.length === 0) continue;
+    for (const s of matches) {
       await db.surface.update({
         where: { id: s.id },
         data: { paintType: fs.paintType },

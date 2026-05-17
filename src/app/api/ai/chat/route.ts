@@ -849,10 +849,20 @@ async function runTestModeChat(
     };
   }
 
-  // Pattern: "set waste factor to N%"
-  const wasteMatch = msg.match(/waste.*?(\d+)\s*%/);
-  if (wasteMatch) {
-    const pct = parseInt(wasteMatch[1], 10);
+  // Pattern: waste factor — accepts digits+% , "N percent", and decimal form
+  // like "0.12 waste". If the user clearly mentions waste but no value can
+  // be confidently extracted, ask rather than guess (never silently set
+  // the wrong number).
+  if (/\bwaste\b/.test(msg)) {
+    const pct = extractPercentage(msg);
+    if (pct === null) {
+      return {
+        assistantText:
+          "What waste percentage do you want? Reply with something like \"12%\" or \"0.12\".",
+        executions: [],
+        pendingConfirmation: null,
+      };
+    }
     const ex = await executeTool(projectId, "set_waste_factor", {
       percentage: pct,
     });
@@ -864,10 +874,17 @@ async function runTestModeChat(
     };
   }
 
-  // Pattern: "set markup to N%" / "change markup to N%"
-  const markupMatch = msg.match(/markup.*?(\d+)\s*%/);
-  if (markupMatch) {
-    const pct = parseInt(markupMatch[1], 10);
+  // Pattern: markup — same rules as waste above.
+  if (/\bmarkup\b/.test(msg)) {
+    const pct = extractPercentage(msg);
+    if (pct === null) {
+      return {
+        assistantText:
+          "What markup percentage do you want? Reply with something like \"25%\" or \"0.25\".",
+        executions: [],
+        pendingConfirmation: null,
+      };
+    }
     const ex = await executeTool(projectId, "set_markup", {
       percentage: pct,
     });
@@ -885,4 +902,39 @@ async function runTestModeChat(
     executions: [],
     pendingConfirmation: null,
   };
+}
+
+/**
+ * Pulls a percentage (0..100) out of a free-form message. Accepts three
+ * unambiguous forms so contractors aren't forced into one phrasing:
+ *   "12%"     → 12
+ *   "12 percent" / "12pct" → 12
+ *   "0.12"    → 12   (decimal between 0 and 1 is treated as a fraction)
+ * Returns null if no confident match (caller should ask for clarification —
+ * never guess on a money setting).
+ */
+function extractPercentage(msg: string): number | null {
+  const pctSign = msg.match(/(\d+(?:\.\d+)?)\s*%/);
+  if (pctSign) return clampPct(parseFloat(pctSign[1]));
+
+  const pctWord = msg.match(/(\d+(?:\.\d+)?)\s*(?:percent|pct)\b/);
+  if (pctWord) return clampPct(parseFloat(pctWord[1]));
+
+  // Bare decimal between 0 and 1 (e.g. "0.12"). Whole numbers without a
+  // unit are too ambiguous ("set markup to 25" — dollars? percent?) so we
+  // require either a unit above or a fractional form here.
+  const decimal = msg.match(/\b(0?\.\d+)\b/);
+  if (decimal) {
+    const n = parseFloat(decimal[1]);
+    if (n > 0 && n <= 1) return clampPct(n * 100);
+  }
+  return null;
+}
+
+function clampPct(n: number): number {
+  if (!Number.isFinite(n) || n < 0) return 0;
+  if (n > 100) return 100;
+  // Round to one decimal place; 12.0 / 12.5 are both meaningful, but the
+  // chat tool spec only documents whole-number behavior.
+  return Math.round(n * 10) / 10;
 }

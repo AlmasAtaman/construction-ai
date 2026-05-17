@@ -64,7 +64,7 @@ test("checkpoint 1 — empty dashboard, create project, upload PDF, render", asy
     /pages appear here/i,
   );
   await expect(page.getByTestId("queue-placeholder")).toContainText(
-    /no pending surfaces/i,
+    /nothing to review/i,
   );
 
   // Usage badge still visible in top bar.

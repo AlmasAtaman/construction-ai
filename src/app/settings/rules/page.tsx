@@ -64,10 +64,17 @@ export default function RulesPage() {
           <div className="mt-4 rounded-md bg-blue-50 px-4 py-3 text-sm text-blue-900">
             <strong>Examples:</strong>
             <ul className="mt-1 list-inside list-disc">
-              <li>Always use net deduction for commercial bids.</li>
-              <li>Always use 12% waste factor for interior work.</li>
               <li>Doors and frames are always semi-gloss enamel.</li>
+              <li>Use net deduction for openings on commercial bids.</li>
+              <li>Treat all corridor walls as high-traffic prep.</li>
             </ul>
+          </div>
+
+          <div className="mt-3 rounded-md border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700">
+            <strong>Heads up:</strong> waste factor, overhead, and markup
+            are <em>not</em> set here. Open a project and use{" "}
+            <strong>Settings</strong> on the top bar to change those numbers
+            for that bid.
           </div>
 
           <div className="mt-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
