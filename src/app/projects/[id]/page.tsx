@@ -49,6 +49,11 @@ export default async function ProjectPage({
             Specs
           </Button>
         </Link>
+        <Link href={`/projects/${project.id}/settings`}>
+          <Button variant="ghost" size="sm" data-testid="project-settings-link">
+            Settings
+          </Button>
+        </Link>
         <HistoryButton projectId={project.id} />
         <Link href={`/projects/${project.id}/bid`}>
           <Button variant="secondary" size="sm" data-testid="open-bid-link">

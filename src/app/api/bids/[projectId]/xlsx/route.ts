@@ -81,6 +81,7 @@ export async function GET(
     ["", ""],
     ["Measurement mode", project.measurementMode],
     ["Waste factor", project.wasteFactor],
+    ["Overhead", project.overheadPct],
     ["Markup", project.markup],
   ];
   for (const [field, value] of summaryRows) {
@@ -89,6 +90,11 @@ export async function GET(
   // Currency formatting on dollar rows.
   for (let r = 7; r <= 11; r++) {
     summary.getRow(r).getCell(2).numFmt = '"$"#,##0.00';
+  }
+  // Percent formatting on waste / overhead / markup so contractors see
+  // "20.00%" instead of the raw 0.2 decimal we store.
+  for (let r = 14; r <= 16; r++) {
+    summary.getRow(r).getCell(2).numFmt = '0.00%';
   }
 
   // ── Line items sheet ───────────────────────────────────────────────

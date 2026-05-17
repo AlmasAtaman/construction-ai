@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import {
+  buildProjectConfig,
   calculateBid,
-  DEFAULT_CONFIG,
-  type BidConfig,
 } from "@/lib/math/bid-calculator";
-import type { SurfaceDTO, SurfaceType } from "@/types/surface";
+import type { SurfaceDTO } from "@/types/surface";
 
 export const dynamic = "force-dynamic";
 
@@ -31,27 +30,8 @@ export async function POST(
   })) as SurfaceDTO[];
 
   const rates = await db.laborRate.findMany();
-  const rules = await db.painterRule.findMany({ where: { active: true } });
 
-  const hourlyCostBySurface: Partial<Record<SurfaceType, number>> = {};
-  for (const r of rates) {
-    hourlyCostBySurface[r.surfaceType as SurfaceType] = r.hourlyCost;
-  }
-  let wasteFactor = project.wasteFactor;
-  for (const r of rules) {
-    const m =
-      r.rule.match(/(\d+(?:\.\d+)?)\s*%\s*waste/i) ??
-      r.rule.match(/waste.*?(\d+(?:\.\d+)?)\s*%/i);
-    if (m) wasteFactor = parseFloat(m[1]) / 100;
-  }
-
-  const config: BidConfig = {
-    ...DEFAULT_CONFIG,
-    measurementMode: project.measurementMode as "net" | "gross" | "pca",
-    wasteFactor,
-    markup: project.markup,
-    hourlyCostBySurface,
-  };
+  const config = buildProjectConfig({ project, rates });
 
   const bid = calculateBid(surfaceDtos, config);
 

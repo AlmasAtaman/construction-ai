@@ -94,6 +94,24 @@ export const CHAT_TOOLS: Anthropic.Messages.Tool[] = [
     },
   },
   {
+    name: "set_markup",
+    description:
+      "Update the project's markup (profit added on top of costs). The user typically says it as a percentage; ALWAYS pass that percentage as a number (e.g., 25 for 25%, 30 for 30%). The server divides by 100 to get the decimal.",
+    input_schema: {
+      type: "object",
+      properties: {
+        percentage: {
+          type: "number",
+          minimum: 0,
+          maximum: 100,
+          description:
+            'The markup percentage as a number, NOT decimal. "25 percent" → 25. "30%" → 30. Server converts to decimal.',
+        },
+      },
+      required: ["percentage"],
+    },
+  },
+  {
     name: "query_quantities",
     description:
       'Look up current quantities. Use for ANY question the user asks about totals, counts, areas, or "do I have any X". Never guess from memory — always call this tool.',

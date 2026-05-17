@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useEditorStore } from "@/lib/store/editor-store";
 import {
+  buildProjectConfig,
   calculateBid,
   DEFAULT_CONFIG,
   type BidConfig,
@@ -32,49 +33,34 @@ export function EstimateWorksheet({ projectId }: Props) {
     async function load() {
       setLoading(true);
       try {
-        const [ratesRes, projectRes, rulesRes] = await Promise.all([
+        const [ratesRes, projectRes] = await Promise.all([
           fetch("/api/settings/rates", { cache: "no-store" }),
           fetch(`/api/projects/${projectId}`, { cache: "no-store" }),
-          fetch("/api/settings/rules", { cache: "no-store" }),
         ]);
         const ratesJson = ratesRes.ok ? await ratesRes.json() : { rates: [] };
         const projectJson = projectRes.ok
           ? await projectRes.json()
           : { project: null };
-        const rulesJson = rulesRes.ok
-          ? await rulesRes.json()
-          : { rules: [] };
         if (cancelled) return;
 
-        const hourlyCostBySurface: Partial<Record<SurfaceType, number>> = {};
-        for (const r of ratesJson.rates ?? []) {
-          if (r.surfaceType && typeof r.rate === "number") {
-            hourlyCostBySurface[r.surfaceType as SurfaceType] = r.rate;
-          }
+        if (!projectJson.project) {
+          setConfig(DEFAULT_CONFIG);
+          return;
         }
 
-        let wasteFactor =
-          projectJson.project?.wasteFactor ?? DEFAULT_CONFIG.wasteFactor;
-        for (const rule of rulesJson.rules ?? []) {
-          const m =
-            String(rule.rule).match(/(\d+(?:\.\d+)?)\s*%\s*waste/i) ??
-            String(rule.rule).match(/waste.*?(\d+(?:\.\d+)?)\s*%/i);
-          if (m) wasteFactor = parseFloat(m[1]) / 100;
-        }
-
-        setConfig({
-          ...DEFAULT_CONFIG,
-          measurementMode:
-            projectJson.project?.measurementMode ?? "net",
-          wasteFactor,
-          markup: projectJson.project?.markup ?? DEFAULT_CONFIG.markup,
-          hourlyCostBySurface,
-          defaultHourlyCost:
-            ratesJson.rates?.find?.(
-              (r: { surfaceType: string; rate: number }) =>
-                r.surfaceType === "default",
-            )?.rate ?? DEFAULT_CONFIG.defaultHourlyCost,
-        });
+        setConfig(
+          buildProjectConfig({
+            project: {
+              measurementMode: projectJson.project.measurementMode ?? "net",
+              wasteFactor:
+                projectJson.project.wasteFactor ?? DEFAULT_CONFIG.wasteFactor,
+              markup: projectJson.project.markup ?? DEFAULT_CONFIG.markup,
+              overheadPct:
+                projectJson.project.overheadPct ?? DEFAULT_CONFIG.overheadPct,
+            },
+            rates: ratesJson.rates ?? [],
+          }),
+        );
       } finally {
         if (!cancelled) setLoading(false);
       }

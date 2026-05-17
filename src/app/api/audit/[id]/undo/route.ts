@@ -55,7 +55,10 @@ export async function POST(
       if (
         parsed &&
         typeof parsed === "object" &&
-        ("wasteFactor" in parsed || "measurementMode" in parsed)
+        ("wasteFactor" in parsed ||
+          "measurementMode" in parsed ||
+          "markup" in parsed ||
+          "overheadPct" in parsed)
       ) {
         await db.project.update({
           where: { id: entry.projectId },

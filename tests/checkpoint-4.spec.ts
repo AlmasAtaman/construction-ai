@@ -57,21 +57,32 @@ test("checkpoint 4 — worksheet totals, labor rate changes, painter rules, spec
     { timeout: 10_000 },
   ).not.toEqual(initialTotal);
 
-  // Open painter rules, add waste-factor rule, save.
-  await page.goto("/settings/rules");
-  await page
-    .getByTestId("rules-textarea")
-    .fill("Always use 18% waste factor for interior commercial work.");
-  await page.getByTestId("save-rules").click();
+  // Capture the grand total after the labor-rate change so we can
+  // verify the waste-factor change *also* moves the total.
+  const afterRates = (await grandTotal.textContent()) ?? "";
+
+  // Set the project's waste factor through the new project settings page.
+  // (This step used to set waste factor by writing "18% waste factor" into
+  // a painter rule and relying on a regex to mine the number — that regex
+  // was Problem C in checkpoint 6: it silently shadowed Project.wasteFactor
+  // and trapped contractors whose rule text didn't match the pattern.
+  // The painter-rules screen is now purely for the AI's standing
+  // instructions; the canonical waste factor lives on the project record.)
+  const projectId = projectUrl.split("/").pop()!;
+  await page.goto(`/projects/${projectId}/settings`);
+  await page.getByTestId("waste-factor-input").fill("18");
+  await page.getByTestId("save-project-settings").click();
   await expect(page.getByTestId("saved-toast")).toBeVisible();
 
   // Back to project — worksheet recalculates with new waste factor.
   await page.goto(projectUrl);
   await expect(page.getByTestId("worksheet")).toBeVisible();
   // Material cost should have gone up because waste went from 10% -> 18%.
-  // We just confirm the grand total changed (already changed once above).
-  const afterRules = (await grandTotal.textContent()) ?? "";
-  expect(afterRules).toContain("$");
+  // Confirm the grand total actually moved.
+  await expect.poll(
+    async () => (await grandTotal.textContent()) ?? "",
+    { timeout: 10_000 },
+  ).not.toEqual(afterRates);
 
   // Navigate to specs page.
   await page.getByTestId("specs-link").click();

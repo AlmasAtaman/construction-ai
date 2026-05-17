@@ -57,6 +57,48 @@ export const DEFAULT_CONFIG: BidConfig = {
   complexity: {},
 };
 
+export interface ProjectConfigInputs {
+  project: {
+    measurementMode: string;
+    wasteFactor: number;
+    markup: number;
+    overheadPct: number;
+  };
+  rates: Array<{ surfaceType: string; rate?: number; hourlyCost?: number }>;
+}
+
+/**
+ * Single source of truth for turning a Project + labor rates into a
+ * BidConfig. Used by the generate route, the live worksheet, and the
+ * bid page so every path produces byte-identical math.
+ */
+export function buildProjectConfig({
+  project,
+  rates,
+}: ProjectConfigInputs): BidConfig {
+  const hourlyCostBySurface: Partial<Record<SurfaceType, number>> = {};
+  for (const r of rates) {
+    if (typeof r.hourlyCost === "number") {
+      hourlyCostBySurface[r.surfaceType as SurfaceType] = r.hourlyCost;
+    }
+  }
+  const defaultRow = rates.find((r) => r.surfaceType === "default");
+  const defaultHourlyCost =
+    typeof defaultRow?.rate === "number"
+      ? defaultRow.rate
+      : DEFAULT_CONFIG.defaultHourlyCost;
+
+  return {
+    ...DEFAULT_CONFIG,
+    measurementMode: (project.measurementMode as MeasurementMode) ?? "net",
+    wasteFactor: project.wasteFactor,
+    markup: project.markup,
+    overheadPct: project.overheadPct,
+    hourlyCostBySurface,
+    defaultHourlyCost,
+  };
+}
+
 export function calculateBid(
   surfaces: SurfaceDTO[],
   config: BidConfig = DEFAULT_CONFIG,

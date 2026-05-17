@@ -511,6 +511,29 @@ async function executeTool(
     return { name, input, result: { wasteFactor: pct / 100 }, description };
   }
 
+  if (name === "set_markup") {
+    const pct = (input.percentage as number) ?? 0;
+    const before = await db.project.findUnique({
+      where: { id: projectId },
+      select: { markup: true },
+    });
+    await db.project.update({
+      where: { id: projectId },
+      data: { markup: pct / 100 },
+    });
+    const description = `Set markup to ${pct}%`;
+    await db.auditEntry.create({
+      data: {
+        projectId,
+        action: description + ".",
+        source: "ai",
+        before: JSON.stringify(before),
+        after: JSON.stringify({ markup: pct / 100 }),
+      },
+    });
+    return { name, input, result: { markup: pct / 100 }, description };
+  }
+
   if (name === "query_quantities") {
     const filter = input.filter as ToolFilter | undefined;
     const where = buildWhere(projectId, filter);
@@ -836,6 +859,21 @@ async function runTestModeChat(
     executions.push(ex);
     return {
       assistantText: `Done. Waste factor is now ${pct}%.`,
+      executions,
+      pendingConfirmation: null,
+    };
+  }
+
+  // Pattern: "set markup to N%" / "change markup to N%"
+  const markupMatch = msg.match(/markup.*?(\d+)\s*%/);
+  if (markupMatch) {
+    const pct = parseInt(markupMatch[1], 10);
+    const ex = await executeTool(projectId, "set_markup", {
+      percentage: pct,
+    });
+    executions.push(ex);
+    return {
+      assistantText: `Done. Markup is now ${pct}%.`,
       executions,
       pendingConfirmation: null,
     };

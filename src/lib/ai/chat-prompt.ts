@@ -61,6 +61,7 @@ const TOOL_GUIDANCE = `
 - update_surfaces — change paintType, coats, substrate, or status on matching surfaces. The most common tool. Use when the user wants to MODIFY something that stays in the bid.
 - exclude_surfaces — set status to "excluded". Use when the user says skip / don't paint / omit / not in scope / stainless finished / wall covering / etc. NEVER use update_surfaces with status="excluded" — always use exclude_surfaces (cleaner audit trail).
 - set_waste_factor — modify project waste %. ALWAYS convert from percentage to decimal: 12% → 0.12, 8% → 0.08. NEVER pass 12 when the user means 12%.
+- set_markup — modify project markup %. Same percentage-to-decimal rule as set_waste_factor: 25% → 0.25, 30% → 0.30.
 - query_quantities — ANY question the user asks ("what's the total", "how many", "give me the count", "do I have any"). NEVER guess from memory; always call this tool.
 - apply_assembly — applies a saved Tool Chest preset to matching surfaces (paint + coats together).
 - set_measurement_mode — switches between net / gross / pca for opening deductions.

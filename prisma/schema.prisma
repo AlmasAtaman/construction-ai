@@ -15,6 +15,7 @@ model Project {
   measurementMode String    @default("net")
   wasteFactor     Float     @default(0.10)
   markup          Float     @default(0.20)
+  overheadPct     Float     @default(0.10)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   plans           Plan[]

@@ -8,21 +8,16 @@ import { formatCurrency } from "@/lib/utils";
 import { AppShell, TopBar } from "@/components/nav/AppShell";
 import { SanityPanel } from "@/components/worksheet/SanityPanel";
 import { SymbolCountsPanel } from "@/components/worksheet/SymbolCountsPanel";
+import {
+  buildProjectConfig,
+  calculateBid,
+  DEFAULT_CONFIG,
+  type BidConfig,
+  type BidLineItem,
+} from "@/lib/math/bid-calculator";
+import type { SurfaceDTO } from "@/types/surface";
 
-interface LineItem {
-  surfaceId: string;
-  type: string;
-  roomLabel: string | null;
-  paintType: string | null;
-  coats: number;
-  quantity: number;
-  unit: string;
-  productionRate: number;
-  laborHours: number;
-  laborCost: number;
-  materialCost: number;
-  gallons: number;
-}
+type LineItem = BidLineItem;
 
 interface BidData {
   id: string;
@@ -58,6 +53,8 @@ export default function BidPage({
   const { id: projectId } = use(params);
   const [bid, setBid] = useState<BidData | null>(null);
   const [project, setProject] = useState<ProjectShape | null>(null);
+  const [config, setConfig] = useState<BidConfig>(DEFAULT_CONFIG);
+  const [surfaces, setSurfaces] = useState<SurfaceDTO[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [excluded, setExcluded] = useState<Set<string>>(
@@ -65,14 +62,47 @@ export default function BidPage({
   );
 
   useEffect(() => {
-    fetch(`/api/projects/${projectId}`)
-      .then((r) => r.json())
-      .then((j) => setProject(j.project));
-    fetch(`/api/bids/${projectId}/generate`)
-      .then((r) => r.json())
-      .then((j) => {
-        if (j.bid) setBid(j.bid);
-      });
+    let cancelled = false;
+    async function load() {
+      const [projectRes, ratesRes, surfacesRes, bidRes] = await Promise.all([
+        fetch(`/api/projects/${projectId}`, { cache: "no-store" }),
+        fetch("/api/settings/rates", { cache: "no-store" }),
+        fetch(`/api/surfaces?projectId=${projectId}`, { cache: "no-store" }),
+        fetch(`/api/bids/${projectId}/generate`, { cache: "no-store" }),
+      ]);
+      const projectJson = projectRes.ok
+        ? await projectRes.json()
+        : { project: null };
+      const ratesJson = ratesRes.ok ? await ratesRes.json() : { rates: [] };
+      const surfacesJson = surfacesRes.ok
+        ? await surfacesRes.json()
+        : { surfaces: [] };
+      const bidJson = bidRes.ok ? await bidRes.json() : { bid: null };
+      if (cancelled) return;
+
+      setProject(projectJson.project);
+      setSurfaces(surfacesJson.surfaces ?? []);
+      if (projectJson.project) {
+        setConfig(
+          buildProjectConfig({
+            project: {
+              measurementMode: projectJson.project.measurementMode ?? "net",
+              wasteFactor:
+                projectJson.project.wasteFactor ?? DEFAULT_CONFIG.wasteFactor,
+              markup: projectJson.project.markup ?? DEFAULT_CONFIG.markup,
+              overheadPct:
+                projectJson.project.overheadPct ?? DEFAULT_CONFIG.overheadPct,
+            },
+            rates: ratesJson.rates ?? [],
+          }),
+        );
+      }
+      if (bidJson.bid) setBid(bidJson.bid);
+    }
+    void load();
+    return () => {
+      cancelled = true;
+    };
   }, [projectId]);
 
   async function generate() {
@@ -260,14 +290,41 @@ export default function BidPage({
                         <BidRow
                           key={i}
                           li={li}
-                          onChange={(updated) => {
-                            setBid((b) => {
-                              if (!b) return b;
-                              const next = { ...b, lineItems: [...b.lineItems] };
-                              next.lineItems[i] = updated;
-                              const totals = recalcTotals(next.lineItems);
-                              return { ...next, ...totals };
+                          onQuantityChange={(newQuantity) => {
+                            const overrides = new Map(
+                              bid.lineItems.map((l, j) => [
+                                l.surfaceId,
+                                j === i ? newQuantity : l.quantity,
+                              ]),
+                            );
+                            const adjustedSurfaces = surfaces.map((s) => {
+                              const q = overrides.get(s.id);
+                              if (q === undefined) return s;
+                              if (s.type === "trim") {
+                                return { ...s, linearFootage: q };
+                              }
+                              if (s.type === "door" || s.type === "window") {
+                                return { ...s, count: q };
+                              }
+                              return { ...s, squareFootage: q };
                             });
+                            const recalculated = calculateBid(
+                              adjustedSurfaces,
+                              config,
+                            );
+                            setBid((b) =>
+                              b
+                                ? {
+                                    ...b,
+                                    lineItems: recalculated.lineItems,
+                                    totalMaterial: recalculated.totalMaterial,
+                                    totalLabor: recalculated.totalLabor,
+                                    totalOverhead: recalculated.totalOverhead,
+                                    totalMarkup: recalculated.totalMarkup,
+                                    grandTotal: recalculated.grandTotal,
+                                  }
+                                : b,
+                            );
                           }}
                         />
                       ))}
@@ -363,10 +420,10 @@ export default function BidPage({
 
 function BidRow({
   li,
-  onChange,
+  onQuantityChange,
 }: {
   li: LineItem;
-  onChange: (next: LineItem) => void;
+  onQuantityChange: (newQuantity: number) => void;
 }) {
   return (
     <tr data-testid="bid-row">
@@ -380,17 +437,9 @@ function BidRow({
         <input
           type="number"
           value={Math.round(li.quantity)}
-          onChange={(e) => {
-            const q = parseFloat(e.target.value) || 0;
-            const ratio = q / Math.max(1, li.quantity);
-            onChange({
-              ...li,
-              quantity: q,
-              laborCost: li.laborCost * ratio,
-              materialCost: li.materialCost * ratio,
-            });
-          }}
+          onChange={(e) => onQuantityChange(parseFloat(e.target.value) || 0)}
           className="num w-16 rounded-[4px] border border-[hsl(var(--line))] px-1.5 py-0.5 text-right text-[12px] focus:border-[hsl(var(--brand))] focus:outline-none"
+          data-testid="bid-row-quantity"
         />{" "}
         <span className="text-[11px] text-[hsl(var(--ink-3))]">{li.unit}</span>
       </td>
@@ -398,15 +447,4 @@ function BidRow({
       <td className="num text-right">{formatCurrency(li.laborCost)}</td>
     </tr>
   );
-}
-
-function recalcTotals(lineItems: LineItem[]) {
-  const totalMaterial = lineItems.reduce((a, l) => a + l.materialCost, 0);
-  const totalLabor = lineItems.reduce((a, l) => a + l.laborCost, 0);
-  const subtotal = totalMaterial + totalLabor;
-  const totalOverhead = subtotal * 0.1;
-  const sub2 = subtotal + totalOverhead;
-  const totalMarkup = sub2 * 0.2;
-  const grandTotal = sub2 + totalMarkup;
-  return { totalMaterial, totalLabor, totalOverhead, totalMarkup, grandTotal };
 }
