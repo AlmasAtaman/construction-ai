@@ -33,8 +33,12 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
   const setTool = useEditorStore((s) => s.setTool);
   const setSelected = useEditorStore((s) => s.setSelected);
   const selectedSurfaceId = useEditorStore((s) => s.selectedSurfaceId);
+  const hoveredSurfaceId = useEditorStore((s) => s.hoveredSurfaceId);
+  const setHovered = useEditorStore((s) => s.setHovered);
+  const showAiOverlay = useEditorStore((s) => s.showAiOverlay);
   const removeSurface = useEditorStore((s) => s.removeSurface);
   const addSurface = useEditorStore((s) => s.addSurface);
+  const updateSurface = useEditorStore((s) => s.updateSurface);
 
   const [drawing, setDrawing] = useState<InProgressShape | null>(null);
   const [polyPoints, setPolyPoints] = useState<{ x: number; y: number }[]>([]);
@@ -109,9 +113,26 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
       } | null;
       attrs?: { surfaceId?: string };
     };
-    evt?: Event;
+    evt?: MouseEvent;
     cancelBubble?: boolean;
   };
+
+  // Drag-to-pan state for the select tool. We start "potential pan" on
+  // mousedown over empty stage; if the cursor moves past a threshold we
+  // upgrade to actual panning, otherwise the mouseup is treated as a
+  // click-on-empty (deselect). Uses native screen coordinates because
+  // konva's pointerPosition is in transformed Stage space.
+  const [panState, setPanState] = useState<{
+    startClientX: number;
+    startClientY: number;
+    startPanX: number;
+    startPanY: number;
+    moved: boolean;
+  } | null>(null);
+  const panX = useEditorStore((s) => s.panX);
+  const panY = useEditorStore((s) => s.panY);
+  const setViewport = useEditorStore((s) => s.setViewport);
+  const PAN_DRAG_THRESHOLD_PX = 3;
 
   function onMouseDown(e: KonvaEvt) {
     const stage = e.target.getStage();
@@ -145,9 +166,17 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
       }
       setTool("select");
     } else if (tool === "select") {
-      // Clicked empty stage — deselect (compare via attrs absence)
-      if (!e.target.attrs?.surfaceId) {
-        setSelected(null);
+      // Empty stage click in select mode → start a potential pan. If the
+      // cursor doesn't move past the threshold, we'll treat it as a
+      // click-to-deselect on mouseup. If it does, the user is panning.
+      if (!e.target.attrs?.surfaceId && e.evt) {
+        setPanState({
+          startClientX: e.evt.clientX,
+          startClientY: e.evt.clientY,
+          startPanX: panX,
+          startPanY: panY,
+          moved: false,
+        });
       }
     }
   }
@@ -183,6 +212,20 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
     if (tool === "rectangle" && drawing) {
       const pos = e.target.getStage()?.getPointerPosition();
       if (pos) setDrawing({ ...drawing, end: pos });
+      return;
+    }
+    if (panState && e.evt) {
+      const dx = e.evt.clientX - panState.startClientX;
+      const dy = e.evt.clientY - panState.startClientY;
+      const moved =
+        panState.moved || Math.hypot(dx, dy) > PAN_DRAG_THRESHOLD_PX;
+      if (moved) {
+        if (!panState.moved) setPanState({ ...panState, moved: true });
+        setViewport({
+          panX: panState.startPanX + dx,
+          panY: panState.startPanY + dy,
+        });
+      }
     }
   }
 
@@ -207,6 +250,14 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
         setTool("select");
       }
     }
+    if (panState) {
+      // Mouseup without movement → it was a click on empty canvas →
+      // preserve the original "click to deselect" behavior.
+      if (!panState.moved) {
+        setSelected(null);
+      }
+      setPanState(null);
+    }
   }
 
   async function commitPolygon() {
@@ -222,13 +273,52 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
     removeSurface(id);
   }
 
+  /**
+   * Drag-end handler: konva moves the Line by an internal x/y offset, but
+   * our polygon coords are in normalized 0..1 space. We rebake the offset
+   * into the polygon points, reset the node's x/y, persist, and update
+   * the store so future renders use the new coords.
+   */
+  async function commitPolygonDrag(
+    surfaceId: string,
+    offsetPx: { x: number; y: number },
+    node: { x: (v: number) => void; y: (v: number) => void },
+  ) {
+    const surface = props.surfaces.find((s) => s.id === surfaceId);
+    if (!surface) return;
+    const newPolygon = surface.polygon.map((p) => ({
+      x: p.x + offsetPx.x / props.width,
+      y: p.y + offsetPx.y / props.height,
+    }));
+    // Reset the konva node's x/y back to 0 since we're baking the offset
+    // into the points themselves.
+    node.x(0);
+    node.y(0);
+    updateSurface(surfaceId, { polygon: newPolygon });
+    try {
+      await fetch(`/api/surfaces/${surfaceId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ polygon: newPolygon }),
+      });
+    } catch {
+      /* the optimistic update already happened; user can drag again */
+    }
+  }
+
   // Memo: pre-compute pixel polygons for visible surfaces. Annotations
-  // are rendered separately as markers, not as polygon outlines.
+  // are rendered separately as markers, not as polygon outlines. When
+  // showAiOverlay is off, keep only manually-drawn / accepted surfaces
+  // so the contractor can see the bare blueprint with their own marks.
   const visibleSurfaces = useMemo(
     () =>
       props.surfaces
         .filter((s) => s.status !== "excluded")
         .filter((s) => !s.type.startsWith("annotation:") && !s.type.startsWith("symbol:"))
+        .filter((s) => {
+          if (showAiOverlay) return true;
+          return s.source !== "ai" || s.status === "manual";
+        })
         .map((s) => ({
           surface: s,
           flatPoints: s.polygon.flatMap((p) => {
@@ -237,7 +327,7 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
           }),
         })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [props.surfaces, props.width, props.height],
+    [props.surfaces, props.width, props.height, showAiOverlay],
   );
 
   const annotations = useMemo(
@@ -290,8 +380,22 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
           {visibleSurfaces.map(({ surface, flatPoints }) => {
             const color = SURFACE_COLORS[surface.type];
             const isSelected = selectedSurfaceId === surface.id;
+            const isHovered = hoveredSurfaceId === surface.id;
             const isLow = surface.confidence < 0.6;
             const isMid = surface.confidence >= 0.6 && surface.confidence < 0.8;
+            // Lighter default fill so the blueprint underneath stays
+            // readable. Bump opacity on hover/selection so the user can
+            // still see exactly what's highlighted.
+            const fillAlpha = isSelected
+              ? "55" // 33%
+              : isHovered
+                ? "40" // 25%
+                : "1A"; // 10%
+            const strokeWidth = isSelected ? 4 : isHovered ? 3 : 1.5;
+            // Selected surface becomes draggable in select mode; everything
+            // else stays anchored so the user can't accidentally yank a
+            // polygon while panning.
+            const draggable = tool === "select" && isSelected;
 
             return (
               <Line
@@ -299,14 +403,28 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
                 surfaceId={surface.id}
                 points={flatPoints}
                 closed
-                fill={`${color}33`}
+                fill={`${color}${fillAlpha}`}
                 stroke={isLow ? "#dc2626" : color}
-                strokeWidth={isSelected ? 4 : 2}
+                strokeWidth={strokeWidth}
                 dash={isMid ? [8, 4] : undefined}
-                shadowEnabled={isLow}
-                shadowColor="#dc2626"
-                shadowBlur={isLow ? 15 : 0}
-                shadowOpacity={isLow ? 0.5 : 0}
+                shadowEnabled={isLow || isHovered}
+                shadowColor={isLow ? "#dc2626" : color}
+                shadowBlur={isLow ? 15 : isHovered ? 8 : 0}
+                shadowOpacity={isLow ? 0.5 : isHovered ? 0.4 : 0}
+                draggable={draggable}
+                onMouseEnter={() => setHovered(surface.id)}
+                onMouseLeave={() => setHovered(null)}
+                onDragEnd={(e) => {
+                  const node = e.target as unknown as {
+                    x: () => number;
+                    y: () => number;
+                  } & { x: (v: number) => void; y: (v: number) => void };
+                  void commitPolygonDrag(
+                    surface.id,
+                    { x: node.x(), y: node.y() },
+                    node,
+                  );
+                }}
                 onClick={(e) => {
                   if (tool === "eraser") {
                     void deleteSurface(surface.id);

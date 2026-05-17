@@ -15,6 +15,7 @@ import { UndoToast } from "./UndoToast";
 import { SurfaceContextMenu } from "./SurfaceContextMenu";
 import type { SurfaceDTO } from "@/types/surface";
 import { DetectionQueue } from "./DetectionQueue";
+import { CanvasToolbar } from "./CanvasToolbar";
 import { cn } from "@/lib/utils";
 
 const SurfaceOverlay = dynamic(
@@ -241,24 +242,27 @@ export function ProjectWorkspace({
               />
             </div>
           ) : currentPlanPage ? (
-            <PdfViewer planId={plan.id} pageNumber={currentPage}>
-              {(size) => (
-                <SurfaceOverlay
-                  width={size.width}
-                  height={size.height}
-                  surfaces={surfaces}
-                  planPageId={currentPlanPage.id}
-                  projectId={projectId}
-                  onSurfaceCreated={refreshSurfaces}
-                  onContextMenu={(surfaceId, pos) =>
-                    setContextMenu({
-                      surfaceId,
-                      position: pos,
-                    })
-                  }
-                />
-              )}
-            </PdfViewer>
+            <>
+              <CanvasToolbar />
+              <PdfViewer planId={plan.id} pageNumber={currentPage}>
+                {(size) => (
+                  <SurfaceOverlay
+                    width={size.width}
+                    height={size.height}
+                    surfaces={surfaces}
+                    planPageId={currentPlanPage.id}
+                    projectId={projectId}
+                    onSurfaceCreated={refreshSurfaces}
+                    onContextMenu={(surfaceId, pos) =>
+                      setContextMenu({
+                        surfaceId,
+                        position: pos,
+                      })
+                    }
+                  />
+                )}
+              </PdfViewer>
+            </>
           ) : null}
           {contextMenu && (
             <SurfaceContextMenu

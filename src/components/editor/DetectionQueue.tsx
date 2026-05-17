@@ -59,6 +59,7 @@ export function DetectionQueue({ onAcceptAllHighConfidence }: Props) {
   const surfaces = useEditorStore((s) => s.surfaces);
   const selected = useEditorStore((s) => s.selectedSurfaceId);
   const setSelected = useEditorStore((s) => s.setSelected);
+  const setHovered = useEditorStore((s) => s.setHovered);
   const updateSurface = useEditorStore((s) => s.updateSurface);
   const removeSurface = useEditorStore((s) => s.removeSurface);
   const setPendingUndo = useEditorStore((s) => s.setPendingUndo);
@@ -187,6 +188,8 @@ export function DetectionQueue({ onAcceptAllHighConfidence }: Props) {
                   : "hover:bg-[hsl(var(--panel-2))]"
               }`}
               onClick={() => setSelected(s.id)}
+              onMouseEnter={() => setHovered(s.id)}
+              onMouseLeave={() => setHovered(null)}
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0 flex-1">
