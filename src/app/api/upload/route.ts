@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { mkdir, writeFile } from "fs/promises";
 import { existsSync } from "fs";
 import path from "path";
+import { PDFDocument } from "pdf-lib";
 import { db } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
@@ -17,13 +18,17 @@ async function ensureUploadsDir() {
 }
 
 async function countPdfPages(buffer: Buffer): Promise<number> {
-  // Count "/Type /Page" occurrences excluding "/Pages". Good enough for
-  // simple PDFs; if it fails we default to 1.
+  // Parse the PDF properly. The old approach regex-scanned the raw bytes
+  // for "/Type /Page", which silently returned 1 for any PDF 1.5+ that
+  // used compressed object streams (most modern files — including federal
+  // procurement drawings). pdf-lib handles every PDF version we care about.
   try {
-    const text = buffer.toString("latin1");
-    const matches = text.match(/\/Type\s*\/Page(?!s)/g);
-    if (matches && matches.length > 0) return matches.length;
-    return 1;
+    const pdf = await PDFDocument.load(buffer, {
+      ignoreEncryption: true,
+      throwOnInvalidObject: false,
+    });
+    const count = pdf.getPageCount();
+    return count > 0 ? count : 1;
   } catch {
     return 1;
   }
