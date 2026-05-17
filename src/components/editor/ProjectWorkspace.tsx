@@ -304,6 +304,7 @@ export function ProjectWorkspace({
             {rightTab === "chat" && (
               <ChatSidebar
                 projectId={projectId}
+                hasPlan={!!plan}
                 onAfterAction={refreshSurfaces}
               />
             )}

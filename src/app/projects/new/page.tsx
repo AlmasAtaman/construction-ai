@@ -50,16 +50,15 @@ export default function NewProjectPage() {
 
   return (
     <AppShell>
-      <TopBar title="New project" subtitle="Set up a new bid" />
+      <TopBar title="New project" subtitle="Set up a new bid">
+        <Link href="/">
+          <Button variant="ghost" size="sm">
+            Back to projects
+          </Button>
+        </Link>
+      </TopBar>
       <main className="flex-1 overflow-y-auto px-6 py-8">
         <div className="mx-auto max-w-2xl">
-          <Link
-            href="/"
-            className="text-[13px] text-[hsl(var(--brand))] hover:underline"
-          >
-            ← Back to projects
-          </Link>
-
           <form
             onSubmit={onSubmit}
             className="mt-6 rounded-[8px] border border-[hsl(var(--line))] bg-white p-6 shadow-sm"

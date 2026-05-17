@@ -2,6 +2,7 @@
 
 import { use, useEffect, useState } from "react";
 import { AppShell, TopBar } from "@/components/nav/AppShell";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 interface ProjectRef {
@@ -109,17 +110,13 @@ export default function CompareTakeoffsPage({
 
   return (
     <AppShell>
-      <TopBar
-        title="Compare takeoffs"
-        right={
-          <Link
-            href={`/projects/${id}`}
-            className="text-[12px] text-[hsl(var(--ink-2))] hover:text-[hsl(var(--ink-1))]"
-          >
-            ← Back to project
-          </Link>
-        }
-      />
+      <TopBar title="Compare takeoffs">
+        <Link href={`/projects/${id}`}>
+          <Button variant="ghost" size="sm">
+            Back to project
+          </Button>
+        </Link>
+      </TopBar>
       <div className="p-5 max-w-5xl mx-auto">
         <div className="rounded-[8px] border border-[hsl(var(--line))] bg-white p-5 shadow-sm">
           <h2 className="text-[14px] font-semibold text-[hsl(var(--ink-1))]">

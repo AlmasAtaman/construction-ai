@@ -6,10 +6,11 @@ import { Button } from "@/components/ui/button";
 
 interface Props {
   projectId: string;
+  hasPlan: boolean;
   onAfterAction: () => void | Promise<void>;
 }
 
-export function ChatSidebar({ projectId, onAfterAction }: Props) {
+export function ChatSidebar({ projectId, hasPlan, onAfterAction }: Props) {
   const messages = useChatStore((s) => s.messages);
   const sending = useChatStore((s) => s.sending);
   const setSending = useChatStore((s) => s.setSending);
@@ -152,6 +153,17 @@ export function ChatSidebar({ projectId, onAfterAction }: Props) {
     textareaRef.current?.focus();
   }
 
+  if (!hasPlan) {
+    return (
+      <div
+        className="flex h-full flex-col bg-[hsl(var(--panel))]"
+        data-testid="chat-sidebar"
+      >
+        <NoPlanState />
+      </div>
+    );
+  }
+
   return (
     <div
       className="flex h-full flex-col bg-[hsl(var(--panel))]"
@@ -280,6 +292,37 @@ function TypingRow() {
         <span className="inline-block h-1.5 w-1.5 animate-bounce rounded-full bg-current [animation-delay:120ms]" />
         <span className="inline-block h-1.5 w-1.5 animate-bounce rounded-full bg-current [animation-delay:240ms]" />
       </div>
+    </div>
+  );
+}
+
+function NoPlanState() {
+  return (
+    <div
+      className="flex flex-1 flex-col items-center justify-center px-6 text-center"
+      data-testid="chat-no-plan"
+    >
+      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[hsl(var(--panel-2))] text-[hsl(var(--ink-3))]">
+        <svg
+          viewBox="0 0 24 24"
+          width="18"
+          height="18"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.7"
+        >
+          <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
+          <path d="M14 3v6h6" />
+        </svg>
+      </div>
+      <div className="text-[13px] font-semibold text-[hsl(var(--ink))]">
+        Upload a blueprint first
+      </div>
+      <p className="mt-1.5 text-[12px] leading-[1.5] text-[hsl(var(--ink-2))]">
+        The AI chat works on the surfaces in your project. Drag a PDF
+        blueprint into the center panel to get started, then come back
+        here.
+      </p>
     </div>
   );
 }

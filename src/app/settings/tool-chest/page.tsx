@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { AppShell, TopBar } from "@/components/nav/AppShell";
 
 interface Assembly {
@@ -83,17 +84,13 @@ export default function ToolChestPage() {
 
   return (
     <AppShell>
-      <TopBar
-        title="Tool chest — paint assemblies"
-        right={
-          <Link
-            href="/settings"
-            className="text-[12px] text-[hsl(var(--ink-2))] hover:text-[hsl(var(--ink-1))]"
-          >
-            ← Settings
-          </Link>
-        }
-      />
+      <TopBar title="Tool chest — paint assemblies">
+        <Link href="/settings">
+          <Button variant="ghost" size="sm">
+            Back to settings
+          </Button>
+        </Link>
+      </TopBar>
       <div className="p-5 max-w-4xl mx-auto">
         <div className="rounded-[8px] border border-[hsl(var(--line))] bg-white p-5 shadow-sm">
           <div className="flex items-baseline justify-between mb-3">

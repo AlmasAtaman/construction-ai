@@ -64,11 +64,10 @@ export default function RatesPage() {
         title="Labor rates"
         subtitle="How fast your team paints and what they cost per hour"
       >
-        <Link
-          href="/settings"
-          className="text-[12px] text-[hsl(var(--ink-2))] hover:text-[hsl(var(--ink-1))]"
-        >
-          ← Settings
+        <Link href="/settings">
+          <Button variant="ghost" size="sm">
+            Back to settings
+          </Button>
         </Link>
       </TopBar>
       <main className="flex-1 px-6 py-10">

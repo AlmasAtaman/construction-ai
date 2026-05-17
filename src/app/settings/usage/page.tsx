@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
 import { AppShell, TopBar } from "@/components/nav/AppShell";
 
@@ -35,11 +36,10 @@ export default function UsagePage() {
         title="AI usage today"
         subtitle="How much of today's AI budget you've used. Resets at midnight."
       >
-        <Link
-          href="/settings"
-          className="text-[12px] text-[hsl(var(--ink-2))] hover:text-[hsl(var(--ink-1))]"
-        >
-          ← Settings
+        <Link href="/settings">
+          <Button variant="ghost" size="sm">
+            Back to settings
+          </Button>
         </Link>
       </TopBar>
       <main className="flex-1 px-6 py-10">

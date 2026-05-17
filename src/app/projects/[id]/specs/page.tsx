@@ -120,13 +120,12 @@ export default function SpecsPage({
         title="Spec reader"
         subtitle="Upload a paint spec PDF — the AI pulls out scope, finishes, and exclusions"
       >
-        <Link
-          href={`/projects/${projectId}`}
-          className="text-[12px] text-[hsl(var(--ink-2))] hover:text-[hsl(var(--ink-1))]"
-        >
-          ← Back to project
-        </Link>
         <UsageBadge />
+        <Link href={`/projects/${projectId}`}>
+          <Button variant="ghost" size="sm">
+            Back to project
+          </Button>
+        </Link>
       </TopBar>
 
       <main className="flex-1 px-6 py-8">
