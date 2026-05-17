@@ -10,6 +10,8 @@ export function CanvasToolbar() {
   const resetViewport = useEditorStore((s) => s.resetViewport);
   const showAiOverlay = useEditorStore((s) => s.showAiOverlay);
   const setShowAiOverlay = useEditorStore((s) => s.setShowAiOverlay);
+  const visibleTypes = useEditorStore((s) => s.visibleTypes);
+  const toggleType = useEditorStore((s) => s.toggleType);
   const surfaces = useEditorStore((s) => s.surfaces);
 
   // Per-type counts. Skip excluded, skip annotations and symbol counts
@@ -109,19 +111,49 @@ export function CanvasToolbar() {
         {counts.total > 0 && (
           <div
             data-testid="surface-count-chip"
-            className="flex items-center gap-2 rounded-[8px] border border-[hsl(var(--line))] bg-white/95 px-2.5 py-1.5 text-[11.5px] shadow-sm backdrop-blur"
-            title="Paintable surfaces detected on this page"
+            className="flex items-center gap-1.5 rounded-[8px] border border-[hsl(var(--line))] bg-white/95 px-2.5 py-1.5 text-[11.5px] shadow-sm backdrop-blur"
+            title="Paintable surfaces detected on this page. Click a type to show/hide its polygons."
           >
             <span className="num font-semibold text-[hsl(var(--ink))]">
               {counts.total}
             </span>
             <span className="text-[hsl(var(--ink-3))]">surfaces</span>
             <span className="h-3 w-px bg-[hsl(var(--line))]" />
-            <CountPill label="walls" n={counts.wall} swatchKey="wall" />
-            <CountPill label="ceilings" n={counts.ceiling} swatchKey="ceiling" />
-            <CountPill label="trim" n={counts.trim} swatchKey="trim" />
-            <CountPill label="doors" n={counts.door} swatchKey="door" />
-            <CountPill label="windows" n={counts.window} swatchKey="window" />
+            <TypeToggle
+              label="walls"
+              n={counts.wall}
+              swatchKey="wall"
+              active={visibleTypes.wall}
+              onClick={() => toggleType("wall")}
+            />
+            <TypeToggle
+              label="ceilings"
+              n={counts.ceiling}
+              swatchKey="ceiling"
+              active={visibleTypes.ceiling}
+              onClick={() => toggleType("ceiling")}
+            />
+            <TypeToggle
+              label="trim"
+              n={counts.trim}
+              swatchKey="trim"
+              active={visibleTypes.trim}
+              onClick={() => toggleType("trim")}
+            />
+            <TypeToggle
+              label="doors"
+              n={counts.door}
+              swatchKey="door"
+              active={visibleTypes.door}
+              onClick={() => toggleType("door")}
+            />
+            <TypeToggle
+              label="windows"
+              n={counts.window}
+              swatchKey="window"
+              active={visibleTypes.window}
+              onClick={() => toggleType("window")}
+            />
           </div>
         )}
 
@@ -178,21 +210,49 @@ function ToolbarButton({
   );
 }
 
-function CountPill({
+function TypeToggle({
   label,
   n,
   swatchKey,
+  active,
+  onClick,
 }: {
   label: string;
   n: number;
   swatchKey: string;
+  active: boolean;
+  onClick: () => void;
 }) {
   if (n === 0) return null;
   return (
-    <span className="inline-flex items-center gap-1 text-[hsl(var(--ink-2))]">
-      <span className={`inline-block h-2 w-2 rounded-sm swatch-${swatchKey}`} />
-      <span className="num font-medium text-[hsl(var(--ink))]">{n}</span>
+    <button
+      type="button"
+      onClick={onClick}
+      data-testid={`type-toggle-${swatchKey}`}
+      aria-pressed={active}
+      title={active ? `Hide ${label}` : `Show ${label}`}
+      className={cn(
+        "inline-flex items-center gap-1 rounded-[4px] px-1 py-0.5 transition-colors",
+        active
+          ? "text-[hsl(var(--ink-2))] hover:bg-[hsl(var(--panel-2))]"
+          : "text-[hsl(var(--ink-3))] line-through opacity-60 hover:opacity-90",
+      )}
+    >
+      <span
+        className={cn(
+          "inline-block h-2 w-2 rounded-sm",
+          active ? `swatch-${swatchKey}` : "bg-[hsl(var(--line))]",
+        )}
+      />
+      <span
+        className={cn(
+          "num font-medium",
+          active ? "text-[hsl(var(--ink))]" : "text-[hsl(var(--ink-3))]",
+        )}
+      >
+        {n}
+      </span>
       <span>{label}</span>
-    </span>
+    </button>
   );
 }

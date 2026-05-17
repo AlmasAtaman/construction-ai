@@ -71,7 +71,10 @@ export async function POST(req: Request) {
   }
 
   const cacheKey = makeCacheKey({
-    endpoint: "takeoff-v2",
+    // Bumped from takeoff-v2 → takeoff-v3 when repositionPolygonsByLabel
+    // changed the shape of persisted polygons. Cached pre-fix results
+    // would replay with the old bunched polygons otherwise.
+    endpoint: "takeoff-v9",
     model: DEFAULT_MODEL,
     prompt: TAKEOFF_SYSTEM_PROMPT_CACHED,
     inputHash: `${hashBuffer(fullPdf)}#${planPage.pageNumber}`,
@@ -276,7 +279,7 @@ async function persistSurfaces(
   let count = 0;
   // Walls
   for (const w of result.walls ?? []) {
-    if (!w.polygon || w.polygon.length < 3) continue;
+    if (!w.polygon) continue; // empty array still persists — surface shows in queue without a canvas marker
     await db.surface.create({
       data: {
         projectId,
@@ -364,7 +367,7 @@ async function persistSurfaces(
   }
   // Windows
   for (const w of result.windows ?? []) {
-    if (!w.polygon || w.polygon.length < 3) continue;
+    if (!w.polygon) continue; // empty array still persists — surface shows in queue without a canvas marker
     await db.surface.create({
       data: {
         projectId,

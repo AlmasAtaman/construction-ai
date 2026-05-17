@@ -36,6 +36,7 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
   const hoveredSurfaceId = useEditorStore((s) => s.hoveredSurfaceId);
   const setHovered = useEditorStore((s) => s.setHovered);
   const showAiOverlay = useEditorStore((s) => s.showAiOverlay);
+  const visibleTypes = useEditorStore((s) => s.visibleTypes);
   const removeSurface = useEditorStore((s) => s.removeSurface);
   const addSurface = useEditorStore((s) => s.addSurface);
   const updateSurface = useEditorStore((s) => s.updateSurface);
@@ -315,6 +316,12 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
       props.surfaces
         .filter((s) => s.status !== "excluded")
         .filter((s) => !s.type.startsWith("annotation:") && !s.type.startsWith("symbol:"))
+        .filter((s) => visibleTypes[s.type as keyof typeof visibleTypes])
+        // Empty polygon = "AI detected this room but we don't know
+        // where on the plan it sits." Keep it in the queue / bid math
+        // upstream, just skip rendering — honest no-marker beats
+        // a wrong marker on the title block.
+        .filter((s) => s.polygon && s.polygon.length >= 3)
         .filter((s) => {
           if (showAiOverlay) return true;
           return s.source !== "ai" || s.status === "manual";
@@ -327,7 +334,7 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
           }),
         })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [props.surfaces, props.width, props.height, showAiOverlay],
+    [props.surfaces, props.width, props.height, showAiOverlay, visibleTypes],
   );
 
   const annotations = useMemo(
@@ -386,12 +393,16 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
             // Lighter default fill so the blueprint underneath stays
             // readable. Bump opacity on hover/selection so the user can
             // still see exactly what's highlighted.
+            // Outline-only by default — these are markers, not painted
+            // regions, and a filled blob hides the wall lines on the
+            // plan underneath. Hover / select bump the fill slightly
+            // so the user can confirm what they're focused on.
             const fillAlpha = isSelected
-              ? "55" // 33%
+              ? "33" // 20%
               : isHovered
-                ? "40" // 25%
-                : "1A"; // 10%
-            const strokeWidth = isSelected ? 4 : isHovered ? 3 : 1.5;
+                ? "1A" // 10%
+                : "00"; // 0% — outline only
+            const strokeWidth = isSelected ? 3 : isHovered ? 2.5 : 1.5;
             // Selected surface becomes draggable in select mode; everything
             // else stays anchored so the user can't accidentally yank a
             // polygon while panning.

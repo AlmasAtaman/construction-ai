@@ -31,6 +31,17 @@ interface EditorState {
   // Toggle that hides AI-detected polygons so the user can read the
   // bare blueprint when validating.
   showAiOverlay: boolean;
+  // Per-surface-type visibility. On dense plans, every room produces 4-5
+  // overlapping polygons (wall + ceiling + trim + door + window) and the
+  // canvas becomes unreadable. Default to walls-only and let the user
+  // toggle the others on when they want to verify a specific type.
+  visibleTypes: {
+    wall: boolean;
+    ceiling: boolean;
+    trim: boolean;
+    door: boolean;
+    window: boolean;
+  };
   setSurfaces: (s: SurfaceDTO[]) => void;
   addSurface: (s: SurfaceDTO) => void;
   updateSurface: (id: string, change: Partial<SurfaceDTO>) => void;
@@ -48,6 +59,7 @@ interface EditorState {
     contentH?: number;
   }) => void;
   setShowAiOverlay: (v: boolean) => void;
+  toggleType: (t: keyof EditorState["visibleTypes"]) => void;
 }
 
 // Zoom range: 1 = fit to container (any tighter and the blueprint becomes
@@ -101,6 +113,13 @@ export const useEditorStore = create<EditorState>((set) => ({
   contentW: 0,
   contentH: 0,
   showAiOverlay: true,
+  visibleTypes: {
+    wall: true,
+    ceiling: false,
+    trim: false,
+    door: false,
+    window: false,
+  },
   setSurfaces: (s) => set({ surfaces: s }),
   addSurface: (s) =>
     set((st) => ({ surfaces: [...st.surfaces, s] })),
@@ -149,4 +168,8 @@ export const useEditorStore = create<EditorState>((set) => ({
       contentH: contentH ?? st.contentH,
     })),
   setShowAiOverlay: (v) => set({ showAiOverlay: v }),
+  toggleType: (t) =>
+    set((st) => ({
+      visibleTypes: { ...st.visibleTypes, [t]: !st.visibleTypes[t] },
+    })),
 }));

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { PdfViewer } from "./PdfViewer";
 import { PlanUploader } from "./PlanUploader";
@@ -32,6 +32,10 @@ export interface PlanData {
 
 type RightPanelTab = "queue" | "chat";
 
+const WORKSHEET_MIN_PX = 120;
+const WORKSHEET_MAX_PX = 600;
+const WORKSHEET_DEFAULT_PX = 288; // matches the old max-h-72 (72 * 4)
+
 export function ProjectWorkspace({
   projectId,
   initialPlan,
@@ -42,11 +46,39 @@ export function ProjectWorkspace({
   const [plan, setPlan] = useState<PlanData | null>(initialPlan);
   const [currentPage, setCurrentPage] = useState(1);
   const [worksheetOpen, setWorksheetOpen] = useState(true);
+  const [worksheetHeight, setWorksheetHeight] = useState(WORKSHEET_DEFAULT_PX);
   const [rightTab, setRightTab] = useState<RightPanelTab>("queue");
   const [contextMenu, setContextMenu] = useState<{
     surfaceId: string;
     position: { x: number; y: number };
   } | null>(null);
+
+  // Worksheet drag-to-resize: hold the top edge and drag to shrink/grow
+  // the bottom panel, like the VSCode terminal.
+  const worksheetResizing = useRef<{ startY: number; startHeight: number } | null>(null);
+  function onWorksheetHandleDown(e: React.PointerEvent<HTMLDivElement>) {
+    e.preventDefault();
+    (e.target as Element).setPointerCapture(e.pointerId);
+    worksheetResizing.current = {
+      startY: e.clientY,
+      startHeight: worksheetHeight,
+    };
+  }
+  function onWorksheetHandleMove(e: React.PointerEvent<HTMLDivElement>) {
+    const r = worksheetResizing.current;
+    if (!r) return;
+    // Drag up to grow (negative delta), down to shrink.
+    const next = r.startHeight - (e.clientY - r.startY);
+    setWorksheetHeight(
+      Math.min(WORKSHEET_MAX_PX, Math.max(WORKSHEET_MIN_PX, next)),
+    );
+  }
+  function onWorksheetHandleUp(e: React.PointerEvent<HTMLDivElement>) {
+    if (worksheetResizing.current) {
+      (e.target as Element).releasePointerCapture(e.pointerId);
+      worksheetResizing.current = null;
+    }
+  }
 
   const surfaces = useEditorStore((s) => s.surfaces);
   const setSurfaces = useEditorStore((s) => s.setSurfaces);
@@ -125,6 +157,22 @@ export function ProjectWorkspace({
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [setTool, removeSurface, selectedSurfaceId]);
+
+  // Stop macOS trackpad pinch / Ctrl+Wheel from zooming the entire
+  // browser window when the user is trying to zoom our canvas. The
+  // PdfViewer handles canvas zoom locally; anywhere else inside the
+  // workspace, we just swallow the gesture so the browser doesn't run
+  // its own page-zoom.
+  useEffect(() => {
+    function onWheelCapture(e: WheelEvent) {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+      }
+    }
+    // Must be non-passive to preventDefault on macOS pinch.
+    document.addEventListener("wheel", onWheelCapture, { passive: false });
+    return () => document.removeEventListener("wheel", onWheelCapture);
+  }, []);
 
   // Command palette dispatched events
   useEffect(() => {
@@ -319,8 +367,20 @@ export function ProjectWorkspace({
       {/* Bottom panel: worksheet */}
       <section
         data-testid="bottom-panel"
-        className="flex-shrink-0 border-t border-[hsl(var(--line))] bg-white"
+        className="relative flex-shrink-0 border-t border-[hsl(var(--line))] bg-white"
       >
+        {worksheetOpen && (
+          <div
+            data-testid="worksheet-resize-handle"
+            onPointerDown={onWorksheetHandleDown}
+            onPointerMove={onWorksheetHandleMove}
+            onPointerUp={onWorksheetHandleUp}
+            onPointerCancel={onWorksheetHandleUp}
+            onDoubleClick={() => setWorksheetHeight(WORKSHEET_DEFAULT_PX)}
+            title="Drag to resize. Double-click to reset."
+            className="absolute inset-x-0 -top-1 z-10 h-2 cursor-row-resize bg-transparent transition-colors hover:bg-[hsl(var(--brand))]/30"
+          />
+        )}
         <button
           onClick={() => setWorksheetOpen((v) => !v)}
           className="flex w-full items-center justify-between px-4 py-2 text-left transition-colors hover:bg-[hsl(var(--panel-2))]"
@@ -350,7 +410,10 @@ export function ProjectWorkspace({
           </div>
         </button>
         {worksheetOpen && (
-          <div className="max-h-72 overflow-auto border-t border-[hsl(var(--line))]">
+          <div
+            className="overflow-auto border-t border-[hsl(var(--line))]"
+            style={{ height: worksheetHeight }}
+          >
             <EstimateWorksheet projectId={projectId} />
           </div>
         )}
