@@ -106,33 +106,36 @@ export function LeftRail() {
   return (
     <nav
       data-testid="left-rail"
-      className="flex h-full w-14 flex-col items-center gap-1 border-r border-[hsl(var(--line))] bg-[hsl(var(--rail))] py-3"
+      className="flex h-full w-[60px] flex-col items-center gap-0.5 border-r border-black/30 bg-[hsl(var(--rail))] py-2"
     >
       <Link
         href="/"
-        className="mb-2 flex h-9 w-9 items-center justify-center rounded-[6px] bg-[hsl(var(--brand))] font-bold text-white"
+        className="mb-1 flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] bg-[hsl(var(--brand))] text-[13px] font-bold text-white"
         title="PainterDesk — home"
       >
         P
       </Link>
-      <div className="h-px w-7 bg-white/10" />
-      <div className="mt-2 flex flex-col gap-1">
+      <div className="my-1 h-px w-8 bg-white/10" />
+      <div className="flex flex-col gap-0.5">
         {RAIL.map((item) => {
           const active = item.match(pathname);
           return (
             <Link
               key={item.href}
               href={item.href}
-              title={item.label}
               data-testid={`rail-${item.label.toLowerCase()}`}
+              title={item.label}
               className={cn(
-                "flex h-10 w-10 items-center justify-center rounded-[6px] transition-colors",
+                "group flex w-[52px] flex-col items-center justify-center gap-0.5 rounded-[var(--radius-sm)] px-1 py-1.5 transition-colors",
                 active
-                  ? "bg-white/10 text-white"
-                  : "text-[hsl(var(--rail-fg))] hover:bg-white/5 hover:text-white",
+                  ? "bg-white/[0.09] text-white"
+                  : "text-[hsl(var(--rail-fg))] hover:bg-white/[0.05] hover:text-white",
               )}
             >
               {item.icon}
+              <span className="text-[9.5px] font-medium leading-none tracking-wide">
+                {item.label}
+              </span>
             </Link>
           );
         })}
@@ -153,11 +156,11 @@ export function TopBar({
   children?: React.ReactNode;
 }) {
   return (
-    <header className="flex h-14 flex-shrink-0 items-center justify-between border-b border-[hsl(var(--line))] bg-white px-4">
+    <header className="flex h-11 flex-shrink-0 items-center justify-between border-b border-[hsl(var(--line))] bg-white px-3">
       <div className="flex min-w-0 items-center gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <h1 className="truncate text-[15px] font-semibold text-[hsl(var(--ink))]">
+            <h1 className="truncate text-[13.5px] font-semibold tracking-[-0.005em] text-[hsl(var(--ink))]">
               {title}
             </h1>
             {status && (
@@ -174,24 +177,64 @@ export function TopBar({
                 {status.label}
               </span>
             )}
+            {subtitle && (
+              <span className="truncate text-[11.5px] text-[hsl(var(--ink-3))]">
+                · {subtitle}
+              </span>
+            )}
           </div>
-          {subtitle && (
-            <div className="truncate text-[12px] text-[hsl(var(--ink-3))]">
-              {subtitle}
-            </div>
-          )}
         </div>
       </div>
-      <div className="flex items-center gap-2">{children}</div>
+      <div className="flex items-center gap-1.5">{children}</div>
     </header>
   );
 }
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+interface StatusSegment {
+  key?: string;
+  value: React.ReactNode;
+  right?: boolean;
+}
+
+export function StatusBar({ segments }: { segments: StatusSegment[] }) {
   return (
-    <div className="flex h-screen">
-      <LeftRail />
-      <div className="flex h-full min-w-0 flex-1 flex-col">{children}</div>
+    <div className="statusbar" data-testid="status-bar">
+      {segments.map((s, i) => (
+        <span key={i} className={cn("seg", s.right && "right")}>
+          {s.key && <span className="seg-key">{s.key}</span>}
+          <span className="seg-val">{s.value}</span>
+        </span>
+      ))}
     </div>
+  );
+}
+
+export function AppShell({
+  children,
+  statusBar,
+}: {
+  children: React.ReactNode;
+  statusBar?: React.ReactNode;
+}) {
+  return (
+    <div className="flex h-screen flex-col">
+      <div className="flex min-h-0 flex-1">
+        <LeftRail />
+        <div className="flex h-full min-w-0 flex-1 flex-col">{children}</div>
+      </div>
+      {statusBar ?? <DefaultStatusBar />}
+    </div>
+  );
+}
+
+function DefaultStatusBar() {
+  return (
+    <StatusBar
+      segments={[
+        { key: "Ready", value: "" },
+        { key: "Model", value: "Opus 4.7" },
+        { right: true, key: "Build", value: "PainterDesk · v0.5" },
+      ]}
+    />
   );
 }

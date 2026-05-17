@@ -52,12 +52,12 @@ export default async function ProjectPage({
         <HistoryButton projectId={project.id} />
         <Link href={`/projects/${project.id}/bid`}>
           <Button variant="secondary" size="sm" data-testid="open-bid-link">
-            Bid review
+            See estimate
           </Button>
         </Link>
         <Link href={`/projects/${project.id}/bid`}>
           <Button variant="accent" size="sm" data-testid="generate-bid-cta">
-            Generate Bid
+            Get price
           </Button>
         </Link>
       </TopBar>

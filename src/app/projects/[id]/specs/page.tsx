@@ -4,6 +4,7 @@ import { use, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { UsageBadge } from "@/components/usage/UsageBadge";
+import { AppShell, TopBar } from "@/components/nav/AppShell";
 
 interface FlaggedReq {
   item: string;
@@ -114,29 +115,19 @@ export default function SpecsPage({
   const summary = latestSpec?.summary ?? null;
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="flex h-14 items-center justify-between border-b border-gray-200 bg-white px-4">
-        <div className="flex items-center gap-3">
-          <Link
-            href={`/projects/${projectId}`}
-            className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-600 font-bold text-white"
-          >
-            P
-          </Link>
-          <div>
-            <div className="text-sm font-semibold text-gray-900">
-              Specs analyzer
-            </div>
-            <Link
-              href={`/projects/${projectId}`}
-              className="text-xs text-blue-600 hover:underline"
-            >
-              Back to project workspace
-            </Link>
-          </div>
-        </div>
+    <AppShell>
+      <TopBar
+        title="Spec reader"
+        subtitle="Upload a paint spec PDF — the AI pulls out scope, finishes, and exclusions"
+      >
+        <Link
+          href={`/projects/${projectId}`}
+          className="text-[12px] text-[hsl(var(--ink-2))] hover:text-[hsl(var(--ink-1))]"
+        >
+          ← Back to project
+        </Link>
         <UsageBadge />
-      </header>
+      </TopBar>
 
       <main className="flex-1 px-6 py-8">
         <div className="mx-auto max-w-4xl space-y-6">
@@ -293,7 +284,7 @@ export default function SpecsPage({
           )}
         </div>
       </main>
-    </div>
+    </AppShell>
   );
 }
 

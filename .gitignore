@@ -46,3 +46,16 @@ prisma/migrations/
 
 # uploads
 uploads/
+
+# playwright MCP captures
+.playwright-mcp/
+
+# loose screenshots / debug images at repo root
+/*.png
+debug-images/
+
+# dev server logs
+*.log
+!yarn-error.log*
+!npm-debug.log*
+dev-server.log

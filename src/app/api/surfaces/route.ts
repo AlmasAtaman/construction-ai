@@ -7,7 +7,10 @@ export const dynamic = "force-dynamic";
 const createSchema = z.object({
   projectId: z.string().min(1),
   planPageId: z.string().min(1),
-  type: z.enum(["wall", "ceiling", "trim", "door", "window"]),
+  // Accept any string here — supports new typed values like
+  // "annotation:note" and "symbol:single_door" without a schema change.
+  // Surface render code already discriminates on the prefix.
+  type: z.string().min(1),
   polygon: z
     .array(z.object({ x: z.number(), y: z.number() }))
     .min(3),
@@ -18,6 +21,7 @@ const createSchema = z.object({
   squareFootage: z.number().optional().nullable(),
   linearFootage: z.number().optional().nullable(),
   count: z.number().int().optional().nullable(),
+  notes: z.string().optional().nullable(),
   status: z.enum(["proposed", "accepted", "manual", "excluded"]).default("manual"),
   source: z.enum(["ai", "manual"]).default("manual"),
 });
@@ -67,6 +71,7 @@ export async function POST(req: Request) {
       squareFootage: d.squareFootage ?? null,
       linearFootage: d.linearFootage ?? null,
       count: d.count ?? null,
+      notes: d.notes ?? null,
       confidence: 1.0,
       status: d.status,
       source: d.source,

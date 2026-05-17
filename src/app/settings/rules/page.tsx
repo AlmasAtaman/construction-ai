@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { AppShell, TopBar } from "@/components/nav/AppShell";
 
 export default function RulesPage() {
   const [text, setText] = useState("");
@@ -41,29 +42,23 @@ export default function RulesPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-6">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-600 font-bold text-white">
-            P
-          </div>
-          <h1 className="text-lg font-semibold text-gray-900">PainterDesk</h1>
+    <AppShell>
+      <TopBar
+        title="Painter rules"
+        subtitle="Standing instructions the AI follows on every project"
+      >
+        <Link
+          href="/settings"
+          className="text-[12px] text-[hsl(var(--ink-2))] hover:text-[hsl(var(--ink-1))]"
+        >
+          ← Settings
         </Link>
-      </header>
+      </TopBar>
       <main className="flex-1 px-6 py-10">
         <div className="mx-auto max-w-3xl">
-          <Link
-            href="/settings"
-            className="text-sm text-blue-600 hover:underline"
-          >
-            &larr; Back to settings
-          </Link>
-          <h2 className="mt-4 text-2xl font-bold text-gray-900">
-            Painter rules
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Standing instructions for the AI. One rule per line, in plain
-            English. The AI follows these on every project.
+          <p className="text-[13px] text-[hsl(var(--ink-2))]">
+            One rule per line, in plain English. The AI follows these every
+            time it measures a plan.
           </p>
 
           <div className="mt-4 rounded-md bg-blue-50 px-4 py-3 text-sm text-blue-900">
@@ -105,6 +100,6 @@ export default function RulesPage() {
           </div>
         </div>
       </main>
-    </div>
+    </AppShell>
   );
 }

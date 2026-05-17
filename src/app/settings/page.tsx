@@ -1,32 +1,20 @@
 import Link from "next/link";
+import { AppShell, TopBar } from "@/components/nav/AppShell";
 
 export default function SettingsPage() {
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-6">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-600 font-bold text-white">
-            P
-          </div>
-          <h1 className="text-lg font-semibold text-gray-900">PainterDesk</h1>
-        </Link>
-      </header>
+    <AppShell>
+      <TopBar title="Settings" subtitle="Defaults for every project" />
       <main className="flex-1 px-6 py-10">
         <div className="mx-auto max-w-3xl">
-          <div className="mb-6">
-            <Link href="/" className="text-sm text-blue-600 hover:underline">
-              &larr; Back to dashboard
-            </Link>
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="text-[13px] text-[hsl(var(--ink-2))]">
             Tune defaults that apply to every project: labor rates, paint
             catalog, painter rules, and the saved tool chest.
           </p>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
             <SettingsCard
               title="Labor rates"
-              description="Hourly cost and production rates for walls, ceilings, trim, and more."
+              description="Hourly cost and how fast your crew paints — walls, ceilings, trim, and more."
               href="/settings/rates"
             />
             <SettingsCard
@@ -36,7 +24,7 @@ export default function SettingsPage() {
             />
             <SettingsCard
               title="Tool chest"
-              description="Saved paint assemblies you can apply to surfaces in one click."
+              description="Saved paint bundles you can apply to rooms in one click."
               href="/settings/tool-chest"
             />
             <SettingsCard
@@ -47,7 +35,7 @@ export default function SettingsPage() {
           </div>
         </div>
       </main>
-    </div>
+    </AppShell>
   );
 }
 
@@ -63,11 +51,15 @@ function SettingsCard({
   return (
     <Link
       href={href}
-      className="block rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition-colors hover:bg-gray-50"
+      className="block rounded-[8px] border border-[hsl(var(--line))] bg-white p-5 shadow-sm transition-colors hover:bg-[hsl(var(--surface-2))]"
     >
-      <h3 className="font-semibold text-gray-900">{title}</h3>
-      <p className="mt-2 text-sm text-gray-600">{description}</p>
-      <div className="mt-3 text-sm font-medium text-blue-600">Open &rarr;</div>
+      <h3 className="text-[14px] font-semibold text-[hsl(var(--ink-1))]">
+        {title}
+      </h3>
+      <p className="mt-2 text-[12px] text-[hsl(var(--ink-2))]">{description}</p>
+      <div className="mt-3 text-[12px] font-medium text-[hsl(var(--brand))]">
+        Open &rarr;
+      </div>
     </Link>
   );
 }

@@ -1,0 +1,101 @@
+{
+  "rooms": [
+    {
+      "label": "LIVING ROOM",
+      "widthFt": null,
+      "heightFt": null,
+      "floorAreaSqft": 280,
+      "basis": "scaled-measurement",
+      "confidence": 0.85
+    },
+    {
+      "label": "MASTER BEDROOM",
+      "widthFt": 13.5,
+      "heightFt": 12.42,
+      "floorAreaSqft": 168,
+      "basis": "printed-dimensions",
+      "confidence": 0.95
+    },
+    {
+      "label": "BEDROOM #2",
+      "widthFt": 10,
+      "heightFt": 11,
+      "floorAreaSqft": 110,
+      "basis": "printed-dimensions",
+      "confidence": 0.9
+    },
+    {
+      "label": "BEDROOM #1",
+      "widthFt": 10,
+      "heightFt": 11,
+      "floorAreaSqft": 110,
+      "basis": "printed-dimensions",
+      "confidence": 0.9
+    },
+    {
+      "label": "BEDROOM #3",
+      "widthFt": 10,
+      "heightFt": 10,
+      "floorAreaSqft": 100,
+      "basis": "printed-dimensions",
+      "confidence": 0.9
+    },
+    {
+      "label": "KITCHEN",
+      "widthFt": 9,
+      "heightFt": 11,
+      "floorAreaSqft": 99,
+      "basis": "printed-dimensions",
+      "confidence": 0.9
+    },
+    {
+      "label": "HALLWAY",
+      "widthFt": null,
+      "heightFt": null,
+      "floorAreaSqft": 85,
+      "basis": "scaled-measurement",
+      "confidence": 0.8
+    },
+    {
+      "label": "MASTER BATH",
+      "widthFt": 9.5,
+      "heightFt": 8,
+      "floorAreaSqft": 76,
+      "basis": "printed-dimensions",
+      "confidence": 0.9
+    },
+    {
+      "label": "WIC",
+      "widthFt": 8.67,
+      "heightFt": 5,
+      "floorAreaSqft": 43,
+      "basis": "printed-dimensions",
+      "confidence": 0.9
+    },
+    {
+      "label": "ENTRY WAY",
+      "widthFt": null,
+      "heightFt": null,
+      "floorAreaSqft": 40,
+      "basis": "scaled-measurement",
+      "confidence": 0.8
+    },
+    {
+      "label": "LAUNDRY ROOM",
+      "widthFt": null,
+      "heightFt": null,
+      "floorAreaSqft": 35,
+      "basis": "scaled-measurement",
+      "confidence": 0.8
+    },
+    {
+      "label": "WATER HEATER",
+      "widthFt": null,
+      "heightFt": null,
+      "floorAreaSqft": 12,
+      "basis": "scaled-measurement",
+      "confidence": 0.75
+    }
+  ],
+  "planNotes": "First floor plan for 3 BED, 2 BATH residence at 3053 N Nordburg Rd, Indianapolis, IN 46236. Measurements taken from printed dimensions where visible on plan. Some rooms like LIVING ROOM and HALLWAY required scaled measurement due to lack of complete dimension callouts. Plan dated 04.02.2024, drawn by C. Giles, sheet A-101."
+}

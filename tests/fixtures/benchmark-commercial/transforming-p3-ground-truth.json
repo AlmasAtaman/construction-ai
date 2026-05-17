@@ -1,0 +1,101 @@
+{
+  "rooms": [
+    {
+      "label": "ENTERTAINMENT/WORKSHOP 1",
+      "floorAreaSqft": 480,
+      "basis": "scaled-measurement",
+      "confidence": 0.85,
+      "widthFt": 24,
+      "heightFt": 20
+    },
+    {
+      "label": "ENTERTAINMENT AREA",
+      "floorAreaSqft": 280,
+      "basis": "scaled-measurement",
+      "confidence": 0.8,
+      "widthFt": 14,
+      "heightFt": 20
+    },
+    {
+      "label": "KING BED",
+      "floorAreaSqft": 200,
+      "basis": "scaled-measurement",
+      "confidence": 0.8,
+      "widthFt": 12,
+      "heightFt": 16.5
+    },
+    {
+      "label": "BEDROOM 1",
+      "floorAreaSqft": 160,
+      "basis": "scaled-measurement",
+      "confidence": 0.85,
+      "widthFt": 12,
+      "heightFt": 13.5
+    },
+    {
+      "label": "STORAGE",
+      "floorAreaSqft": 160,
+      "basis": "scaled-measurement",
+      "confidence": 0.8,
+      "widthFt": 10,
+      "heightFt": 16
+    },
+    {
+      "label": "CORRIDOR",
+      "floorAreaSqft": 85,
+      "basis": "scaled-measurement",
+      "confidence": 0.75,
+      "widthFt": 5,
+      "heightFt": 17
+    },
+    {
+      "label": "STORAGE",
+      "floorAreaSqft": 65,
+      "basis": "scaled-measurement",
+      "confidence": 0.75,
+      "widthFt": 7,
+      "heightFt": 9.5
+    },
+    {
+      "label": "BATH",
+      "floorAreaSqft": 48,
+      "basis": "scaled-measurement",
+      "confidence": 0.8,
+      "widthFt": 6,
+      "heightFt": 8
+    },
+    {
+      "label": "HALL/LAUNDRY",
+      "floorAreaSqft": 45,
+      "basis": "scaled-measurement",
+      "confidence": 0.75,
+      "widthFt": 5,
+      "heightFt": 9
+    },
+    {
+      "label": "CLOSET",
+      "floorAreaSqft": 28,
+      "basis": "scaled-measurement",
+      "confidence": 0.75,
+      "widthFt": 4,
+      "heightFt": 7
+    },
+    {
+      "label": "CLOSET",
+      "floorAreaSqft": 25,
+      "basis": "scaled-measurement",
+      "confidence": 0.75,
+      "widthFt": 5,
+      "heightFt": 5
+    },
+    {
+      "label": "CLOSET",
+      "floorAreaSqft": 20,
+      "basis": "scaled-measurement",
+      "confidence": 0.75,
+      "widthFt": 4,
+      "heightFt": 5
+    }
+  ],
+  "planNotes": "Basement floor plan at Scale: 1/4\"=1'-0\". Areas calculated using scaled measurements from visible room boundaries. Plan shows basement layout with entertainment spaces, bedroom, bath, storage areas, and circulation. Some room labels partially visible or overlapped by fixtures. Dimensions estimated from scale bar and room proportions."
+}

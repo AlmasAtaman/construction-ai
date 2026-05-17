@@ -50,9 +50,11 @@
     --surface-door: 25 95% 53%;
     --surface-window: 45 93% 47%;
 
-    --radius-sm: 4px;
-    --radius: 6px;
-    --radius-lg: 8px;
+    /* Industrial radii — Bluebeam/Procore territory. Nothing > 6px. */
+    --radius-sm: 3px;
+    --radius: 4px;
+    --radius-lg: 6px;
+    --statusbar-h: 26px;
 
     /* Shadcn-style aliases kept for components that still reference them */
     --background: var(--canvas);
@@ -97,8 +99,10 @@
     font-feature-settings: "tnum" 1;
   }
 
-  /* Strong, never-light headers */
-  h1, h2, h3, h4, h5, h6 {
+  /* Strong, never-light headers. Use :where() so this is zero-specificity,
+   * letting any Tailwind text-{color} class (e.g., text-white on a dark
+   * banner) override the default ink color without !important wars. */
+  :where(h1, h2, h3, h4, h5, h6) {
     font-weight: 600;
     letter-spacing: -0.01em;
     color: hsl(var(--ink));
@@ -113,36 +117,107 @@
   .swatch-door    { background-color: hsl(var(--surface-door)); }
   .swatch-window  { background-color: hsl(var(--surface-window)); }
 
-  /* Spreadsheet-style table — zebra rows, dense, monospaced numbers */
+  /* Spreadsheet-style table — dense rows, monospaced numbers, hairline grid */
   .sheet {
     width: 100%;
-    font-size: 13px;
+    font-size: 12.5px;
+    border-collapse: collapse;
   }
   .sheet th {
     text-align: left;
     font-weight: 600;
     color: hsl(var(--ink-2));
-    font-size: 11px;
+    font-size: 10.5px;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
-    padding: 8px 12px;
+    letter-spacing: 0.06em;
+    padding: 6px 10px;
     background: hsl(var(--panel-2));
     border-bottom: 1px solid hsl(var(--line));
     position: sticky;
     top: 0;
     z-index: 1;
+    height: 26px;
   }
   .sheet td {
-    padding: 7px 12px;
+    padding: 4px 10px;
     border-bottom: 1px solid hsl(var(--line-2));
-    height: 34px;
+    height: 28px;
     vertical-align: middle;
-  }
-  .sheet tbody tr:nth-child(even) {
-    background: hsl(var(--panel-2));
   }
   .sheet tbody tr:hover {
     background: hsl(var(--brand-soft));
+  }
+
+  /* Persistent bottom strip — Bluebeam/Figma-style system info */
+  .statusbar {
+    height: var(--statusbar-h);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 12px;
+    background: hsl(var(--rail));
+    color: hsl(var(--rail-fg));
+    font-size: 11px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    user-select: none;
+  }
+  .statusbar .seg {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .statusbar .seg + .seg {
+    padding-left: 12px;
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .statusbar .seg-key {
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 9.5px;
+    font-weight: 600;
+  }
+  .statusbar .seg-val {
+    color: hsl(var(--rail-fg-active));
+    font-variant-numeric: tabular-nums;
+  }
+  .statusbar .seg.right {
+    margin-left: auto;
+  }
+
+  /* Toolbar — flat square icon buttons like CAD/PDF software */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 4px;
+    background: hsl(var(--panel));
+    border: 1px solid hsl(var(--line));
+    border-radius: var(--radius-sm);
+  }
+  .toolbar-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 2px;
+    color: hsl(var(--ink-2));
+    transition: background 80ms ease, color 80ms ease;
+  }
+  .toolbar-btn:hover {
+    background: hsl(var(--panel-2));
+    color: hsl(var(--ink));
+  }
+  .toolbar-btn[data-active="true"] {
+    background: hsl(var(--brand-soft));
+    color: hsl(var(--brand));
+  }
+  .toolbar-divider {
+    width: 1px;
+    height: 18px;
+    background: hsl(var(--line));
+    margin: 0 4px;
   }
 
   /* Status pills */

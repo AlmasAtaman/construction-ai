@@ -604,6 +604,74 @@ async function executeTool(
     };
   }
 
+  if (name === "search_surfaces") {
+    const query = (input.query ?? {}) as {
+      roomLabelPattern?: string;
+      surfaceType?: string;
+      paintType?: string;
+      substrate?: string;
+      symbolType?: string;
+    };
+    const where: Record<string, unknown> = { projectId };
+    if (query.symbolType) {
+      where.type = `symbol:${query.symbolType}`;
+    } else if (query.surfaceType) {
+      where.type = query.surfaceType;
+    }
+    if (query.paintType) where.paintType = query.paintType;
+    if (query.substrate) where.substrate = query.substrate;
+    let surfaces = await db.surface.findMany({ where });
+    if (query.roomLabelPattern) {
+      const re = new RegExp(query.roomLabelPattern, "i");
+      surfaces = surfaces.filter((s) => s.roomLabel && re.test(s.roomLabel));
+    }
+    return {
+      name,
+      input,
+      result: {
+        count: surfaces.length,
+        sample: surfaces.slice(0, 10).map((s) => ({
+          roomLabel: s.roomLabel,
+          type: s.type,
+          squareFootage: s.squareFootage,
+          linearFootage: s.linearFootage,
+          count: s.count,
+          paintType: s.paintType,
+        })),
+      },
+      affectedCount: surfaces.length,
+      description: `Searched surfaces — ${surfaces.length} matched.`,
+    };
+  }
+
+  if (name === "count_symbols") {
+    const symType = input.symbolType as string;
+    if (!symType) {
+      return {
+        name,
+        input,
+        result: { error: "symbolType is required" },
+        description: "Symbol count requires a type.",
+      };
+    }
+    const rows = await db.surface.findMany({
+      where: { projectId, type: `symbol:${symType}` },
+    });
+    const total = rows.reduce((a, r) => a + (r.count ?? 0), 0);
+    const byRoom: Record<string, number> = {};
+    for (const r of rows) {
+      const k = r.roomLabel ?? "(no room)";
+      byRoom[k] = (byRoom[k] ?? 0) + (r.count ?? 0);
+    }
+    return {
+      name,
+      input,
+      result: { type: symType, total, byRoom },
+      affectedCount: total,
+      description: `Counted ${total} ${symType.replace(/_/g, " ")}${total === 1 ? "" : "s"} across the project.`,
+    };
+  }
+
   return {
     name,
     input,

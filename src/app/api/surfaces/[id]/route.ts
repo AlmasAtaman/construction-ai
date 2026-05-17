@@ -6,6 +6,7 @@ export const dynamic = "force-dynamic";
 
 const updateSchema = z.object({
   status: z.enum(["proposed", "accepted", "manual", "excluded"]).optional(),
+  type: z.string().optional(),
   paintType: z.string().nullable().optional(),
   coats: z.number().int().min(1).max(10).optional(),
   substrate: z.string().nullable().optional(),

@@ -3,7 +3,7 @@
 import { create } from "zustand";
 import type { SurfaceDTO } from "@/types/surface";
 
-export type EditorTool = "select" | "rectangle" | "polygon" | "eraser";
+export type EditorTool = "select" | "rectangle" | "polygon" | "eraser" | "note";
 
 interface UndoEntry {
   label: string;

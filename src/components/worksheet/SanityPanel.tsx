@@ -15,6 +15,9 @@ interface SanityReport {
   wallToCeilingRatio: number;
   totalFloorSqft: number;
   totalWallSqft: number;
+  totalWallLinearFt: number;
+  totalNetFloorSqft: number;
+  totalGrossFloorSqft: number;
 }
 
 interface Props {
@@ -54,7 +57,7 @@ export function SanityPanel({ projectId, refreshKey = 0 }: Props) {
   if (loading) {
     return (
       <div className="rounded-[8px] border border-[hsl(var(--line))] bg-white p-5 text-[12px] text-[hsl(var(--ink-3))] shadow-sm">
-        Running pre-bid sanity checks…
+        Double-checking the numbers…
       </div>
     );
   }
@@ -82,7 +85,7 @@ export function SanityPanel({ projectId, refreshKey = 0 }: Props) {
       <div className="border-b border-current/10 bg-white/50 px-5 py-3">
         <div className="flex items-center justify-between">
           <h3 className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[hsl(var(--ink-3))]">
-            Pre-bid sanity check
+            Quick check
           </h3>
           <span
             className="text-[12px] font-medium text-[hsl(var(--ink))]"
@@ -110,20 +113,22 @@ export function SanityPanel({ projectId, refreshKey = 0 }: Props) {
           </span>
         </div>
         <div className="mt-2 grid grid-cols-3 gap-3 text-[11px] text-[hsl(var(--ink-2))]">
-          <div>
+          <div title="Net = interior usable area, walls excluded. Gross = footprint including walls.">
             <div className="text-[10px] uppercase tracking-wide text-[hsl(var(--ink-3))]">
-              Floor area
+              Floor (net / gross)
             </div>
             <div className="num text-[14px] font-semibold text-[hsl(var(--ink))]">
-              {Math.round(report.totalFloorSqft).toLocaleString()} sqft
+              {Math.round(report.totalNetFloorSqft).toLocaleString()}
+              <span className="text-[10px] text-[hsl(var(--ink-3))]"> / {Math.round(report.totalGrossFloorSqft).toLocaleString()}</span>
             </div>
           </div>
-          <div>
+          <div title="Total wall paintable area (perimeter × ceiling height) AND linear feet">
             <div className="text-[10px] uppercase tracking-wide text-[hsl(var(--ink-3))]">
-              Wall area
+              Walls (SF / LF)
             </div>
             <div className="num text-[14px] font-semibold text-[hsl(var(--ink))]">
-              {Math.round(report.totalWallSqft).toLocaleString()} sqft
+              {Math.round(report.totalWallSqft).toLocaleString()}
+              <span className="text-[10px] text-[hsl(var(--ink-3))]"> / {Math.round(report.totalWallLinearFt).toLocaleString()}</span>
             </div>
           </div>
           <div>

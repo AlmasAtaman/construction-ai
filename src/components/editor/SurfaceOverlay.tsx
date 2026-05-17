@@ -127,11 +127,55 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
       if (id) {
         void deleteSurface(id);
       }
+    } else if (tool === "note") {
+      // Drop a sticky note at the click position. Prompt for text.
+      const text = window.prompt("Note (visible to your team):", "");
+      if (text && text.trim().length > 0) {
+        const norm = pxToNorm(pos);
+        const r = 0.015; // tiny bbox around the click for the polygon
+        void persistAnnotationNote(
+          [
+            { x: norm.x - r, y: norm.y - r },
+            { x: norm.x + r, y: norm.y - r },
+            { x: norm.x + r, y: norm.y + r },
+            { x: norm.x - r, y: norm.y + r },
+          ],
+          text.trim(),
+        );
+      }
+      setTool("select");
     } else if (tool === "select") {
       // Clicked empty stage — deselect (compare via attrs absence)
       if (!e.target.attrs?.surfaceId) {
         setSelected(null);
       }
+    }
+  }
+
+  async function persistAnnotationNote(
+    polygon: { x: number; y: number }[],
+    text: string,
+  ): Promise<void> {
+    try {
+      const res = await fetch("/api/surfaces", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          projectId: props.projectId,
+          planPageId: props.planPageId,
+          type: "annotation:note",
+          polygon,
+          status: "manual",
+          source: "manual",
+          notes: text,
+        }),
+      });
+      if (!res.ok) return;
+      const json = await res.json();
+      addSurface(json.surface);
+      props.onSurfaceCreated?.();
+    } catch {
+      /* ignore */
     }
   }
 
@@ -178,11 +222,13 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
     removeSurface(id);
   }
 
-  // Memo: pre-compute pixel polygons for visible surfaces.
+  // Memo: pre-compute pixel polygons for visible surfaces. Annotations
+  // are rendered separately as markers, not as polygon outlines.
   const visibleSurfaces = useMemo(
     () =>
       props.surfaces
         .filter((s) => s.status !== "excluded")
+        .filter((s) => !s.type.startsWith("annotation:") && !s.type.startsWith("symbol:"))
         .map((s) => ({
           surface: s,
           flatPoints: s.polygon.flatMap((p) => {
@@ -193,6 +239,28 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [props.surfaces, props.width, props.height],
   );
+
+  const annotations = useMemo(
+    () =>
+      props.surfaces
+        .filter((s) => s.type === "annotation:note" && s.status !== "excluded")
+        .map((s) => {
+          // Note position: centroid of the polygon.
+          let cx = 0, cy = 0;
+          for (const p of s.polygon) {
+            cx += p.x;
+            cy += p.y;
+          }
+          cx /= s.polygon.length;
+          cy /= s.polygon.length;
+          const px = normToPx({ x: cx, y: cy });
+          return { id: s.id, text: s.notes ?? "", x: px.x, y: px.y };
+        }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [props.surfaces, props.width, props.height],
+  );
+
+  const [hoveredNote, setHoveredNote] = useState<string | null>(null);
 
   // Pointer-events strategy: when a tool is active that needs canvas
   // interaction, the overlay must accept pointer events. The wrapper sets
@@ -281,8 +349,48 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
               dash={[4, 4]}
             />
           )}
+
+          {/* Annotation notes — small yellow markers */}
+          {annotations.map((a) => (
+            <Rect
+              key={a.id}
+              x={a.x - 6}
+              y={a.y - 6}
+              width={12}
+              height={12}
+              fill="#facc15"
+              stroke="#854d0e"
+              strokeWidth={1.5}
+              cornerRadius={2}
+              onMouseEnter={() => setHoveredNote(a.id)}
+              onMouseLeave={() => setHoveredNote(null)}
+              onClick={(e) => {
+                if (tool === "eraser") {
+                  void deleteSurface(a.id);
+                }
+                e.cancelBubble = true;
+              }}
+            />
+          ))}
         </Layer>
       </Stage>
+
+      {hoveredNote &&
+        (() => {
+          const a = annotations.find((x) => x.id === hoveredNote);
+          if (!a) return null;
+          return (
+            <div
+              className="pointer-events-none absolute z-30 max-w-xs rounded-[6px] border border-amber-300 bg-amber-50 px-3 py-2 text-[12px] text-[hsl(var(--ink-1))] shadow-md"
+              style={{
+                left: Math.min(a.x + 12, props.width - 240),
+                top: Math.max(a.y - 8, 0),
+              }}
+            >
+              {a.text}
+            </div>
+          );
+        })()}
 
       {tool === "polygon" && polyPoints.length > 0 && (
         <div className="absolute left-4 top-4 rounded-md bg-gray-900/90 px-3 py-1.5 text-xs text-white">

@@ -52,6 +52,17 @@ const TOOLS: Tool[] = [
       </svg>
     ),
   },
+  {
+    id: "note",
+    label: "Note",
+    shortcut: "N",
+    icon: (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={1.7}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9l-6-6z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M14 3v6h6" />
+      </svg>
+    ),
+  },
 ];
 
 export function ToolPalette() {

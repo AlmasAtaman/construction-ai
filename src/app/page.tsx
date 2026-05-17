@@ -59,7 +59,7 @@ export default async function DashboardPage() {
           {projects.length === 0 ? (
             <EmptyState />
           ) : (
-            <div className="overflow-hidden rounded-[8px] border border-[hsl(var(--line))] bg-white shadow-sm">
+            <div className="overflow-hidden rounded-[var(--radius)] border border-[hsl(var(--line))] bg-white">
               <table className="sheet w-full">
                 <thead>
                   <tr>
@@ -67,7 +67,7 @@ export default async function DashboardPage() {
                     <th>Client</th>
                     <th>Status</th>
                     <th className="text-right">Plans</th>
-                    <th className="text-right">Surfaces</th>
+                    <th className="text-right">Rooms</th>
                     <th className="text-right">Updated</th>
                     <th></th>
                   </tr>
@@ -125,7 +125,7 @@ function EmptyState() {
   return (
     <div
       data-testid="empty-state"
-      className="rounded-[8px] border border-[hsl(var(--line))] bg-white px-6 py-16 text-center shadow-sm"
+      className="rounded-[var(--radius)] border border-[hsl(var(--line))] bg-white px-6 py-16 text-center"
     >
       <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-[8px] bg-[hsl(var(--brand-soft))] text-[hsl(var(--brand))]">
         <svg

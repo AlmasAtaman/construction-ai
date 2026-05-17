@@ -7,6 +7,7 @@ import { UsageBadge } from "@/components/usage/UsageBadge";
 import { formatCurrency } from "@/lib/utils";
 import { AppShell, TopBar } from "@/components/nav/AppShell";
 import { SanityPanel } from "@/components/worksheet/SanityPanel";
+import { SymbolCountsPanel } from "@/components/worksheet/SymbolCountsPanel";
 
 interface LineItem {
   surfaceId: string;
@@ -110,13 +111,13 @@ export default function BidPage({
   return (
     <AppShell>
       <TopBar
-        title="Bid review"
+        title="Your estimate"
         subtitle={project?.name ?? "Loading…"}
       >
         <UsageBadge />
         <Link href={`/projects/${projectId}`}>
           <Button variant="ghost" size="sm">
-            Back to workspace
+            Back to plan
           </Button>
         </Link>
         <Button
@@ -125,7 +126,7 @@ export default function BidPage({
           disabled={loading}
           data-testid="generate-bid-button"
         >
-          {loading ? "Generating…" : bid ? "Regenerate" : "Generate Bid"}
+          {loading ? "Working…" : bid ? "Update price" : "Calculate price"}
         </Button>
         {bid && (
           <>
@@ -154,23 +155,23 @@ export default function BidPage({
       <main className="flex-1 overflow-y-auto bg-[hsl(var(--canvas))] px-6 py-6">
         <div className="mx-auto max-w-5xl">
           {error && (
-            <div className="mb-4 rounded-[6px] border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-red-800">
+            <div className="mb-4 rounded-[var(--radius-sm)] border-l-2 border-[hsl(var(--danger))] bg-white px-3 py-2 text-[12.5px] text-[hsl(var(--ink))]">
               {error}
             </div>
           )}
 
           {!bid && (
             <div
-              className="rounded-[8px] border border-dashed border-[hsl(var(--line))] bg-white p-12 text-center shadow-sm"
+              className="rounded-[var(--radius)] border border-dashed border-[hsl(var(--line))] bg-white p-12 text-center"
               data-testid="bid-empty-state"
             >
               <h2 className="text-[18px] font-semibold text-[hsl(var(--ink))]">
-                Ready to make your bid?
+                Ready to price the job?
               </h2>
               <p className="mx-auto mt-2 max-w-md text-[13px] text-[hsl(var(--ink-2))]">
-                Click <strong>Generate Bid</strong> and we&apos;ll roll up all
-                your surfaces, labor rates, and painter rules into a
-                professional proposal.
+                Click <strong>Calculate price</strong> and we&apos;ll add up
+                every room, paint cost, and labor hour into a clean estimate
+                you can send to your customer.
               </p>
               <div className="mt-5">
                 <Button
@@ -179,7 +180,7 @@ export default function BidPage({
                   onClick={() => void generate()}
                   disabled={loading}
                 >
-                  {loading ? "Generating…" : "Generate Bid"}
+                  {loading ? "Working…" : "Calculate price"}
                 </Button>
               </div>
             </div>
@@ -187,31 +188,60 @@ export default function BidPage({
 
           {bid && (
             <>
-              {/* Proposal header block */}
-              <div className="overflow-hidden rounded-[8px] border border-[hsl(var(--line))] bg-white shadow-sm">
-                <div className="flex items-start justify-between border-b border-[hsl(var(--line))] bg-[hsl(var(--rail))] px-6 py-5 text-white">
-                  <div>
-                    <div className="text-[11px] font-semibold uppercase tracking-[0.1em] text-white/70">
-                      Painting Proposal
-                    </div>
-                    <h2 className="mt-1 text-[20px] font-semibold">
-                      {project?.name ?? "—"}
-                    </h2>
-                    {project?.clientName && (
-                      <div className="mt-0.5 text-[13px] text-white/80">
-                        Prepared for {project.clientName}
+              {/* Industrial proposal header — total + meta + cost breakdown in one band */}
+              <div
+                data-testid="bid-grand-total-hero"
+                className="overflow-hidden rounded-[var(--radius-lg)] border border-[hsl(var(--line))] bg-white"
+              >
+                <div className="grid grid-cols-[1fr_auto] items-stretch border-b border-[hsl(var(--line))] bg-[hsl(var(--rail))] text-white">
+                  <div className="flex flex-col justify-between gap-4 px-6 py-5">
+                    <div>
+                      <div className="text-[10.5px] font-semibold uppercase tracking-[0.08em] text-white/55">
+                        Painting estimate
                       </div>
-                    )}
-                  </div>
-                  <div className="text-right text-[12px] text-white/80">
-                    <div className="num">{today}</div>
-                    <div className="mt-0.5">
-                      Version {bid.versionNumber} · PCA standards
+                      <div className="mt-0.5 text-[16px] font-semibold leading-tight text-white">
+                        {project?.name ?? "—"}
+                      </div>
+                      {project?.clientName && (
+                        <div className="text-[12px] text-white/65">
+                          Prepared for {project.clientName}
+                        </div>
+                      )}
                     </div>
+                    <div className="num flex items-baseline gap-2">
+                      <span className="text-[10.5px] font-semibold uppercase tracking-[0.08em] text-white/55">
+                        Total
+                      </span>
+                      <span className="text-[28px] font-semibold leading-none text-white">
+                        {formatCurrency(bid.grandTotal)}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="num grid grid-cols-2 gap-x-6 gap-y-1 border-l border-white/10 bg-black/15 px-6 py-5 text-[11.5px]">
+                    <span className="text-white/55">Paint</span>
+                    <span className="text-right text-white">
+                      {formatCurrency(bid.totalMaterial)}
+                    </span>
+                    <span className="text-white/55">Labor</span>
+                    <span className="text-right text-white">
+                      {formatCurrency(bid.totalLabor)}
+                    </span>
+                    <span className="text-white/55">Overhead</span>
+                    <span className="text-right text-white">
+                      {formatCurrency(bid.totalOverhead)}
+                    </span>
+                    <span className="text-white/55">Markup</span>
+                    <span className="text-right text-white">
+                      {formatCurrency(bid.totalMarkup)}
+                    </span>
+                    <span className="col-span-2 mt-1.5 flex justify-between border-t border-white/10 pt-1.5 text-white/85">
+                      <span>Estimate {bid.versionNumber}</span>
+                      <span>{today}</span>
+                    </span>
                   </div>
                 </div>
 
-                {/* Line items */}
+                {/* Line items — sits flush under the dark header */}
                 <div data-testid="bid-line-items">
                   <table className="sheet w-full">
                     <thead>
@@ -246,46 +276,30 @@ export default function BidPage({
                 </div>
               </div>
 
-              <div className="mt-5">
+              <div className="mt-5 grid gap-4 md:grid-cols-2">
                 <SanityPanel
+                  projectId={projectId}
+                  refreshKey={bid?.versionNumber ?? 0}
+                />
+                <SymbolCountsPanel
                   projectId={projectId}
                   refreshKey={bid?.versionNumber ?? 0}
                 />
               </div>
 
-              <div className="mt-4 grid gap-4 md:grid-cols-2">
-                {/* Totals card */}
-                <div
-                  className="rounded-[8px] border border-[hsl(var(--line))] bg-white p-5 shadow-sm"
-                  data-testid="bid-totals"
-                >
-                  <h3 className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[hsl(var(--ink-3))]">
-                    Bid total
-                  </h3>
-                  <div className="mt-2 space-y-1.5 text-[13px]">
-                    <Row label="Materials" value={bid.totalMaterial} />
-                    <Row label="Labor" value={bid.totalLabor} />
-                    <Row label="Overhead" value={bid.totalOverhead} />
-                    <Row label="Markup" value={bid.totalMarkup} />
-                  </div>
-                  <div className="mt-4 flex items-baseline justify-between border-t-2 border-[hsl(var(--ink))] pt-3">
-                    <span className="text-[12px] font-semibold uppercase tracking-wide text-[hsl(var(--ink-2))]">
-                      Grand total
-                    </span>
-                    <span
-                      className="num text-[22px] font-bold text-[hsl(var(--ink))]"
-                      data-testid="bid-grand-total"
-                    >
-                      {formatCurrency(bid.grandTotal)}
-                    </span>
-                  </div>
-                </div>
-
+              <div className="mt-4 grid gap-4 md:grid-cols-1">
                 {/* P23 exclusions */}
                 <div
-                  className="rounded-[8px] border border-[hsl(var(--line))] bg-white p-5 shadow-sm"
+                  className="rounded-[var(--radius)] border border-[hsl(var(--line))] bg-white p-5"
                   data-testid="bid-exclusions"
                 >
+                  {/* hidden grand-total anchor used by tests / exports */}
+                  <span
+                    className="sr-only num"
+                    data-testid="bid-grand-total"
+                  >
+                    {formatCurrency(bid.grandTotal)}
+                  </span>
                   <h3 className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[hsl(var(--ink-3))]">
                     PCA P23 exclusions
                   </h3>
@@ -318,15 +332,15 @@ export default function BidPage({
 
               {/* Scope */}
               <div
-                className="mt-4 rounded-[8px] border border-[hsl(var(--line))] bg-white p-5 shadow-sm"
+                className="mt-4 rounded-[var(--radius)] border border-[hsl(var(--line))] bg-white p-5"
                 data-testid="bid-scope"
               >
                 <h3 className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[hsl(var(--ink-3))]">
                   Scope of work
                 </h3>
                 <p className="mt-2 text-[13px] leading-relaxed text-[hsl(var(--ink))]">
-                  Painting and surface preparation per PCA standards. All work
-                  performed by licensed commercial painting crews.
+                  Painting and surface preparation. All work performed by
+                  licensed painting crews to PCA P10 industry standards.
                   {excluded.size > 0 && (
                     <>
                       {" "}
@@ -344,17 +358,6 @@ export default function BidPage({
         </div>
       </main>
     </AppShell>
-  );
-}
-
-function Row({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="flex justify-between">
-      <span className="text-[hsl(var(--ink-2))]">{label}</span>
-      <span className="num font-medium text-[hsl(var(--ink))]">
-        {formatCurrency(value)}
-      </span>
-    </div>
   );
 }
 

@@ -65,6 +65,9 @@ export function calculateBid(
 
   for (const s of surfaces) {
     if (s.status === "excluded") continue;
+    // Skip non-paintable surface kinds (annotations, symbol counts) so
+    // they don't pollute the bid totals.
+    if (s.type.startsWith("annotation:") || s.type.startsWith("symbol:")) continue;
 
     const unit = unitFor(s.type);
     let quantity = 0;

@@ -142,24 +142,24 @@ export function TakeoffButton({ planPageId, onComplete }: Props) {
     <div className="space-y-2">
       <Button
         variant="accent"
-        size="default"
+        size="lg"
         onClick={() => void run()}
         disabled={running || !planPageId}
         data-testid="run-takeoff"
-        className="w-full"
-        title="Detect walls, ceilings, trim, doors, and windows."
+        className="w-full h-12 text-[14px] font-semibold shadow-md"
+        title="Find every room, wall, and door automatically."
       >
         {running ? (
           <>
-            <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-            Analyzing…
+            <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+            Looking at your plan…
           </>
         ) : (
           <>
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
             </svg>
-            Run AI Takeoff
+            Measure my plan
           </>
         )}
       </Button>

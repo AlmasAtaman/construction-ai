@@ -33,6 +33,7 @@ import {
   roomDimensionsFromCallouts,
   type DimensionCallout,
 } from "./dimension-callouts";
+import { verifyScaleViaDoors, type ScaleVerification } from "./scale-verifier";
 
 export interface RoomCandidate {
   /** Human-readable label drawn from the text layer (e.g., "CORRIDOR CE-3"). */
@@ -82,6 +83,14 @@ export interface CommercialRoomsResult {
    * measurement converts to feet deterministically.
    */
   scaleAnchor: ScaleAnchor | null;
+  /**
+   * Cross-check on the parsed scale via door symbol width (architectural
+   * doors are always ~3 ft wide). When the median detected door width
+   * matches the scale anchor's pt/ft × 3, the scale is verified — strong
+   * confidence boost. When it doesn't match, the scale parser may have
+   * picked up a detail-sheet scale rather than the plan's scale.
+   */
+  scaleVerification: ScaleVerification | null;
   /** All dimension callouts parsed from the text layer. */
   dimensionCallouts: DimensionCallout[];
   /** Vector wall segments extracted. */
@@ -142,11 +151,19 @@ interface TextFragment {
 
 /** Label-shape heuristics (shared with the validation script). */
 const ROOM_KW =
-  /\b(ROOM|CORRIDOR|OFFICE|STAIR|ELEV|LOBBY|STORAGE|STORE|OXYGEN|BATH|RESTROOM|TOILET|MECH|ELECTRICAL|JANITOR|KITCHEN|LOCKER|VEST|LOUNGE|WAIT|PANTRY|CLOSET|UTILITY|SOIL|CLEAN|SOILED|LINEN|EXAM|CONF|RECEPTION|STAFF|PATIENT|NOURISH|ALCOVE|VESTIBULE|LINK|CONNECTING|VOLTAGE|VEND)\b/i;
+  /\b(ROOM|CORRIDOR|OFFICE|STAIR|ELEV|LOBBY|STORAGE|STORE|OXYGEN|BATH|RESTROOM|TOILET|MECH|ELECTRICAL|JANITOR|KITCHEN|LOCKER|VEST|LOUNGE|WAIT|PANTRY|CLOSET|UTILITY|SOIL|CLEAN|SOILED|LINEN|EXAM|CONF|RECEPTION|STAFF|PATIENT|NOURISH|ALCOVE|VESTIBULE|LINK|CONNECTING|VOLTAGE|VEND|BEDROOM|BED|DINING|LIVING|GARAGE|FOYER|LAUNDRY|POWDER|HALL|WIC|PWDR|MASTER|ENTRY|DEN|STUDY|NOOK|PORCH|DECK|PATIO|MUDROOM|MUD|FAMILY|GREAT|MEDIA|BONUS|REC|HOBBY|GUEST|NURSERY|PLAYROOM|GYM)\b/i;
+// Room numbers must be at least 2 digits to avoid catching callout
+// markers like E1, D2, W3 which are detail-sheet references.
 const ROOM_NUM = /^[A-Z]{0,3}\s*\d{2,4}[A-Z]?$/i;
-const ROOM_CODE = /^[A-Z]{1,3}-?\d{1,3}[A-Z]?$/i;
+// REMOVED ROOM_CODE — it was matching elevation/door/window/section
+// callouts (E1, D19, W18, S5) and treating them as rooms. The detail
+// callouts vastly outnumber actual room codes; the cost/benefit no
+// longer favors keeping single-letter+digit patterns as room labels.
 const EXCLUDE =
-  /\b(SF|SQFT|TYP|DET|DETAIL|NOTE|NOTES|SEE|ALIGN|VIF|REF|SECTION|ELEVATION|PLAN|DRAWING|SHEET|SCALE|TITLE|STAMP|REVISION|PROJECT|ARCHITECT|ENGINEER|CONSULTANT|FINISH|SCHEDULE|GENERAL|LEGEND|KEY|SYMBOL|CODE|NAVIGATION|DEPARTMENT|VETERANS)\b/i;
+  /\b(SF|SQFT|TYP|DET|DETAIL|NOTE|NOTES|SEE|ALIGN|VIF|REF|SECTION|ELEVATION|PLAN|DRAWING|SHEET|SCALE|TITLE|STAMP|REVISION|PROJECT|ARCHITECT|ENGINEER|CONSULTANT|FINISH|SCHEDULE|GENERAL|LEGEND|KEY|SYMBOL|CODE|NAVIGATION|DEPARTMENT|VETERANS|RENDERING|OVERVIEW|WINDOW|DOOR)\b/i;
+// Callout markers: E1, D19, W18, S5, A101, T-1 — short letter prefix
+// followed by 1-2 digits, with no room keyword present. Rejected.
+const CALLOUT_CODE = /^[A-Z]{1,3}\s*-?\s*\d{1,3}[A-Z]?$/i;
 const DIM_CALLOUT = /^\d+(['"’”′″]|\s*(SF|sqft))/;
 const NOTE_BULLET = /^\d{1,2}\.$/;
 
@@ -156,9 +173,11 @@ function isLikelyRoomLabel(text: string): boolean {
   if (NOTE_BULLET.test(t)) return false;
   if (DIM_CALLOUT.test(t)) return false;
   if (EXCLUDE.test(t)) return false;
+  // Reject detail callouts (E1, D19, W18, S5, etc.) unless they're
+  // explicitly paired with a room keyword.
+  if (CALLOUT_CODE.test(t)) return false;
   if (ROOM_KW.test(t)) return true;
   if (ROOM_NUM.test(t)) return true;
-  if (ROOM_CODE.test(t)) return true;
   return false;
 }
 
@@ -543,11 +562,20 @@ export async function extractCommercialRoomCandidates(
     }
   }
 
+  // Cross-check the parsed scale via door symbol widths.
+  const scaleVerification = scaleAnchor
+    ? verifyScaleViaDoors(doorCandidates, {
+        ptPerFoot: scaleAnchor.ptPerFoot,
+        label: scaleAnchor.label,
+      })
+    : null;
+
   return {
     pageWidthPt,
     pageHeightPt,
     candidates,
     scaleAnchor,
+    scaleVerification,
     dimensionCallouts: callouts,
     vectorWallCount,
     imageWallCount,

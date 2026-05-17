@@ -210,9 +210,9 @@ export function ProjectWorkspace({
 
           <div className="border-t border-[hsl(var(--line))] p-3">
             <div className="mb-2 flex items-center justify-between">
-              <SectionTitle>AI Takeoff</SectionTitle>
+              <SectionTitle>Measure plan</SectionTitle>
               <span className="text-[11px] text-[hsl(var(--ink-3))]">
-                {acceptedCount} kept · {proposedCount} pending
+                {acceptedCount} kept · {proposedCount} to review
               </span>
             </div>
             <TakeoffButton
@@ -280,7 +280,7 @@ export function ProjectWorkspace({
               onClick={() => setRightTab("queue")}
               testId="tab-queue"
             >
-              Queue
+              Review
               {proposedCount > 0 && (
                 <span className="ml-1.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[hsl(var(--accent))] px-1 text-[10px] font-semibold text-white">
                   {proposedCount}
@@ -337,10 +337,10 @@ export function ProjectWorkspace({
               <path d="m6 9 6 6 6-6" />
             </svg>
             <span className="text-[13px] font-semibold text-[hsl(var(--ink))]">
-              Estimate Worksheet
+              Cost breakdown
             </span>
             <span className="text-[11px] text-[hsl(var(--ink-3))]">
-              ({acceptedCount} surfaces)
+              ({acceptedCount} {acceptedCount === 1 ? "room" : "rooms"})
             </span>
           </div>
         </button>

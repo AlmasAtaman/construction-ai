@@ -27,6 +27,7 @@ import {
   extractCommercialRoomCandidates,
   type RoomCandidate,
 } from "@/lib/commercial-rooms";
+import { runHighResTakeoff } from "./high-res-takeoff";
 
 /**
  * The takeoff runner orchestrates the multi-stage pipeline:
@@ -204,6 +205,128 @@ export async function runTakeoff(
     classifierConfidence: classification.confidence,
     message: "Reading the floor plan. About 30 seconds.",
   });
+
+  // High-res Set-of-Marks path — single Opus 4.7 call at 2576px with a
+  // coordinate-grid overlay + numbered markers at every room label.
+  // On the INHP benchmark vs MANUAL ground truth: 100% room ID, 9% MAE
+  // ($0.29/page). 12/13 rooms read from architect's printed dimensions.
+  //
+  // Off by default while we A/B against production until we have wider
+  // coverage of plan types. Enable with USE_HIGH_RES_TAKEOFF=1.
+  const useHighRes = process.env.USE_HIGH_RES_TAKEOFF === "1";
+  if (useHighRes) {
+    try {
+      // Pull room-label positions from the rendered PDF for Set-of-Marks markers.
+      const labelPositions = (rendered.roomLabels ?? []).map((l) => ({
+        label: l.text,
+        xNorm: l.xNorm,
+        // pdf text Y is up; high-res-takeoff expects 0..1 with y-up
+        yNorm: l.yNorm,
+      }));
+      const hrResult = await runHighResTakeoff({
+        pdfBuffer: input.pdfBuffer,
+        pageNumber: input.pageNumber,
+        maxImagePx: 2576,
+        gridDivisions: 10,
+        model: "claude-opus-4-7",
+        roomLabelPositions: labelPositions,
+      });
+
+      // Translate high-res rooms → TakeoffToolResult shape.
+      const placeholderPoly = [
+        { x: 0.1, y: 0.1 },
+        { x: 0.9, y: 0.1 },
+        { x: 0.9, y: 0.9 },
+        { x: 0.1, y: 0.9 },
+      ];
+      const walls: TakeoffToolResult["walls"] = hrResult.rooms.map((r) => ({
+        room_label: r.label,
+        area_sqft:
+          r.wallAreaSqft ??
+          Math.round(
+            ((r.widthFt ?? 10) + (r.heightFt ?? 10)) *
+              2 *
+              r.ceilingHeightFt *
+              0.93,
+          ),
+        linear_ft: Math.round(((r.widthFt ?? 10) + (r.heightFt ?? 10)) * 2),
+        substrate: "drywall",
+        polygon: placeholderPoly,
+        confidence: r.confidence,
+      }));
+      const ceilings: TakeoffToolResult["ceilings"] = hrResult.rooms.map((r) => ({
+        room_label: r.label,
+        area_sqft: r.floorAreaSqft,
+        substrate: "drywall",
+        polygon: placeholderPoly,
+        confidence: r.confidence,
+      }));
+      const doors: TakeoffToolResult["doors"] = hrResult.rooms
+        .filter((r) => r.doors > 0)
+        .map((r) => ({
+          room_label: r.label,
+          count: r.doors,
+          substrate: "wood",
+          polygon: placeholderPoly,
+          confidence: r.confidence,
+        }));
+      const windows: TakeoffToolResult["windows"] = hrResult.rooms
+        .filter((r) => r.windows > 0)
+        .map((r) => ({
+          room_label: r.label,
+          count: r.windows,
+          substrate: "metal",
+          polygon: placeholderPoly,
+          confidence: r.confidence,
+        }));
+
+      const result: TakeoffToolResult = {
+        scale_anchor: {
+          found: hrResult.scale != null,
+          ceiling_height_ft: 9,
+          note: hrResult.scale ?? undefined,
+        },
+        walls,
+        ceilings,
+        trim: [],
+        doors,
+        windows,
+        warnings: [
+          `High-res Set-of-Marks takeoff: ${hrResult.rooms.length} rooms at ${hrResult.imageWidthPx}×${hrResult.imageHeightPx} px.`,
+        ],
+      };
+
+      // Skip per-room cropping + validator since high-res already gives
+      // us per-room printed-dimension reads.
+      const vector = await vectorP;
+      return {
+        status: "ok",
+        result,
+        classification,
+        rendered,
+        takeoffInputTokens: hrResult.inputTokens,
+        takeoffOutputTokens: hrResult.outputTokens,
+        takeoffCacheCreationInputTokens: hrResult.cacheCreationInputTokens,
+        takeoffCacheReadInputTokens: hrResult.cacheReadInputTokens,
+        validatorInputTokens: 0,
+        validatorOutputTokens: 0,
+        validatorCacheReadInputTokens: 0,
+        validatorCacheCreationInputTokens: 0,
+        perRoomInputTokens: 0,
+        perRoomOutputTokens: 0,
+        perRoomCacheReadInputTokens: 0,
+        perRoomCacheCreationInputTokens: 0,
+        perRoomCount: hrResult.rooms.length,
+        plausibilityFlags: 0,
+        validatorFindings: 0,
+        vectorRoomCandidates: vector?.candidates ?? [],
+        vectorExtractionMs: vector?.elapsedMs ?? 0,
+      };
+    } catch (err) {
+      // Fall through to the legacy pipeline on any failure.
+      console.warn("[takeoff] high-res failed, falling back:", (err as Error).message);
+    }
+  }
 
   let toolResult: TakeoffToolResult | null = null;
   let inputTokens = 0;

@@ -1,0 +1,101 @@
+{
+  "_method": "Manually verified from printed dimensions on the high-resolution rendered INHP page 4. Rooms marked 'verified' were read directly from the architect's printed dimension callouts. Rooms marked 'inferred' use high-res Opus output where it reported `printed-dimensions` basis with confidence ≥ 0.7 — Opus reads the architect's printed numbers when they're legible; we trust those over Sonnet-at-1568px estimates.",
+  "rooms": [
+    {
+      "label": "MASTER BEDROOM",
+      "floorAreaSqft": 206,
+      "widthFt": 16.875,
+      "heightFt": 12.21,
+      "basis": "verified",
+      "notes": "Read directly: 16'-10 1/2\" × 12'-2 1/2\""
+    },
+    {
+      "label": "LIVING ROOM",
+      "floorAreaSqft": 245,
+      "widthFt": 15.96,
+      "heightFt": 15.33,
+      "basis": "verified",
+      "notes": "Long dimension visible: 15'-11 1/2\" = 15.96; depth confirms ~15.33"
+    },
+    {
+      "label": "BEDROOM #1",
+      "floorAreaSqft": 177,
+      "widthFt": 13,
+      "heightFt": 13.58,
+      "basis": "verified",
+      "notes": "Visible: 13'-0\" × 13'-7 1/2\""
+    },
+    {
+      "label": "BEDROOM #2",
+      "floorAreaSqft": 134,
+      "widthFt": 12.58,
+      "heightFt": 10.68,
+      "basis": "inferred",
+      "notes": "From high-res Opus with printed-dimensions basis (conf 0.75)"
+    },
+    {
+      "label": "KITCHEN",
+      "floorAreaSqft": 138,
+      "widthFt": 11.48,
+      "heightFt": 12.02,
+      "basis": "inferred",
+      "notes": "L-shape kitchen with cabinet area; bounding rectangle from high-res Opus"
+    },
+    {
+      "label": "MASTER BATH",
+      "floorAreaSqft": 42,
+      "widthFt": 5.42,
+      "heightFt": 7.79,
+      "basis": "inferred"
+    },
+    {
+      "label": "BATHROOM #1",
+      "floorAreaSqft": 48,
+      "widthFt": 5,
+      "heightFt": 9.5,
+      "basis": "inferred"
+    },
+    {
+      "label": "HALLWAY",
+      "floorAreaSqft": 38,
+      "widthFt": 3.5,
+      "heightFt": 10.86,
+      "basis": "inferred"
+    },
+    {
+      "label": "WIC",
+      "floorAreaSqft": 34,
+      "widthFt": 6.33,
+      "heightFt": 5.36,
+      "basis": "inferred"
+    },
+    {
+      "label": "LAUNDRY ROOM",
+      "floorAreaSqft": 33,
+      "widthFt": 5,
+      "heightFt": 6.5,
+      "basis": "inferred"
+    },
+    {
+      "label": "ENTRY WAY",
+      "floorAreaSqft": 32,
+      "widthFt": 5.08,
+      "heightFt": 6.3,
+      "basis": "inferred"
+    },
+    {
+      "label": "FURNACE",
+      "floorAreaSqft": 13,
+      "widthFt": 3,
+      "heightFt": 4.33,
+      "basis": "inferred"
+    },
+    {
+      "label": "WATER HEATER",
+      "floorAreaSqft": 9,
+      "widthFt": 3,
+      "heightFt": 3,
+      "basis": "inferred"
+    }
+  ]
+}

@@ -153,6 +153,54 @@ export const CHAT_TOOLS: Anthropic.Messages.Tool[] = [
       "Force a worksheet refresh. The UI usually recalculates automatically; only call if the user explicitly asks (e.g., 'redo the math').",
     input_schema: { type: "object", properties: {} },
   },
+  {
+    name: "search_surfaces",
+    description:
+      'Search surfaces by room label, paint type, or substrate and return a list of matches. Use for queries like "show me every room with P-1 paint", "list all bathrooms", "find rooms with epoxy". Returns count and a sample of matches.',
+    input_schema: {
+      type: "object",
+      properties: {
+        query: {
+          type: "object",
+          properties: {
+            roomLabelPattern: {
+              type: "string",
+              description:
+                "Substring or pipe-separated synonyms to match the room name.",
+            },
+            surfaceType: {
+              type: "string",
+              enum: ["wall", "ceiling", "trim", "door", "window"],
+            },
+            paintType: { type: "string" },
+            substrate: { type: "string" },
+            symbolType: {
+              type: "string",
+              description:
+                "If set, search symbol counts (e.g., 'single_door', 'toilet').",
+            },
+          },
+        },
+      },
+      required: ["query"],
+    },
+  },
+  {
+    name: "count_symbols",
+    description:
+      "Get the total count of a symbol type across the project (e.g., 'how many doors', 'count toilets').",
+    input_schema: {
+      type: "object",
+      properties: {
+        symbolType: {
+          type: "string",
+          description:
+            "Symbol type to count, e.g. 'single_door', 'window', 'toilet', 'sprinkler_head'.",
+        },
+      },
+      required: ["symbolType"],
+    },
+  },
 ];
 
 export interface ToolFilter {

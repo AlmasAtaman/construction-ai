@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useEditorStore } from "@/lib/store/editor-store";
@@ -9,6 +9,7 @@ import {
   confidenceLabel,
   type SurfaceDTO,
 } from "@/types/surface";
+import { SurfaceEditDialog } from "./SurfaceEditDialog";
 
 interface Props {
   onAcceptAllHighConfidence: () => void | Promise<void>;
@@ -69,6 +70,18 @@ export function DetectionQueue({ onAcceptAllHighConfidence }: Props) {
 
   const highCount = proposed.filter((s) => s.confidence >= 0.8).length;
 
+  // All known room labels in this project — for the edit dialog datalist
+  // and the "reassign" affordance.
+  const knownRoomLabels = useMemo(() => {
+    const set = new Set<string>();
+    for (const s of surfaces) {
+      if (s.roomLabel) set.add(s.roomLabel);
+    }
+    return [...set].sort();
+  }, [surfaces]);
+
+  const [editing, setEditing] = useState<SurfaceDTO | null>(null);
+
   if (proposed.length === 0) {
     return (
       <div
@@ -80,8 +93,8 @@ export function DetectionQueue({ onAcceptAllHighConfidence }: Props) {
             <path d="M20 6 9 17l-5-5" />
           </svg>
         </div>
-        <p>No pending surfaces.</p>
-        <p className="mt-1">Run AI Takeoff to find walls, ceilings, trim, and openings.</p>
+        <p>Nothing to review yet.</p>
+        <p className="mt-1">Click <strong>Measure my plan</strong> to find walls, ceilings, trim, doors, and windows.</p>
       </div>
     );
   }
@@ -137,7 +150,7 @@ export function DetectionQueue({ onAcceptAllHighConfidence }: Props) {
           <span className="num font-semibold text-[hsl(var(--ink))]">
             {proposed.length}
           </span>{" "}
-          pending
+          to review
         </span>
         {highCount > 0 && (
           <Button
@@ -184,7 +197,17 @@ export function DetectionQueue({ onAcceptAllHighConfidence }: Props) {
                     <span className="truncate text-[13px] font-medium text-[hsl(var(--ink))]">
                       {s.roomLabel || SURFACE_TYPE_LABELS[s.type]}
                     </span>
-                    <span className={`pill pill-${conf}`}>{conf}</span>
+                    <span
+                      title={`${conf === "high" ? "Looks good" : conf === "medium" ? "Worth a glance" : "Please double-check"} (confidence: ${Math.round(s.confidence * 100)}%)`}
+                      className={cn(
+                        "inline-block h-2 w-2 flex-shrink-0 rounded-full",
+                        conf === "high"
+                          ? "bg-emerald-500"
+                          : conf === "medium"
+                            ? "bg-amber-400"
+                            : "bg-red-500",
+                      )}
+                    />
                   </div>
                   <div className="mt-0.5 flex items-center gap-2 text-[11px] text-[hsl(var(--ink-3))]">
                     <span className="capitalize">
@@ -217,6 +240,19 @@ export function DetectionQueue({ onAcceptAllHighConfidence }: Props) {
                 </Button>
                 <Button
                   size="sm"
+                  variant="ghost"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setEditing(s);
+                  }}
+                  data-testid="edit-surface"
+                  className="h-7 px-2"
+                  title="Edit room label, type, or quantity"
+                >
+                  Edit
+                </Button>
+                <Button
+                  size="sm"
                   variant="secondary"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -232,6 +268,11 @@ export function DetectionQueue({ onAcceptAllHighConfidence }: Props) {
           );
         })}
       </ul>
+      <SurfaceEditDialog
+        surface={editing}
+        knownRoomLabels={knownRoomLabels}
+        onClose={() => setEditing(null)}
+      />
     </div>
   );
 }

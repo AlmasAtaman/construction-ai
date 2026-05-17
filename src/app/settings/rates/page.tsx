@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { AppShell, TopBar } from "@/components/nav/AppShell";
 
 interface Rate {
   surfaceType: string;
@@ -58,27 +59,23 @@ export default function RatesPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-6">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-600 font-bold text-white">
-            P
-          </div>
-          <h1 className="text-lg font-semibold text-gray-900">PainterDesk</h1>
+    <AppShell>
+      <TopBar
+        title="Labor rates"
+        subtitle="How fast your team paints and what they cost per hour"
+      >
+        <Link
+          href="/settings"
+          className="text-[12px] text-[hsl(var(--ink-2))] hover:text-[hsl(var(--ink-1))]"
+        >
+          ← Settings
         </Link>
-      </header>
+      </TopBar>
       <main className="flex-1 px-6 py-10">
         <div className="mx-auto max-w-3xl">
-          <Link
-            href="/settings"
-            className="text-sm text-blue-600 hover:underline"
-          >
-            &larr; Back to settings
-          </Link>
-          <h2 className="mt-4 text-2xl font-bold text-gray-900">Labor rates</h2>
-          <p className="mt-2 text-sm text-gray-600">
-            How fast your team paints, and how much they cost per hour. Used
-            for every project until you change them.
+          <p className="text-[13px] text-[hsl(var(--ink-2))]">
+            Set how fast your team paints and what they cost per hour. These
+            defaults apply to every project until you change them.
           </p>
 
           <div
@@ -155,6 +152,6 @@ export default function RatesPage() {
           </div>
         </div>
       </main>
-    </div>
+    </AppShell>
   );
 }

@@ -103,7 +103,7 @@ export function EstimateWorksheet({ projectId }: Props) {
   if (bid.lineItems.length === 0) {
     return (
       <div className="px-4 py-4 text-[13px] text-[hsl(var(--ink-3))]">
-        Line items will appear here once you accept or draw surfaces.
+        Rooms will appear here after you measure or draw them.
       </div>
     );
   }
@@ -117,11 +117,11 @@ export function EstimateWorksheet({ projectId }: Props) {
             <th className="w-[10%]">Type</th>
             <th className="w-[16%]">Paint</th>
             <th className="w-[6%] text-right">Coats</th>
-            <th className="w-[10%] text-right">Qty</th>
-            <th className="w-[10%] text-right">Rate</th>
-            <th className="w-[8%] text-right">Hrs</th>
-            <th className="w-[10%] text-right">Material</th>
-            <th className="w-[12%] text-right">Labor</th>
+            <th className="w-[10%] text-right">Size</th>
+            <th className="w-[10%] text-right" title="Painting speed — square feet per hour">Speed</th>
+            <th className="w-[8%] text-right">Hours</th>
+            <th className="w-[10%] text-right">Paint $</th>
+            <th className="w-[12%] text-right">Labor $</th>
           </tr>
         </thead>
         <tbody>

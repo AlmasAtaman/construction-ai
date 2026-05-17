@@ -1,0 +1,141 @@
+{
+  "rooms": [
+    {
+      "label": "GARAGE",
+      "floorAreaSqft": 440,
+      "basis": "estimate",
+      "confidence": 0.75,
+      "widthFt": null,
+      "heightFt": null
+    },
+    {
+      "label": "LIVING",
+      "floorAreaSqft": 350,
+      "basis": "estimate",
+      "confidence": 0.75,
+      "widthFt": null,
+      "heightFt": null
+    },
+    {
+      "label": "KITCHEN",
+      "floorAreaSqft": 280,
+      "basis": "estimate",
+      "confidence": 0.75,
+      "widthFt": null,
+      "heightFt": null
+    },
+    {
+      "label": "DINING",
+      "floorAreaSqft": 200,
+      "basis": "estimate",
+      "confidence": 0.7,
+      "widthFt": null,
+      "heightFt": null
+    },
+    {
+      "label": "BEDROOM SUITE",
+      "floorAreaSqft": 200,
+      "basis": "estimate",
+      "confidence": 0.7,
+      "widthFt": null,
+      "heightFt": null
+    },
+    {
+      "label": "BEDROOM",
+      "floorAreaSqft": 180,
+      "basis": "estimate",
+      "confidence": 0.7,
+      "widthFt": null,
+      "heightFt": null
+    },
+    {
+      "label": "BEDROOM 2",
+      "floorAreaSqft": 160,
+      "basis": "estimate",
+      "confidence": 0.7,
+      "widthFt": null,
+      "heightFt": null
+    },
+    {
+      "label": "OFFICE",
+      "floorAreaSqft": 150,
+      "basis": "estimate",
+      "confidence": 0.75,
+      "widthFt": null,
+      "heightFt": null
+    },
+    {
+      "label": "BATH SUITE",
+      "floorAreaSqft": 120,
+      "basis": "estimate",
+      "confidence": 0.7,
+      "widthFt": null,
+      "heightFt": null
+    },
+    {
+      "label": "HALL",
+      "floorAreaSqft": 120,
+      "basis": "estimate",
+      "confidence": 0.65,
+      "widthFt": null,
+      "heightFt": null
+    },
+    {
+      "label": "FOYER",
+      "floorAreaSqft": 90,
+      "basis": "estimate",
+      "confidence": 0.7,
+      "widthFt": null,
+      "heightFt": null
+    },
+    {
+      "label": "LAUNDRY",
+      "floorAreaSqft": 80,
+      "basis": "estimate",
+      "confidence": 0.7,
+      "widthFt": null,
+      "heightFt": null
+    },
+    {
+      "label": "BATH",
+      "floorAreaSqft": 60,
+      "basis": "estimate",
+      "confidence": 0.7,
+      "widthFt": null,
+      "heightFt": null
+    },
+    {
+      "label": "PANTRY",
+      "floorAreaSqft": 55,
+      "basis": "estimate",
+      "confidence": 0.7,
+      "widthFt": null,
+      "heightFt": null
+    },
+    {
+      "label": "W.I.C.",
+      "floorAreaSqft": 45,
+      "basis": "estimate",
+      "confidence": 0.7,
+      "widthFt": null,
+      "heightFt": null
+    },
+    {
+      "label": "POWDER",
+      "floorAreaSqft": 40,
+      "basis": "estimate",
+      "confidence": 0.7,
+      "widthFt": null,
+      "heightFt": null
+    },
+    {
+      "label": "CLOSET",
+      "floorAreaSqft": 35,
+      "basis": "estimate",
+      "confidence": 0.65,
+      "widthFt": null,
+      "heightFt": null
+    }
+  ],
+  "planNotes": "Main floor plan at 1/4\"=1'-0\" scale. Room dimensions are estimated by scaling from the drawing as printed dimensions are difficult to read clearly at this resolution. All exterior dimensions are to framing/main layer. Architect should verify all measurements. Areas are approximate and should be confirmed for final specifications."
+}

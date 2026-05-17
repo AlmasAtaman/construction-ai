@@ -28,6 +28,21 @@ export interface SanityReport {
   totalFloorSqft: number;
   /** Total wall sqft across all surfaces. */
   totalWallSqft: number;
+  /**
+   * Total wall LINEAR feet (perimeter of all walls). Industry-standard
+   * metric for trim contractors and door/window estimators.
+   */
+  totalWallLinearFt: number;
+  /**
+   * Net floor SF (interior usable area, walls excluded). For now
+   * approximated as totalFloorSqft × 0.93 (typical 7% wall band).
+   */
+  totalNetFloorSqft: number;
+  /**
+   * Gross floor SF (building footprint with walls). Approximated as
+   * totalFloorSqft + wall thickness band added back.
+   */
+  totalGrossFloorSqft: number;
 }
 
 /**
@@ -138,7 +153,26 @@ export function runSanityChecks(surfaces: SurfaceDTO[]): SanityReport {
     });
   }
 
-  return { flags, wallToCeilingRatio, totalFloorSqft, totalWallSqft };
+  const totalWallLinearFt = walls.reduce(
+    (a, w) => a + (w.linearFootage ?? 0),
+    0,
+  );
+  // Net = floor area minus a wall band approximation. For each room with
+  // wall LF, deduct LF × 0.25 ft (half of a 6" wall, applied to interior
+  // perimeter). Gross = floor + same band added back. These are
+  // approximations until polygon-level computation is plumbed everywhere.
+  const NET_DEDUCTION = totalWallLinearFt * 0.25;
+  const totalNetFloorSqft = Math.max(0, totalFloorSqft - NET_DEDUCTION);
+  const totalGrossFloorSqft = totalFloorSqft + NET_DEDUCTION;
+  return {
+    flags,
+    wallToCeilingRatio,
+    totalFloorSqft,
+    totalWallSqft,
+    totalWallLinearFt,
+    totalNetFloorSqft,
+    totalGrossFloorSqft,
+  };
 }
 
 function normalizeRoom(label: string | null): string {
