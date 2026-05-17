@@ -14,6 +14,9 @@ interface ProgressState {
   message?: string;
   pageType?: string;
   classifierConfidence?: number;
+  errorTitle?: string;
+  errorBody?: string;
+  errorDetails?: string;
 }
 
 interface CompletePayload {
@@ -24,15 +27,116 @@ interface CompletePayload {
   reason?: string;
 }
 
+/**
+ * Turn whatever the takeoff pipeline coughed up into a human message and a
+ * one-line "what to do" hint. The raw error stays available behind a
+ * collapsible so power users / dev mode can still see it.
+ */
+function humanizeTakeoffError(raw: string): {
+  title: string;
+  body: string;
+  details: string;
+} {
+  const r = raw.trim();
+  const lower = r.toLowerCase();
+
+  // 401 from Anthropic — wrong/missing/typo'd API key.
+  if (
+    lower.includes("authentication_error") ||
+    lower.startsWith("401 ") ||
+    lower.includes("x-api-key") ||
+    lower.includes("invalid api key")
+  ) {
+    return {
+      title: "Your Anthropic API key isn't working",
+      body: "The key in .env.local was rejected. Double-check there's no typo (it should start with sk-ant-), no quotes around it, and that you've restarted the dev server since adding it.",
+      details: r,
+    };
+  }
+
+  // 429 — rate-limited.
+  if (lower.includes("rate_limit") || lower.startsWith("429")) {
+    return {
+      title: "Anthropic is rate-limiting us",
+      body: "Too many requests in a short window. Wait about a minute, then try again.",
+      details: r,
+    };
+  }
+
+  // Budget cap inside the app.
+  if (lower.includes("daily ai usage limit") || lower.includes("budget")) {
+    return {
+      title: "Today's AI budget is used up",
+      body: "PainterDesk caps AI spend at $20/day. Resets at midnight local time. You can keep editing the plan by hand.",
+      details: r,
+    };
+  }
+
+  // Missing API key configured on the server.
+  if (lower.includes("anthropic api key") || lower.includes("anthropic_api_key")) {
+    return {
+      title: "No Anthropic API key configured",
+      body: "Add your key to .env.local as ANTHROPIC_API_KEY=sk-ant-… and restart the dev server.",
+      details: r,
+    };
+  }
+
+  // Network / fetch failure.
+  if (
+    lower.includes("failed to fetch") ||
+    lower.includes("network") ||
+    lower.includes("econnrefused") ||
+    lower.includes("could not reach")
+  ) {
+    return {
+      title: "Couldn't reach Anthropic",
+      body: "Check your internet connection, then try again. If you're on a VPN, try toggling it off.",
+      details: r,
+    };
+  }
+
+  // Couldn't read the PDF page (mupdf / render failures).
+  if (
+    lower.includes("render") &&
+    (lower.includes("pdf") || lower.includes("page"))
+  ) {
+    return {
+      title: "Couldn't render that page of the blueprint",
+      body: "The PDF may be corrupted or use an unusual encoding. Try uploading it again, or pick a different page.",
+      details: r,
+    };
+  }
+
+  // Default — keep the raw message visible but framed.
+  return {
+    title: "Couldn't analyze your blueprint",
+    body: "The AI takeoff didn't complete. Try again — if it keeps failing, check the details below.",
+    details: r,
+  };
+}
+
 export function TakeoffButton({ planPageId, onComplete }: Props) {
   const [running, setRunning] = useState(false);
   const [progress, setProgress] = useState<ProgressState | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [resultNote, setResultNote] = useState<string | null>(null);
+
+  function showError(rawMessage: string) {
+    const { title, body, details } = humanizeTakeoffError(rawMessage);
+    setProgress({
+      stage: "error",
+      errorTitle: title,
+      errorBody: body,
+      errorDetails: details,
+    });
+    setRunning(false);
+  }
+
+  function dismissProgress() {
+    setProgress(null);
+  }
 
   async function run() {
     if (!planPageId) return;
-    setError(null);
     setResultNote(null);
     setProgress({ stage: "rendering" });
     setRunning(true);
@@ -45,9 +149,11 @@ export function TakeoffButton({ planPageId, onComplete }: Props) {
       });
       if (!res.ok || !res.body) {
         const json = await res.json().catch(() => ({}));
-        setError(json.error ?? "Something went wrong. Try again.");
-        setRunning(false);
-        setProgress(null);
+        const rawText =
+          typeof json.error === "string"
+            ? json.error
+            : `${res.status} ${await res.text().catch(() => "")}`.trim();
+        showError(rawText || `${res.status} ${res.statusText}`);
         return;
       }
 
@@ -93,9 +199,7 @@ export function TakeoffButton({ planPageId, onComplete }: Props) {
       }
 
       if (errorPayload) {
-        setError(errorPayload.error);
-        setProgress(null);
-        setRunning(false);
+        showError(errorPayload.error);
         return;
       }
 
@@ -130,9 +234,10 @@ export function TakeoffButton({ planPageId, onComplete }: Props) {
       }
       await onComplete();
       setTimeout(() => setProgress(null), 1200);
-    } catch {
-      setError("We couldn't reach the AI. Check your internet and try again.");
-      setProgress(null);
+    } catch (err) {
+      const raw =
+        err instanceof Error ? err.message : "Could not reach the AI service.";
+      showError(raw);
     } finally {
       setRunning(false);
     }
@@ -172,15 +277,6 @@ export function TakeoffButton({ planPageId, onComplete }: Props) {
           {resultNote}
         </div>
       )}
-      {error && (
-        <div
-          role="alert"
-          className="rounded-[4px] border border-red-200 bg-red-50 px-2.5 py-2 text-[11px] leading-tight text-red-800"
-          data-testid="takeoff-error"
-        >
-          {error}
-        </div>
-      )}
 
       <TakeoffProgress
         visible={progress !== null}
@@ -188,6 +284,11 @@ export function TakeoffButton({ planPageId, onComplete }: Props) {
         message={progress?.message}
         pageType={progress?.pageType}
         classifierConfidence={progress?.classifierConfidence}
+        errorTitle={progress?.errorTitle}
+        errorBody={progress?.errorBody}
+        errorDetails={progress?.errorDetails}
+        onDismiss={dismissProgress}
+        onRetry={() => void run()}
       />
     </div>
   );
