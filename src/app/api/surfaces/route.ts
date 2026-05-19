@@ -24,6 +24,21 @@ const createSchema = z.object({
   notes: z.string().optional().nullable(),
   status: z.enum(["proposed", "accepted", "manual", "excluded"]).default("manual"),
   source: z.enum(["ai", "manual"]).default("manual"),
+  derivation: z
+    .enum([
+      "scale-measured",
+      "table-cross-checked",
+      "traced",
+      "sized-from-dimensions",
+      "table-only",
+      "virtual-partition",
+      "scale-needed",
+      "geometry-uncertain",
+      "ai-fallback",
+      "manual",
+    ])
+    .optional()
+    .nullable(),
 });
 
 export async function GET(req: Request) {
@@ -75,6 +90,7 @@ export async function POST(req: Request) {
       confidence: 1.0,
       status: d.status,
       source: d.source,
+      derivation: d.derivation ?? (d.source === "manual" ? "manual" : null),
     },
   });
 

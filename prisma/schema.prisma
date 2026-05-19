@@ -16,6 +16,10 @@ model Project {
   wasteFactor     Float     @default(0.10)
   markup          Float     @default(0.20)
   overheadPct     Float     @default(0.10)
+  // Default ceiling height in feet. Used to compute wall area =
+  // perimeter × ceiling. Editable per-project; per-room override is a
+  // future follow-up (would require a per-Surface column).
+  ceilingHeightFt Float     @default(9)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   plans           Plan[]
@@ -45,7 +49,16 @@ model PlanPage {
   imagePath   String?
   width       Int?
   height      Int?
+  // PDF points per real-world foot for this page. Set by the scale
+  // engine (text-notation parse, scale-bar detection) or by the user via
+  // two-point calibration. Null until established.
   scaleRatio  Float?
+  // How scaleRatio was established. One of: "text-notation",
+  // "scale-bar", "user", or null.
+  scaleMethod String?
+  // Human-readable display for the banner — e.g. "1/8\" = 1'-0\"",
+  // "1:200", "10 ft = 90 pt (set by you)".
+  scaleLabel  String?
   aiProcessed Boolean   @default(false)
   surfaces    Surface[]
 }
@@ -68,6 +81,10 @@ model Surface {
   confidence    Float
   status        String   @default("proposed")
   source        String
+  // How the polygon's coordinates were produced. Lets the contractor see
+  // whether a box is a true traced wall outline or a rectangle sized from
+  // a printed dimensions table. See SurfaceDerivation in types/surface.ts.
+  derivation    String?
   notes         String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

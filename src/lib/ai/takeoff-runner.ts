@@ -28,6 +28,17 @@ import {
   type RoomCandidate,
 } from "@/lib/commercial-rooms";
 import { runHighResTakeoff } from "./high-res-takeoff";
+import {
+  extractPage,
+  type ExtractedPage,
+  type ExtractedRoom,
+} from "@/lib/extract/page-extract";
+import type { EstablishedScale, UserSuppliedScale } from "@/lib/extract/scale";
+
+// Default ceiling height (in feet) used when the caller doesn't pass
+// one. Real wall-area math should use the per-project value from
+// Project.ceilingHeightFt — this is just the conservative fallback.
+const DEFAULT_CEILING_HEIGHT_FT = 9;
 
 /**
  * The takeoff runner orchestrates the multi-stage pipeline:
@@ -67,6 +78,17 @@ export interface TakeoffProgressEvent {
 export interface TakeoffRunInput {
   pdfBuffer: Buffer;
   pageNumber: number;
+  /**
+   * Optional user-supplied scale (from a two-point calibration stored
+   * on PlanPage.scaleRatio + scaleLabel). When present, it overrides
+   * any text-notation or scale-bar detection the engine would do.
+   */
+  userScale?: UserSuppliedScale | null;
+  /**
+   * Per-project ceiling height in feet. Used for wall-area math
+   * (linear ft × ceiling ft = sqft). Defaults to 9 if omitted.
+   */
+  ceilingHeightFt?: number;
 }
 
 export interface TakeoffRunSuccess {
@@ -99,6 +121,13 @@ export interface TakeoffRunSuccess {
    */
   vectorRoomCandidates: RoomCandidate[];
   vectorExtractionMs: number;
+  /**
+   * The scale the engine used (or null if none could be established
+   * and the user hasn't calibrated). Plumbed to the API route so the
+   * scaleRatio/Method/Label can be persisted on PlanPage and surfaced
+   * to the UI banner.
+   */
+  establishedScale: EstablishedScale | null;
 }
 
 export interface TakeoffRunSkip {
@@ -114,6 +143,7 @@ export async function runTakeoff(
   input: TakeoffRunInput,
   onProgress?: (e: TakeoffProgressEvent) => void,
 ): Promise<TakeoffRunResult> {
+  const ceilingHeightFt = input.ceilingHeightFt ?? DEFAULT_CEILING_HEIGHT_FT;
   // --- Stage 1: render + parallel vector-room extraction ------------------
   onProgress?.({ stage: "rendering" });
   const renderedP = renderPdfPage(input.pdfBuffer, input.pageNumber);
@@ -125,6 +155,16 @@ export async function runTakeoff(
         input.pdfBuffer,
         input.pageNumber,
       ).catch(() => null);
+  // Deterministic geometry pipeline — runs in parallel and produces
+  // real wall-bounded polygons + scale-measured dimensions. The runner
+  // uses this as the source of truth for surface coordinates AND for
+  // wall lengths / room areas. The AI call below is now responsible
+  // for substrate, doors, windows, and trim keyed by room label.
+  const extractedP: Promise<ExtractedPage | null> = isTestMode()
+    ? Promise.resolve(null)
+    : extractPage(input.pdfBuffer, input.pageNumber, {
+        userScale: input.userScale ?? null,
+      }).catch(() => null);
   const rendered = await renderedP;
 
   if (isTestMode()) {
@@ -172,6 +212,7 @@ export async function runTakeoff(
       validatorFindings: 0,
       vectorRoomCandidates: [],
       vectorExtractionMs: 0,
+      establishedScale: null,
     };
   }
 
@@ -189,6 +230,32 @@ export async function runTakeoff(
     const reason = `This looks like a ${classification.type.replace("_", " ")} (${Math.round(
       classification.confidence * 100,
     )}% confidence). We only run AI takeoff on floor plans and reflected ceiling plans to save you money — switch to another page if this is wrong.`;
+    onProgress?.({
+      stage: "skipped",
+      pageType: classification.type,
+      classifierConfidence: classification.confidence,
+      message: reason,
+    });
+    return { status: "skipped", classification, rendered, reason };
+  }
+
+  // Deterministic skip: the extractor knows when a page has no room-
+  // like labels and no usable vector wall network (covers, photo
+  // pages, amenities text, specifications, back covers). Honor that
+  // before spending Sonnet tokens on a page we can't auto-detect.
+  const earlyExtracted = await extractedP;
+  if (earlyExtracted && earlyExtracted.status === "skipped") {
+    const reasonByKey: Record<string, string> = {
+      no_text_layer:
+        "This page has no extractable text or vector geometry — we can't auto-detect rooms on a scanned or image-only sheet.",
+      non_floor_plan:
+        "This page has no room labels — it looks like a cover, amenities, or specifications sheet rather than a floor plan.",
+      low_geometry:
+        "This page's vector geometry isn't dense enough to find room boundaries reliably.",
+    };
+    const reason =
+      reasonByKey[earlyExtracted.reason ?? "low_geometry"] ??
+      "This page can't be auto-detected from its vector geometry.";
     onProgress?.({
       stage: "skipped",
       pageType: classification.type,
@@ -339,8 +406,17 @@ export async function runTakeoff(
       // grid-cell assignment is more reliable than label-matching guesses,
       // so we don't run repositionPolygonsByLabel here.
       const vector = await vectorP;
+      const extractedHr = await extractedP;
       void labelPositions; void vector; // kept for parity with legacy path
-      const result = rawResult;
+      // Override the grid-cell polygons + the AI's measurements with
+      // deterministic geometry from the extractor — same rule as the
+      // legacy path so both code paths return surfaces whose
+      // coordinates AND measurements come from the PDF, not the AI.
+      const result = applyExtractionGeometry(
+        rawResult,
+        extractedHr,
+        ceilingHeightFt,
+      );
 
       // Skip per-room cropping + validator since high-res already gives
       // us per-room printed-dimension reads.
@@ -366,6 +442,7 @@ export async function runTakeoff(
         validatorFindings: 0,
         vectorRoomCandidates: vector?.candidates ?? [],
         vectorExtractionMs: vector?.elapsedMs ?? 0,
+        establishedScale: extractedHr?.establishedScale ?? null,
       };
     } catch (err) {
       // Fall through to the legacy pipeline on any failure.
@@ -656,23 +733,18 @@ export async function runTakeoff(
 
   // Collect the vector extraction result we kicked off in parallel.
   const vector = await vectorP;
+  const extracted = await extractedP;
 
-  // Replace AI's vague polygon coordinates with anchored boxes so the
-  // overlay actually sits on top of each room. Sources, best to worst:
-  // (1) vector-extracted room face (real geometry + label pairing),
-  // (2) text-layer label position, (3) orphan vector room (round-robin
-  // for surfaces the AI named but neither vector nor text could match).
-  finalResult = repositionPolygonsByLabel(
+  // Replace the AI's polygon coordinates AND measurements with the
+  // deterministic page extractor's output. Surfaces now get their
+  // boxes from real PDF geometry, and their wall lengths / floor
+  // areas from extracted polygons × the established scale (or from
+  // a printed dim-table when present). The AI's number is never
+  // surfaced as a measurement.
+  finalResult = applyExtractionGeometry(
     finalResult,
-    (rendered.roomLabels ?? []).map((l) => ({
-      label: l.text,
-      xNorm: l.xNorm,
-      yNorm: l.yNorm,
-    })),
-    vector?.candidates ?? [],
-    vector?.pageWidthPt ?? 0,
-    vector?.pageHeightPt ?? 0,
-    rendered.heightPx > 0 ? rendered.widthPx / rendered.heightPx : 1,
+    extracted,
+    ceilingHeightFt,
   );
 
   return {
@@ -697,10 +769,190 @@ export async function runTakeoff(
     validatorFindings,
     vectorRoomCandidates: vector?.candidates ?? [],
     vectorExtractionMs: vector?.elapsedMs ?? 0,
+    establishedScale: extracted?.establishedScale ?? null,
   };
 }
 
 import type { TakeoffResponse } from "./test-mode";
+import type { SurfaceDerivation } from "./takeoff-prompt";
+
+/**
+ * Replace every AI-returned polygon AND measurement with values from the
+ * deterministic page extractor, and tag each surface with its derivation.
+ * The AI's own area_sqft / linear_ft are NEVER surfaced to the user —
+ * we either use real extraction × scale, the printed dim-table, or null
+ * (with a "scale needed" / "AI guess" badge prompting the contractor).
+ *
+ * Matching is by normalized room label (lowercased, alphanumeric-only)
+ * with a substring fallback for room-number suffixes ("BEDROOM 2"
+ * matches "BEDROOM").
+ *
+ * Per-room measurement mapping:
+ *   - wall    → linear_ft = room.perimeterFt
+ *               area_sqft = perimeterFt × ceilingHeightFt
+ *   - ceiling → area_sqft = room.areaSqft  (floor area)
+ *   - trim    → linear_ft = room.perimeterFt  (base + casing path)
+ *   - door    → AI count retained; no length/area
+ *   - window  → AI count retained; no length/area
+ *
+ * When the matching room has no measurement (derivation `scale-needed`
+ * or the AI named a room the extractor didn't find), all of area_sqft
+ * and linear_ft are nulled — honest absence beats confident wrongness.
+ */
+function applyExtractionGeometry(
+  result: TakeoffToolResult,
+  extracted: ExtractedPage | null,
+  ceilingHeightFt: number,
+): TakeoffToolResult {
+  if (!extracted || extracted.status !== "ok" || extracted.rooms.length === 0) {
+    // No extraction available — drop polygons + measurements; tag as
+    // ai-fallback so the queue badge prompts the user for review.
+    return clearAllToAiFallback(result);
+  }
+  const norm = (s: string) =>
+    (s ?? "").toLowerCase().replace(/[^a-z0-9]+/g, "");
+  const byLabel = new Map<string, ExtractedRoom>();
+  for (const room of extracted.rooms) {
+    const k = norm(room.label);
+    if (k && !byLabel.has(k)) byLabel.set(k, room);
+  }
+
+  function lookup(label: string): ExtractedRoom | undefined {
+    const k = norm(label);
+    if (!k) return undefined;
+    const direct = byLabel.get(k);
+    if (direct) return direct;
+    // Loose match: AI returned "BEDROOM 2" or "BEDROOM #137" — find
+    // any extracted room whose key is a prefix of the AI key OR vice
+    // versa. Prevents missing rooms when the AI elaborates the label.
+    for (const [extKey, room] of byLabel.entries()) {
+      if (extKey.length < 3) continue;
+      if (k.startsWith(extKey) || extKey.startsWith(k)) return room;
+    }
+    return undefined;
+  }
+
+  function wallMeasures(
+    room: ExtractedRoom,
+  ): { area_sqft: number | null; linear_ft: number | null } {
+    // Wall length = polygon perimeter (or table 2(W+H)).
+    const linear_ft = room.perimeterFt;
+    if (linear_ft === null) {
+      return { area_sqft: null, linear_ft: null };
+    }
+    // Wall area = perimeter × ceilingHeight. The 5-8 % door/window
+    // deduction the AI used to do is dropped here — the deterministic
+    // engine doesn't know openings yet, and over-counting is safer
+    // than under-counting for a paint estimate. Manual edits remain
+    // the user's escape hatch.
+    return { area_sqft: round1(linear_ft * ceilingHeightFt), linear_ft };
+  }
+
+  function patchWall(entry: TakeoffToolResult["walls"][number]) {
+    const room = lookup(entry.room_label);
+    if (!room) {
+      return {
+        ...entry,
+        polygon: [],
+        area_sqft: null,
+        linear_ft: null,
+        derivation: "ai-fallback" as const,
+      };
+    }
+    const m = wallMeasures(room);
+    return {
+      ...entry,
+      polygon: room.polygonNorm,
+      area_sqft: m.area_sqft,
+      linear_ft: m.linear_ft,
+      derivation: room.derivation,
+    };
+  }
+
+  function patchCeiling(entry: TakeoffToolResult["ceilings"][number]) {
+    const room = lookup(entry.room_label);
+    if (!room) {
+      return {
+        ...entry,
+        polygon: [],
+        area_sqft: null,
+        derivation: "ai-fallback" as const,
+      };
+    }
+    return {
+      ...entry,
+      polygon: room.polygonNorm,
+      area_sqft: room.areaSqft,
+      derivation: room.derivation,
+    };
+  }
+
+  function patchTrim(entry: TakeoffToolResult["trim"][number]) {
+    const room = lookup(entry.room_label);
+    if (!room) {
+      return {
+        ...entry,
+        polygon: [],
+        linear_ft: null,
+        derivation: "ai-fallback" as const,
+      };
+    }
+    return {
+      ...entry,
+      polygon: room.polygonNorm,
+      linear_ft: room.perimeterFt,
+      derivation: room.derivation,
+    };
+  }
+
+  function patchCount<T extends TakeoffToolResult["doors"][number]>(entry: T): T {
+    const room = lookup(entry.room_label);
+    if (!room) {
+      return { ...entry, polygon: [], derivation: "ai-fallback" };
+    }
+    return {
+      ...entry,
+      polygon: room.polygonNorm,
+      derivation: room.derivation,
+    };
+  }
+
+  return {
+    ...result,
+    walls: result.walls.map(patchWall),
+    ceilings: result.ceilings.map(patchCeiling),
+    trim: result.trim.map(patchTrim),
+    doors: result.doors.map(patchCount),
+    windows: result.windows.map(patchCount),
+  };
+}
+
+function clearAllToAiFallback(result: TakeoffToolResult): TakeoffToolResult {
+  return {
+    ...result,
+    walls: result.walls.map((w) => ({
+      ...w,
+      polygon: [],
+      area_sqft: null,
+      linear_ft: null,
+      derivation: "ai-fallback",
+    })),
+    ceilings: result.ceilings.map((c) => ({
+      ...c,
+      polygon: [],
+      area_sqft: null,
+      derivation: "ai-fallback",
+    })),
+    trim: result.trim.map((t) => ({
+      ...t,
+      polygon: [],
+      linear_ft: null,
+      derivation: "ai-fallback",
+    })),
+    doors: result.doors.map((d) => ({ ...d, polygon: [], derivation: "ai-fallback" })),
+    windows: result.windows.map((w) => ({ ...w, polygon: [], derivation: "ai-fallback" })),
+  };
+}
 
 /**
  * Run per-room measurement calls in parallel batches. We cap concurrency

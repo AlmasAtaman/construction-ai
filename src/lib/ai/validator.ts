@@ -121,14 +121,14 @@ function summarizeClaims(result: TakeoffToolResult): string {
   }
   for (const w of result.walls ?? []) {
     const b = bucket(w.room_label);
-    b.wallSqft += w.area_sqft;
-    b.wallLf += w.linear_ft;
+    b.wallSqft += w.area_sqft ?? 0;
+    b.wallLf += w.linear_ft ?? 0;
   }
   for (const c of result.ceilings ?? []) {
-    bucket(c.room_label).ceilSqft += c.area_sqft;
+    bucket(c.room_label).ceilSqft += c.area_sqft ?? 0;
   }
   for (const t of result.trim ?? []) {
-    bucket(t.room_label).trimLf += t.linear_ft;
+    bucket(t.room_label).trimLf += t.linear_ft ?? 0;
   }
   for (const d of result.doors ?? []) {
     bucket(d.room_label).doors += d.count;

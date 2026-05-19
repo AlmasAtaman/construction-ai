@@ -232,6 +232,10 @@ export function TakeoffButton({ planPageId, onComplete }: Props) {
         );
         window.dispatchEvent(new Event("ai-usage-changed"));
       }
+      // The engine may have established (or refined) the page's scale.
+      // Tell the banner to refetch so its display matches the freshly
+      // persisted scaleRatio/scaleMethod/scaleLabel.
+      window.dispatchEvent(new Event("scale-updated"));
       await onComplete();
       setTimeout(() => setProgress(null), 1200);
     } catch (err) {

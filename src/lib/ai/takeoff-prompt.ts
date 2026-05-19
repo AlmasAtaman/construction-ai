@@ -319,29 +319,51 @@ export interface TakeoffToolPoint {
   y: number;
 }
 
+/**
+ * Derivation tag attached to each surface AFTER the AI returns. The AI
+ * never sets this — the takeoff runner overrides it during the
+ * deterministic geometry pass so the verification UI can show how each
+ * number was produced. Values mirror the SurfaceDerivation type in
+ * @/types/surface — keep them in sync.
+ */
+export type SurfaceDerivation =
+  | "scale-measured"
+  | "table-cross-checked"
+  | "traced"
+  | "sized-from-dimensions"
+  | "table-only"
+  | "virtual-partition"
+  | "scale-needed"
+  | "geometry-uncertain"
+  | "ai-fallback";
+
 export interface TakeoffToolWall {
   room_label: string;
-  area_sqft: number;
-  linear_ft: number;
+  /** Null when the engine can't measure (no scale established + no table). */
+  area_sqft: number | null;
+  linear_ft: number | null;
   substrate: string;
   polygon: TakeoffToolPoint[];
   confidence: number;
+  derivation?: SurfaceDerivation;
 }
 
 export interface TakeoffToolCeiling {
   room_label: string;
-  area_sqft: number;
+  area_sqft: number | null;
   substrate: string;
   polygon: TakeoffToolPoint[];
   confidence: number;
+  derivation?: SurfaceDerivation;
 }
 
 export interface TakeoffToolTrim {
   room_label: string;
-  linear_ft: number;
+  linear_ft: number | null;
   substrate: string;
   polygon: TakeoffToolPoint[];
   confidence: number;
+  derivation?: SurfaceDerivation;
 }
 
 export interface TakeoffToolCount {
@@ -350,6 +372,7 @@ export interface TakeoffToolCount {
   substrate: string;
   polygon: TakeoffToolPoint[];
   confidence: number;
+  derivation?: SurfaceDerivation;
 }
 
 export interface TakeoffToolResult {

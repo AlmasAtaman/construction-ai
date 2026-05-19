@@ -55,6 +55,83 @@ function SourceBadge({ source }: { source: string }) {
   );
 }
 
+/**
+ * Shows how the surface's polygon coordinates were produced. Distinct
+ * from the broader source badge: this is specifically about whether
+ * the contractor can trust the BOX position on the plan.
+ */
+function DerivationBadge({ derivation }: { derivation: string | null }) {
+  if (!derivation) return null;
+  const styles: Record<string, { cls: string; label: string; title: string }> = {
+    "scale-measured": {
+      cls: "bg-emerald-50 text-emerald-700 border-emerald-200",
+      label: "Scale-measured",
+      title:
+        "Wall length and area measured from the plan's vector geometry × the established scale. Deterministic, not estimated.",
+    },
+    "table-cross-checked": {
+      cls: "bg-emerald-50 text-emerald-800 border-emerald-300",
+      label: "Table ✓ scale",
+      title:
+        "Printed dimension table and scale-measured geometry agree within ±10 %. Highest confidence — both sources back this number.",
+    },
+    traced: {
+      cls: "bg-sky-50 text-sky-700 border-sky-200",
+      label: "Traced",
+      title:
+        "Box outline came from real wall segments in the PDF's vector layer. Dimensions are from the printed table.",
+    },
+    "sized-from-dimensions": {
+      cls: "bg-amber-50 text-amber-800 border-amber-200",
+      label: "Sized from dims",
+      title:
+        "Box is a rectangle sized from the room's printed dimensions, anchored to its label. Position is approximate; size is accurate.",
+    },
+    "table-only": {
+      cls: "bg-slate-100 text-slate-600 border-slate-300",
+      label: "Table only",
+      title:
+        "Room dimensions came from the printed schedule. No reliable on-plan placement — the room shows in the queue but no box is drawn.",
+    },
+    "virtual-partition": {
+      cls: "bg-amber-50 text-amber-800 border-amber-300",
+      label: "Estimated boundary",
+      title:
+        "This room has no fully enclosing walls (open plan). The boundary was computed by partitioning the open zone between nearby labels, snapped to the real walls that do exist. Review before bidding — the dimensions are an honest estimate, not a traced measurement.",
+    },
+    "scale-needed": {
+      cls: "bg-orange-50 text-orange-800 border-orange-300",
+      label: "Scale needed",
+      title:
+        "Room found in the PDF's vector layer, but no scale is established for this page. Set the scale in the banner above to see real measurements.",
+    },
+    "ai-fallback": {
+      cls: "bg-rose-50 text-rose-700 border-rose-200",
+      label: "AI guess",
+      title:
+        "Box position is an AI estimate — the deterministic extractor couldn't pair this room with real geometry. Double-check before accepting.",
+    },
+    manual: {
+      cls: "bg-slate-100 text-slate-700 border-slate-300",
+      label: "Drawn",
+      title: "You drew this box by hand.",
+    },
+  };
+  const s = styles[derivation];
+  if (!s) return null;
+  return (
+    <span
+      className={cn(
+        "rounded border px-1.5 py-0 text-[9px] font-semibold uppercase tracking-wide",
+        s.cls,
+      )}
+      title={s.title}
+    >
+      {s.label}
+    </span>
+  );
+}
+
 export function DetectionQueue({ onAcceptAllHighConfidence }: Props) {
   const surfaces = useEditorStore((s) => s.surfaces);
   const selected = useEditorStore((s) => s.selectedSurfaceId);
@@ -224,6 +301,7 @@ export function DetectionQueue({ onAcceptAllHighConfidence }: Props) {
                         <span>{s.substrate}</span>
                       </>
                     )}
+                    <DerivationBadge derivation={s.derivation} />
                     <SourceBadge source={s.source} />
                   </div>
                 </div>

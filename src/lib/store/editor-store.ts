@@ -42,6 +42,14 @@ interface EditorState {
     door: boolean;
     window: boolean;
   };
+  // Two-point scale calibration. When stage is non-null the overlay
+  // intercepts the next click(s) on the canvas instead of starting a
+  // draw — the user is calibrating, not annotating.
+  scaleCalib: {
+    stage: "pick-p1" | "pick-p2" | "enter-feet" | null;
+    p1: { x: number; y: number } | null;
+    p2: { x: number; y: number } | null;
+  };
   setSurfaces: (s: SurfaceDTO[]) => void;
   addSurface: (s: SurfaceDTO) => void;
   updateSurface: (id: string, change: Partial<SurfaceDTO>) => void;
@@ -60,6 +68,9 @@ interface EditorState {
   }) => void;
   setShowAiOverlay: (v: boolean) => void;
   toggleType: (t: keyof EditorState["visibleTypes"]) => void;
+  startScaleCalibration: () => void;
+  cancelScaleCalibration: () => void;
+  pushScalePoint: (p: { x: number; y: number }) => void;
 }
 
 // Zoom range: 1 = fit to container (any tighter and the blueprint becomes
@@ -120,6 +131,7 @@ export const useEditorStore = create<EditorState>((set) => ({
     door: false,
     window: false,
   },
+  scaleCalib: { stage: null, p1: null, p2: null },
   setSurfaces: (s) => set({ surfaces: s }),
   addSurface: (s) =>
     set((st) => ({ surfaces: [...st.surfaces, s] })),
@@ -172,4 +184,20 @@ export const useEditorStore = create<EditorState>((set) => ({
     set((st) => ({
       visibleTypes: { ...st.visibleTypes, [t]: !st.visibleTypes[t] },
     })),
+  startScaleCalibration: () =>
+    set({ scaleCalib: { stage: "pick-p1", p1: null, p2: null } }),
+  cancelScaleCalibration: () =>
+    set({ scaleCalib: { stage: null, p1: null, p2: null } }),
+  pushScalePoint: (p) =>
+    set((st) => {
+      if (st.scaleCalib.stage === "pick-p1") {
+        return { scaleCalib: { stage: "pick-p2", p1: p, p2: null } };
+      }
+      if (st.scaleCalib.stage === "pick-p2") {
+        return {
+          scaleCalib: { stage: "enter-feet", p1: st.scaleCalib.p1, p2: p },
+        };
+      }
+      return {};
+    }),
 }));

@@ -40,6 +40,8 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
   const removeSurface = useEditorStore((s) => s.removeSurface);
   const addSurface = useEditorStore((s) => s.addSurface);
   const updateSurface = useEditorStore((s) => s.updateSurface);
+  const scaleCalib = useEditorStore((s) => s.scaleCalib);
+  const pushScalePoint = useEditorStore((s) => s.pushScalePoint);
 
   const [drawing, setDrawing] = useState<InProgressShape | null>(null);
   const [polyPoints, setPolyPoints] = useState<{ x: number; y: number }[]>([]);
@@ -139,6 +141,16 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
     const stage = e.target.getStage();
     const pos = stage?.getPointerPosition();
     if (!pos) return;
+
+    // Scale calibration intercepts clicks before the draw tools see
+    // them. The user is picking two points; nothing else fires.
+    if (
+      scaleCalib.stage === "pick-p1" ||
+      scaleCalib.stage === "pick-p2"
+    ) {
+      pushScalePoint(pxToNorm(pos));
+      return;
+    }
 
     if (tool === "rectangle") {
       setDrawing({ start: pos, end: pos });
@@ -308,34 +320,29 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
   }
 
   // Memo: pre-compute pixel polygons for visible surfaces. Annotations
-  // are rendered separately as markers, not as polygon outlines. When
-  // showAiOverlay is off, keep only manually-drawn / accepted surfaces
-  // so the contractor can see the bare blueprint with their own marks.
-  const visibleSurfaces = useMemo(
-    () =>
-      props.surfaces
-        .filter((s) => s.status !== "excluded")
-        .filter((s) => !s.type.startsWith("annotation:") && !s.type.startsWith("symbol:"))
-        .filter((s) => visibleTypes[s.type as keyof typeof visibleTypes])
-        // Empty polygon = "AI detected this room but we don't know
-        // where on the plan it sits." Keep it in the queue / bid math
-        // upstream, just skip rendering — honest no-marker beats
-        // a wrong marker on the title block.
-        .filter((s) => s.polygon && s.polygon.length >= 3)
-        .filter((s) => {
-          if (showAiOverlay) return true;
-          return s.source !== "ai" || s.status === "manual";
-        })
-        .map((s) => ({
-          surface: s,
-          flatPoints: s.polygon.flatMap((p) => {
-            const px = normToPx(p);
-            return [px.x, px.y];
-          }),
-        })),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [props.surfaces, props.width, props.height, showAiOverlay, visibleTypes],
-  );
+  // are rendered separately as markers, not as polygon outlines.
+  // Skips empty polygons (surfaces tagged ai-fallback / geometry-uncertain
+  // / scale-needed without a reliable boundary deliberately carry no
+  // shape — they live in the queue with a "needs measurement" badge
+  // and don't draw anything on the canvas).
+  const visibleSurfaces = useMemo(() => {
+    return props.surfaces
+      .filter(
+        (s) =>
+          s.status !== "excluded" &&
+          s.type !== ("annotation:note" as SurfaceType) &&
+          s.polygon.length >= 3 &&
+          (showAiOverlay || s.source !== "ai") &&
+          (visibleTypes[s.type as keyof typeof visibleTypes] ?? true),
+      )
+      .map((s) => ({
+        surface: s,
+        flatPoints: s.polygon.flatMap((p) => [
+          p.x * props.width,
+          p.y * props.height,
+        ]),
+      }));
+  }, [props.surfaces, props.width, props.height, showAiOverlay, visibleTypes]);
 
   const annotations = useMemo(
     () =>
@@ -477,6 +484,49 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
               strokeWidth={2}
               dash={[4, 4]}
             />
+          )}
+
+          {/* Scale-calibration line — visible while the user is picking
+              the two points and after both are set. */}
+          {scaleCalib.p1 && (
+            (() => {
+              const a = normToPx(scaleCalib.p1);
+              const b = scaleCalib.p2 ? normToPx(scaleCalib.p2) : null;
+              return (
+                <>
+                  <Rect
+                    x={a.x - 5}
+                    y={a.y - 5}
+                    width={10}
+                    height={10}
+                    fill="#0ea5e9"
+                    stroke="#0c4a6e"
+                    strokeWidth={1.5}
+                    cornerRadius={6}
+                  />
+                  {b && (
+                    <>
+                      <Line
+                        points={[a.x, a.y, b.x, b.y]}
+                        stroke="#0ea5e9"
+                        strokeWidth={2}
+                        dash={[6, 4]}
+                      />
+                      <Rect
+                        x={b.x - 5}
+                        y={b.y - 5}
+                        width={10}
+                        height={10}
+                        fill="#0ea5e9"
+                        stroke="#0c4a6e"
+                        strokeWidth={1.5}
+                        cornerRadius={6}
+                      />
+                    </>
+                  )}
+                </>
+              );
+            })()
           )}
 
           {/* Annotation notes — small yellow markers */}

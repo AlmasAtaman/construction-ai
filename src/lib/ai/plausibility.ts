@@ -46,6 +46,9 @@ export function plausibilityCheck(
     const w = corrected.walls[i];
     const lf = w.linear_ft;
     const sqft = w.area_sqft;
+    // Null measurements come from the deterministic engine when scale
+    // isn't yet established — nothing to plausibility-check.
+    if (lf == null || sqft == null) continue;
     if (lf <= 0) continue;
 
     // Wall area should be perimeter × ceiling-height, give or take 20% for
@@ -98,7 +101,8 @@ export function plausibilityCheck(
     );
     if (!matchingWall) continue;
     const lf = matchingWall.linear_ft;
-    if (lf <= 0) continue;
+    if (lf == null || lf <= 0) continue;
+    if (c.area_sqft == null) continue;
 
     // Maximum floor area for a given perimeter is the square (lf/4)^2;
     // typical rooms are between half and full of that.

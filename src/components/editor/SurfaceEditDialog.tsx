@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useEditorStore } from "@/lib/store/editor-store";
-import type { SurfaceDTO } from "@/types/surface";
+import type { SurfaceDTO, SurfaceDerivation } from "@/types/surface";
 import { cn } from "@/lib/utils";
 
 const TYPE_OPTIONS = [
@@ -45,12 +45,234 @@ interface Props {
  * Saves via PATCH /api/surfaces/[id]. Optimistic update on the local
  * store; rolls back on error.
  */
+interface PageContext {
+  scale: { ptPerFoot: number; method: string; label: string } | null;
+  ceilingHeightFt: number;
+}
+
+const DERIVATION_LABELS: Record<SurfaceDerivation, { label: string; cls: string; tip: string }> = {
+  "scale-measured": {
+    label: "Scale-measured",
+    cls: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    tip: "Derived from the PDF's vector geometry × the plan's scale.",
+  },
+  "table-cross-checked": {
+    label: "Table ✓ scale",
+    cls: "bg-emerald-50 text-emerald-800 border-emerald-300",
+    tip: "Printed dimensions and scale-measured geometry agree within ±10 %.",
+  },
+  traced: {
+    label: "Traced",
+    cls: "bg-sky-50 text-sky-700 border-sky-200",
+    tip: "Boundary traced from real walls. Dimensions from the printed table.",
+  },
+  "sized-from-dimensions": {
+    label: "Sized from dims",
+    cls: "bg-amber-50 text-amber-800 border-amber-200",
+    tip: "Rectangle sized from the printed dimensions, anchored to the label.",
+  },
+  "table-only": {
+    label: "Table only",
+    cls: "bg-slate-100 text-slate-600 border-slate-300",
+    tip: "From the printed schedule. No on-plan placement available.",
+  },
+  "virtual-partition": {
+    label: "Estimated boundary",
+    cls: "bg-amber-50 text-amber-800 border-amber-300",
+    tip: "Open-plan room — the boundary was computed by partitioning the open zone between nearby labels. Snapped to real walls where they exist. Review before bidding.",
+  },
+  "scale-needed": {
+    label: "Scale needed",
+    cls: "bg-orange-50 text-orange-800 border-orange-300",
+    tip: "Set the plan scale to measure this room.",
+  },
+  "geometry-uncertain": {
+    label: "Geometry uncertain",
+    cls: "bg-orange-50 text-orange-800 border-orange-300",
+    tip: "Found the label, but the extracted boundary isn't trustworthy. Enter the dimension manually.",
+  },
+  "ai-fallback": {
+    label: "AI guess",
+    cls: "bg-rose-50 text-rose-700 border-rose-200",
+    tip: "AI named this room but the engine couldn't measure it.",
+  },
+  manual: {
+    label: "Drawn",
+    cls: "bg-slate-100 text-slate-700 border-slate-300",
+    tip: "You drew this surface by hand.",
+  },
+};
+
+function MeasurementBreakdown({
+  surface,
+  ctx,
+}: {
+  surface: SurfaceDTO;
+  ctx: PageContext | null;
+}) {
+  const derivation = (surface.derivation ?? "ai-fallback") as SurfaceDerivation;
+  const meta = DERIVATION_LABELS[derivation];
+  const isWall = surface.type === "wall";
+  const isCeiling = surface.type === "ceiling";
+  const ceiling = ctx?.ceilingHeightFt ?? 9;
+  const lf = surface.linearFootage;
+  const sqft = surface.squareFootage;
+  const hasMeasurement =
+    (isWall && (lf != null || sqft != null)) ||
+    (isCeiling && sqft != null) ||
+    (!isWall && !isCeiling && surface.count != null);
+
+  return (
+    <div className="mt-3 rounded-[6px] border border-[hsl(var(--line))] bg-[hsl(var(--panel-2))] p-3">
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <span className="text-[11px] font-medium uppercase tracking-wide text-[hsl(var(--ink-3))]">
+          How this number was produced
+        </span>
+        {meta && (
+          <span
+            title={meta.tip}
+            className={cn(
+              "rounded border px-1.5 py-0 text-[9px] font-semibold uppercase tracking-wide",
+              meta.cls,
+            )}
+          >
+            {meta.label}
+          </span>
+        )}
+      </div>
+
+      {!hasMeasurement ? (
+        <p className="text-[12px] text-orange-700">
+          <strong>Needs measurement.</strong> The engine couldn&rsquo;t produce a
+          reliable size for this surface. Set the dimension in the quantity
+          field below to add it to the bid.
+        </p>
+      ) : (
+        <div className="space-y-1 text-[12px] text-[hsl(var(--ink-2))]">
+          {isWall && (
+            <>
+              {lf != null && (
+                <div className="num">
+                  Wall length:{" "}
+                  <span className="font-semibold text-[hsl(var(--ink))]">
+                    {lf.toFixed(1)} lf
+                  </span>
+                </div>
+              )}
+              <div className="num">
+                Ceiling height:{" "}
+                <span className="font-semibold text-[hsl(var(--ink))]">
+                  {ceiling.toFixed(1)} ft
+                </span>{" "}
+                <span className="text-[hsl(var(--ink-3))]">
+                  (set per-project in the worksheet)
+                </span>
+              </div>
+              {sqft != null && lf != null && (
+                <div className="num pt-0.5">
+                  Wall area:{" "}
+                  <span className="font-semibold text-[hsl(var(--ink))]">
+                    {sqft.toFixed(1)} sqft
+                  </span>{" "}
+                  <span className="text-[hsl(var(--ink-3))]">
+                    = {lf.toFixed(1)} lf × {ceiling.toFixed(1)} ft
+                  </span>
+                </div>
+              )}
+            </>
+          )}
+          {isCeiling && sqft != null && (
+            <div className="num">
+              Floor / ceiling area:{" "}
+              <span className="font-semibold text-[hsl(var(--ink))]">
+                {sqft.toFixed(1)} sqft
+              </span>
+            </div>
+          )}
+          {!isWall && !isCeiling && surface.linearFootage != null && (
+            <div className="num">
+              Linear feet:{" "}
+              <span className="font-semibold text-[hsl(var(--ink))]">
+                {surface.linearFootage.toFixed(1)} lf
+              </span>
+            </div>
+          )}
+          {!isWall && !isCeiling && surface.count != null && (
+            <div className="num">
+              Count:{" "}
+              <span className="font-semibold text-[hsl(var(--ink))]">
+                {surface.count}
+              </span>
+            </div>
+          )}
+        </div>
+      )}
+
+      <div className="mt-2 border-t border-[hsl(var(--line))] pt-2 text-[11px] text-[hsl(var(--ink-3))]">
+        {ctx?.scale ? (
+          <>
+            Plan scale:{" "}
+            <span className="text-[hsl(var(--ink-2))]">
+              {ctx.scale.label}
+            </span>{" "}
+            ({ctx.scale.method === "user" ? "set by you" : ctx.scale.method}, {ctx.scale.ptPerFoot.toFixed(2)} pt/ft)
+          </>
+        ) : (
+          <span className="text-orange-700">
+            No scale established on this page — set the scale in the banner
+            above the plan to enable measurements.
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function SurfaceEditDialog({ surface, knownRoomLabels, onClose }: Props) {
   const updateSurface = useEditorStore((s) => s.updateSurface);
   const [draft, setDraft] = useState<Partial<SurfaceDTO>>({});
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pageCtx, setPageCtx] = useState<PageContext | null>(null);
   const firstFieldRef = useRef<HTMLInputElement>(null);
+
+  // Fetch the page's scale + project's ceiling height so the breakdown
+  // panel can show "X lf × Y ft ceiling = Z sqft" with real values.
+  useEffect(() => {
+    if (!surface) return;
+    let cancelled = false;
+    async function load() {
+      try {
+        const [scaleRes, projRes] = await Promise.all([
+          fetch(`/api/plan-pages/${surface!.planPageId}/scale`, {
+            cache: "no-store",
+          }),
+          fetch(`/api/projects/${surface!.projectId}`, { cache: "no-store" }),
+        ]);
+        const scaleJson = scaleRes.ok
+          ? ((await scaleRes.json()) as {
+              scale: { ptPerFoot: number; method: string; label: string } | null;
+            })
+          : { scale: null };
+        const projJson = projRes.ok
+          ? ((await projRes.json()) as {
+              project: { ceilingHeightFt?: number } | null;
+            })
+          : { project: null };
+        if (cancelled) return;
+        setPageCtx({
+          scale: scaleJson.scale,
+          ceilingHeightFt: projJson.project?.ceilingHeightFt ?? 9,
+        });
+      } catch {
+        if (!cancelled) setPageCtx({ scale: null, ceilingHeightFt: 9 });
+      }
+    }
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [surface]);
 
   useEffect(() => {
     if (surface) {
@@ -147,6 +369,8 @@ export function SurfaceEditDialog({ surface, knownRoomLabels, onClose }: Props) 
             {error}
           </div>
         )}
+
+        <MeasurementBreakdown surface={surface} ctx={pageCtx} />
 
         <div className="mt-4 space-y-3">
           {/* Room label with datalist autocomplete */}

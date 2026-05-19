@@ -16,6 +16,7 @@ import { SurfaceContextMenu } from "./SurfaceContextMenu";
 import type { SurfaceDTO } from "@/types/surface";
 import { DetectionQueue } from "./DetectionQueue";
 import { CanvasToolbar } from "./CanvasToolbar";
+import { ScaleBanner } from "./ScaleBanner";
 import { cn } from "@/lib/utils";
 
 const SurfaceOverlay = dynamic(
@@ -292,6 +293,7 @@ export function ProjectWorkspace({
           ) : currentPlanPage ? (
             <>
               <CanvasToolbar />
+              <ScaleBanner planPageId={currentPlanPage.id} />
               <PdfViewer planId={plan.id} pageNumber={currentPage}>
                 {(size) => (
                   <SurfaceOverlay

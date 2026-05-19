@@ -46,7 +46,7 @@ export async function POST(req: Request) {
 
   const planPage = await db.planPage.findUnique({
     where: { id: parsed.data.planPageId },
-    include: { plan: true },
+    include: { plan: { include: { project: true } } },
   });
   if (!planPage) {
     return NextResponse.json(
@@ -70,14 +70,28 @@ export async function POST(req: Request) {
     );
   }
 
+  // Build the user-supplied scale (set via the scale banner) so the
+  // engine can use the user's two-point calibration as the canonical
+  // pt/ft for every measurement on this page.
+  const userScale =
+    planPage.scaleRatio != null && planPage.scaleLabel != null
+      ? { ptPerFoot: planPage.scaleRatio, label: planPage.scaleLabel }
+      : null;
+  const ceilingHeightFt = planPage.plan.project.ceilingHeightFt;
+
   const cacheKey = makeCacheKey({
-    // Bumped from takeoff-v2 → takeoff-v3 when repositionPolygonsByLabel
-    // changed the shape of persisted polygons. Cached pre-fix results
-    // would replay with the old bunched polygons otherwise.
-    endpoint: "takeoff-v9",
+    // Bumped to v11 when the scale engine took over measurements — old
+    // cached results would replay AI-estimated areas + a hardcoded
+    // table-derived rectangle, both of which we no longer trust.
+    // The user-set scale is part of the cache key so re-calibrating
+    // produces a fresh extraction.
+    endpoint: "takeoff-v11",
     model: DEFAULT_MODEL,
     prompt: TAKEOFF_SYSTEM_PROMPT_CACHED,
-    inputHash: `${hashBuffer(fullPdf)}#${planPage.pageNumber}`,
+    inputHash:
+      `${hashBuffer(fullPdf)}#${planPage.pageNumber}` +
+      (userScale ? `#user:${userScale.ptPerFoot.toFixed(4)}` : "") +
+      `#ceil:${ceilingHeightFt.toFixed(2)}`,
   });
 
   const encoder = new TextEncoder();
@@ -142,7 +156,12 @@ export async function POST(req: Request) {
         let runResult: TakeoffRunResult;
         try {
           runResult = await runTakeoff(
-            { pdfBuffer: fullPdf, pageNumber: planPage.pageNumber },
+            {
+              pdfBuffer: fullPdf,
+              pageNumber: planPage.pageNumber,
+              userScale,
+              ceilingHeightFt,
+            },
             send,
           );
         } catch (err) {
@@ -233,16 +252,36 @@ export async function POST(req: Request) {
           runResult.result,
         );
 
+        // Persist the established scale unless the user has already set
+        // one — `userScale != null` means PlanPage.scaleRatio came from
+        // the user's two-point calibration and is authoritative.
+        const established = runResult.establishedScale;
+        const scaleUpdate =
+          userScale == null && established != null
+            ? {
+                scaleRatio: established.ptPerFoot,
+                scaleMethod: established.method,
+                scaleLabel: established.label,
+              }
+            : {};
         await db.planPage.update({
           where: { id: planPage.id },
-          data: { aiProcessed: true },
+          data: { aiProcessed: true, ...scaleUpdate },
         });
 
         done({
           cached: false,
           surfaceCount: created,
           pageType: runResult.classification.type,
-          scaleAnchor: runResult.result.scale_anchor,
+          scale: established
+            ? {
+                ptPerFoot: established.ptPerFoot,
+                method: established.method,
+                label: established.label,
+                confidence: established.confidence,
+                note: established.note,
+              }
+            : null,
           warnings: runResult.result.warnings,
         });
       } catch (err) {
@@ -288,12 +327,13 @@ async function persistSurfaces(
         roomLabel: w.room_label,
         substrate: w.substrate,
         polygon: JSON.stringify(w.polygon),
-        squareFootage: w.area_sqft,
-        linearFootage: w.linear_ft,
+        squareFootage: w.area_sqft ?? null,
+        linearFootage: w.linear_ft ?? null,
         count: null,
         confidence: w.confidence,
         status: "proposed",
         source: "ai",
+        derivation: w.derivation ?? "ai-fallback",
         coats: 2,
       },
     });
@@ -301,7 +341,7 @@ async function persistSurfaces(
   }
   // Ceilings
   for (const c of result.ceilings ?? []) {
-    if (!c.polygon || c.polygon.length < 3) continue;
+    if (!c.polygon) continue; // empty array still persists — surface shows in queue without a canvas marker
     await db.surface.create({
       data: {
         projectId,
@@ -310,12 +350,13 @@ async function persistSurfaces(
         roomLabel: c.room_label,
         substrate: c.substrate,
         polygon: JSON.stringify(c.polygon),
-        squareFootage: c.area_sqft,
+        squareFootage: c.area_sqft ?? null,
         linearFootage: null,
         count: null,
         confidence: c.confidence,
         status: "proposed",
         source: "ai",
+        derivation: c.derivation ?? "ai-fallback",
         coats: 2,
       },
     });
@@ -323,7 +364,7 @@ async function persistSurfaces(
   }
   // Trim
   for (const t of result.trim ?? []) {
-    if (!t.polygon || t.polygon.length < 3) continue;
+    if (!t.polygon) continue; // empty array still persists — surface shows in queue without a canvas marker
     await db.surface.create({
       data: {
         projectId,
@@ -333,11 +374,12 @@ async function persistSurfaces(
         substrate: t.substrate,
         polygon: JSON.stringify(t.polygon),
         squareFootage: null,
-        linearFootage: t.linear_ft,
+        linearFootage: t.linear_ft ?? null,
         count: null,
         confidence: t.confidence,
         status: "proposed",
         source: "ai",
+        derivation: t.derivation ?? "ai-fallback",
         coats: 2,
       },
     });
@@ -345,7 +387,7 @@ async function persistSurfaces(
   }
   // Doors
   for (const d of result.doors ?? []) {
-    if (!d.polygon || d.polygon.length < 3) continue;
+    if (!d.polygon) continue; // empty array still persists — surface shows in queue without a canvas marker
     await db.surface.create({
       data: {
         projectId,
@@ -360,6 +402,7 @@ async function persistSurfaces(
         confidence: d.confidence,
         status: "proposed",
         source: "ai",
+        derivation: d.derivation ?? "ai-fallback",
         coats: 2,
       },
     });
@@ -382,6 +425,7 @@ async function persistSurfaces(
         confidence: w.confidence,
         status: "proposed",
         source: "ai",
+        derivation: w.derivation ?? "ai-fallback",
         coats: 2,
       },
     });
