@@ -43,6 +43,24 @@ const TOOLS: Tool[] = [
     ),
   },
   {
+    id: "wall-path",
+    label: "Wall path",
+    shortcut: "W",
+    icon: (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={1.7}>
+        {/* Open polyline along walls — three connected segments with
+            small dots at the joints to read as a traced path. */}
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 18 L9 18 L9 7 L17 7 L17 14 L21 14" />
+        <circle cx="3" cy="18" r="1.4" fill="currentColor" stroke="none" />
+        <circle cx="9" cy="18" r="1.4" fill="currentColor" stroke="none" />
+        <circle cx="9" cy="7" r="1.4" fill="currentColor" stroke="none" />
+        <circle cx="17" cy="7" r="1.4" fill="currentColor" stroke="none" />
+        <circle cx="17" cy="14" r="1.4" fill="currentColor" stroke="none" />
+        <circle cx="21" cy="14" r="1.4" fill="currentColor" stroke="none" />
+      </svg>
+    ),
+  },
+  {
     id: "eraser",
     label: "Erase",
     shortcut: "E",

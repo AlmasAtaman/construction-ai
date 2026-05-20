@@ -11,9 +11,26 @@ const createSchema = z.object({
   // "annotation:note" and "symbol:single_door" without a schema change.
   // Surface render code already discriminates on the prefix.
   type: z.string().min(1),
-  polygon: z
-    .array(z.object({ x: z.number(), y: z.number() }))
-    .min(3),
+  // .min(2) (not 3) because wall-path surfaces are open polylines —
+  // two points is a legal one-segment path. Polygon-type surfaces
+  // (rect, freeform polygon) still send 3+ in practice; nothing
+  // currently sends 2-point closed polygons.
+  polygon: z.array(z.object({ x: z.number(), y: z.number() })).min(2),
+  // Open-polyline geometry for wall-path surfaces. Each vertex carries
+  // its snap provenance so the breakdown panel can mark which segments
+  // are exact (snapped to extracted wall geometry) vs. approximated
+  // (free-click fallback for walls the extractor missed).
+  pathPoints: z
+    .array(
+      z.object({
+        x: z.number(),
+        y: z.number(),
+        snap: z.enum(["endpoint", "edge", "free"]),
+      }),
+    )
+    .min(2)
+    .optional()
+    .nullable(),
   paintType: z.string().optional().nullable(),
   coats: z.number().int().min(1).max(10).default(2),
   substrate: z.string().optional().nullable(),
@@ -59,6 +76,13 @@ export async function GET(req: Request) {
     surfaces: surfaces.map((s) => ({
       ...s,
       polygon: JSON.parse(s.polygon) as { x: number; y: number }[],
+      pathPoints: s.pathPoints
+        ? (JSON.parse(s.pathPoints) as {
+            x: number;
+            y: number;
+            snap: "endpoint" | "edge" | "free";
+          }[])
+        : null,
     })),
   });
 }
@@ -79,6 +103,7 @@ export async function POST(req: Request) {
       planPageId: d.planPageId,
       type: d.type,
       polygon: JSON.stringify(d.polygon),
+      pathPoints: d.pathPoints ? JSON.stringify(d.pathPoints) : null,
       paintType: d.paintType ?? null,
       coats: d.coats,
       substrate: d.substrate ?? null,
@@ -104,6 +129,10 @@ export async function POST(req: Request) {
   });
 
   return NextResponse.json({
-    surface: { ...surface, polygon: JSON.parse(surface.polygon) },
+    surface: {
+      ...surface,
+      polygon: JSON.parse(surface.polygon),
+      pathPoints: surface.pathPoints ? JSON.parse(surface.pathPoints) : null,
+    },
   });
 }

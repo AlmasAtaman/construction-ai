@@ -1,4 +1,15 @@
-export type SurfaceType = "wall" | "ceiling" | "trim" | "door" | "window";
+// "wall-path" is the traced-polyline primitive: an OPEN polyline along
+// real wall faces measured as `linear feet × ceiling height`. Geometry
+// lives in `pathPoints` (not `polygon`). Tagged separately so the
+// renderer draws it as an unclosed line and the breakdown panel uses
+// the linear-footage × ceiling-height math instead of polygon area.
+export type SurfaceType =
+  | "wall"
+  | "ceiling"
+  | "trim"
+  | "door"
+  | "window"
+  | "wall-path";
 export type SurfaceStatus = "proposed" | "accepted" | "manual" | "excluded";
 export type SurfaceSource = "ai" | "manual";
 
@@ -41,6 +52,18 @@ export interface SurfacePoint {
   y: number;
 }
 
+// Snap provenance for each vertex of a traced wall path. Lets the
+// breakdown panel show "snapped to extracted segment" vs. "free-click"
+// per vertex so the estimator can tell which numbers are exact arithmetic
+// on real geometry and which come from cursor approximation.
+export type PathSnap = "endpoint" | "edge" | "free";
+
+export interface PathPoint {
+  x: number;
+  y: number;
+  snap: PathSnap;
+}
+
 export interface SurfaceDTO {
   id: string;
   projectId: string;
@@ -51,6 +74,10 @@ export interface SurfaceDTO {
   substrate: string | null;
   roomLabel: string | null;
   polygon: SurfacePoint[];
+  // Open-polyline geometry for `type === "wall-path"`. Null for every
+  // other surface type. Coordinates are normalized 0..1 (y-down),
+  // matching `polygon`. See PathPoint above.
+  pathPoints: PathPoint[] | null;
   squareFootage: number | null;
   linearFootage: number | null;
   count: number | null;
@@ -69,6 +96,9 @@ export const SURFACE_COLORS: Record<SurfaceType, string> = {
   trim: "#22c55e",
   door: "#f97316",
   window: "#eab308",
+  // Wall-path uses a stronger blue-cyan so a traced polyline stands
+  // out clearly against the existing wall-polygon fill.
+  "wall-path": "#0ea5e9",
 };
 
 export const SURFACE_TYPE_LABELS: Record<SurfaceType, string> = {
@@ -77,6 +107,7 @@ export const SURFACE_TYPE_LABELS: Record<SurfaceType, string> = {
   trim: "Trim",
   door: "Door",
   window: "Window",
+  "wall-path": "Wall path",
 };
 
 export function confidenceLabel(c: number): "high" | "medium" | "low" {

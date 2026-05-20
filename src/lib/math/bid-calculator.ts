@@ -110,6 +110,12 @@ export function calculateBid(
     // Skip non-paintable surface kinds (annotations, symbol counts) so
     // they don't pollute the bid totals.
     if (s.type.startsWith("annotation:") || s.type.startsWith("symbol:")) continue;
+    // Wall-path traces are measured + reviewable but are NOT rolled
+    // into the bid yet — that's the dedicated "rolled-up totals" task.
+    // Including them now would double-count walls already measured as
+    // room polygons. Keeping them out preserves existing bid math
+    // exactly while the trace is reviewed.
+    if (s.type === "wall-path") continue;
 
     const unit = unitFor(s.type);
     let quantity = 0;

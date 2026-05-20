@@ -3,7 +3,25 @@
 import { create } from "zustand";
 import type { SurfaceDTO } from "@/types/surface";
 
-export type EditorTool = "select" | "rectangle" | "polygon" | "eraser" | "note";
+export type EditorTool =
+  | "select"
+  | "rectangle"
+  | "polygon"
+  | "wall-path"
+  | "eraser"
+  | "note";
+
+/**
+ * One cleaned wall segment in normalized (0..1, y-down) page coords.
+ * Streamed from GET /api/plan-pages/[id]/walls. Used by the wall-path
+ * tool's snap engine and by the auto-trace UI.
+ */
+export interface WallSegmentNorm {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+}
 
 interface UndoEntry {
   label: string;
@@ -50,6 +68,18 @@ interface EditorState {
     p1: { x: number; y: number } | null;
     p2: { x: number; y: number } | null;
   };
+  // Cleaned wall network for the current page, keyed by planPageId.
+  // Loaded lazily when the wall-path tool is first activated for a
+  // page. Coordinates are normalized (0..1, y-down). Also carries the
+  // page's PDF dimensions and ptPerFoot so the tool can convert
+  // between screen / normalized / pt / feet without round-trips.
+  wallData: {
+    planPageId: string | null;
+    segments: WallSegmentNorm[];
+    pageWidthPt: number;
+    pageHeightPt: number;
+    ptPerFoot: number | null;
+  } | null;
   setSurfaces: (s: SurfaceDTO[]) => void;
   addSurface: (s: SurfaceDTO) => void;
   updateSurface: (id: string, change: Partial<SurfaceDTO>) => void;
@@ -71,6 +101,15 @@ interface EditorState {
   startScaleCalibration: () => void;
   cancelScaleCalibration: () => void;
   pushScalePoint: (p: { x: number; y: number }) => void;
+  setWallData: (
+    data: {
+      planPageId: string;
+      segments: WallSegmentNorm[];
+      pageWidthPt: number;
+      pageHeightPt: number;
+      ptPerFoot: number | null;
+    } | null,
+  ) => void;
 }
 
 // Zoom range: 1 = fit to container (any tighter and the blueprint becomes
@@ -132,6 +171,7 @@ export const useEditorStore = create<EditorState>((set) => ({
     window: false,
   },
   scaleCalib: { stage: null, p1: null, p2: null },
+  wallData: null,
   setSurfaces: (s) => set({ surfaces: s }),
   addSurface: (s) =>
     set((st) => ({ surfaces: [...st.surfaces, s] })),
@@ -200,4 +240,5 @@ export const useEditorStore = create<EditorState>((set) => ({
       }
       return {};
     }),
+  setWallData: (data) => set({ wallData: data }),
 }));

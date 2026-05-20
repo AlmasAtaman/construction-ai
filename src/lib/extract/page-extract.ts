@@ -296,8 +296,38 @@ function detectDimTableBox(
 // Vector path walking (mupdf)
 // ---------------------------------------------------------------------------
 
-interface VectorScan {
+/**
+ * Minimum length (in PDF points) for a non-axis-aligned segment to be
+ * kept as an architectural wall instead of dropped as stray vector ink.
+ *
+ * Picked above the 18-45 pt door-swing band with headroom so short
+ * dimension ticks, hatch ends, and small ornamental diagonals don't
+ * masquerade as walls. Tuned against the angled east entrance on the
+ * commercial fixture and DP-BP page 10 (see Day 1 probe in
+ * scripts/probe-diagonal-walls.mjs).
+ *
+ * Surfaced as a named export so the wall-tracer pipeline and test
+ * probes share one source of truth.
+ */
+export const DIAGONAL_WALL_MIN_PT = 50;
+
+export interface VectorScan {
+  /**
+   * Axis-aligned wall segments. Contract: every entry is either purely
+   * horizontal (y1 === y2) or purely vertical (x1 === x2). Consumed by
+   * the room detector (detectRooms, roomBoundsFromRays, virtualPartition)
+   * which assumes axis-alignment throughout. Do NOT push diagonals here
+   * — they belong in diagonalWalls.
+   */
   walls: { x1: number; y1: number; x2: number; y2: number }[];
+  /**
+   * Long non-axis-aligned wall segments — angled entries, bay clips,
+   * non-orthogonal corridors. Captured for the wall-path tracer; NOT
+   * fed to the room detector (its planar graph assumes H/V edges and
+   * adding diagonals would mutate existing room faces). Exposed
+   * alongside `walls` so the tracer pipeline can consume both.
+   */
+  diagonalWalls: { x1: number; y1: number; x2: number; y2: number }[];
   doorCandidates: { x: number; y: number; size: number }[];
   pathOpCount: number;
   /** AABB of every emitted segment endpoint in pt (y-up). */
@@ -317,7 +347,7 @@ interface MupdfPage {
   run: (device: unknown, matrix: number[]) => void;
 }
 
-async function scanVectorPaths(
+export async function scanVectorPaths(
   pdfBuffer: Buffer,
   pageNumber: number,
 ): Promise<{
@@ -337,6 +367,7 @@ async function scanVectorPaths(
 
   const scan: VectorScan = {
     walls: [],
+    diagonalWalls: [],
     doorCandidates: [],
     pathOpCount: 0,
     segmentBboxPt: null,
@@ -374,6 +405,13 @@ async function scanVectorPaths(
         y: (y1 + y2) / 2,
         size: len,
       });
+    } else if (len >= DIAGONAL_WALL_MIN_PT) {
+      // Long non-axis segment — architectural diagonal (angled entry,
+      // bay clip, non-orthogonal corridor). Kept in a separate array
+      // so the room detector (which assumes H/V everywhere) is not
+      // disturbed; the wall-path tracer reads both walls and
+      // diagonalWalls.
+      scan.diagonalWalls.push({ x1, y1, x2, y2 });
     }
   }
   function collect(p: MupdfPath, ctm: number[]): void {

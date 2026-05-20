@@ -14,7 +14,18 @@ const updateSchema = z.object({
   squareFootage: z.number().nullable().optional(),
   linearFootage: z.number().nullable().optional(),
   count: z.number().int().nullable().optional(),
-  polygon: z.array(z.object({ x: z.number(), y: z.number() })).min(3).optional(),
+  polygon: z.array(z.object({ x: z.number(), y: z.number() })).min(2).optional(),
+  pathPoints: z
+    .array(
+      z.object({
+        x: z.number(),
+        y: z.number(),
+        snap: z.enum(["endpoint", "edge", "free"]),
+      }),
+    )
+    .min(2)
+    .nullable()
+    .optional(),
 });
 
 export async function PATCH(
@@ -44,6 +55,8 @@ export async function PATCH(
     if (v === undefined) continue;
     if (k === "polygon") {
       data.polygon = JSON.stringify(v);
+    } else if (k === "pathPoints") {
+      data.pathPoints = v === null ? null : JSON.stringify(v);
     } else {
       data[k] = v;
     }
@@ -62,7 +75,11 @@ export async function PATCH(
   });
 
   return NextResponse.json({
-    surface: { ...updated, polygon: JSON.parse(updated.polygon) },
+    surface: {
+      ...updated,
+      polygon: JSON.parse(updated.polygon),
+      pathPoints: updated.pathPoints ? JSON.parse(updated.pathPoints) : null,
+    },
   });
 }
 

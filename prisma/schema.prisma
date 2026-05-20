@@ -60,6 +60,12 @@ model PlanPage {
   // "1:200", "10 ft = 90 pt (set by you)".
   scaleLabel  String?
   aiProcessed Boolean   @default(false)
+  // Cached cleaned wall network from src/lib/extract/wall-graph.ts.
+  // JSON: { ptPerFoot, pageWidthPt, pageHeightPt, segments: [{x1,y1,x2,y2}, …] }
+  // Coordinates are normalized 0..1 (y-down). Populated lazily by
+  // GET /api/plan-pages/[id]/walls. Walls don't change unless the
+  // PDF is replaced, so caching is safe.
+  wallsJson   String?
   surfaces    Surface[]
 }
 
@@ -75,6 +81,12 @@ model Surface {
   substrate     String?
   roomLabel     String?
   polygon       String
+  // Open-polyline geometry for `type = "wall-path"` surfaces. JSON:
+  //   [ { x, y, snap: "endpoint" | "edge" | "free" }, … ]
+  // x,y are normalized 0..1 page coords (y-down) matching `polygon`.
+  // Null for closed-polygon surfaces (every existing surface type).
+  // See PathPoint in src/types/surface.ts.
+  pathPoints    String?
   squareFootage Float?
   linearFootage Float?
   count         Int?

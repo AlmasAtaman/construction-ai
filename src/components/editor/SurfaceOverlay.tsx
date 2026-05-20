@@ -1,14 +1,21 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Stage, Layer, Line, Rect } from "react-konva";
+import { useEffect, useMemo, useState } from "react";
+import { Stage, Layer, Line, Rect, Circle } from "react-konva";
 import {
   SURFACE_COLORS,
+  type PathPoint,
   type SurfaceDTO,
   type SurfaceType,
 } from "@/types/surface";
 import { useEditorStore } from "@/lib/store/editor-store";
 import { useUndoStore } from "@/lib/store/undo-store";
+import {
+  polylineLengthFt,
+  screenRadiusToNorm,
+  snapToWalls,
+  type SnapResult,
+} from "@/lib/wall-snap";
 
 export interface SurfaceOverlayProps {
   width: number;
@@ -16,6 +23,10 @@ export interface SurfaceOverlayProps {
   surfaces: SurfaceDTO[];
   planPageId: string;
   projectId: string;
+  /** Project ceiling height in feet. Drives the live `lf × ceiling`
+   *  readout while tracing a wall-path and the persisted sqft of
+   *  committed wall-path surfaces. */
+  ceilingHeightFt: number;
   onContextMenu?: (
     surfaceId: string,
     pos: { x: number; y: number },
@@ -42,15 +53,117 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
   const updateSurface = useEditorStore((s) => s.updateSurface);
   const scaleCalib = useEditorStore((s) => s.scaleCalib);
   const pushScalePoint = useEditorStore((s) => s.pushScalePoint);
+  const wallData = useEditorStore((s) => s.wallData);
+  const setWallData = useEditorStore((s) => s.setWallData);
+  const zoom = useEditorStore((s) => s.zoom);
+  const contentW = useEditorStore((s) => s.contentW);
 
   const [drawing, setDrawing] = useState<InProgressShape | null>(null);
   const [polyPoints, setPolyPoints] = useState<{ x: number; y: number }[]>([]);
+  // Wall-path tool: in-progress traced path. Each vertex carries its
+  // snap provenance so the persisted surface tells the breakdown panel
+  // which segments are exact vs. free-click approximations.
+  const [pathPoints, setPathPoints] = useState<PathPoint[]>([]);
+  const [pathSnap, setPathSnap] = useState<SnapResult | null>(null);
 
   function pxToNorm(p: { x: number; y: number }) {
     return { x: p.x / props.width, y: p.y / props.height };
   }
   function normToPx(p: { x: number; y: number }) {
     return { x: p.x * props.width, y: p.y * props.height };
+  }
+
+  // Lazy-fetch the cleaned wall network when the user activates the
+  // wall-path tool on a page we haven't loaded yet. Cached by the
+  // server, so re-activations after the first fetch are instant.
+  useEffect(() => {
+    if (tool !== "wall-path") return;
+    if (wallData?.planPageId === props.planPageId) return;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await fetch(
+          `/api/plan-pages/${props.planPageId}/walls`,
+        );
+        if (!res.ok) return;
+        const data = (await res.json()) as {
+          planPageId: string;
+          segments: {
+            x1: number;
+            y1: number;
+            x2: number;
+            y2: number;
+          }[];
+          pageWidthPt: number;
+          pageHeightPt: number;
+          ptPerFoot: number | null;
+        };
+        if (cancelled) return;
+        setWallData({
+          planPageId: data.planPageId,
+          segments: data.segments,
+          pageWidthPt: data.pageWidthPt,
+          pageHeightPt: data.pageHeightPt,
+          ptPerFoot: data.ptPerFoot,
+        });
+      } catch {
+        /* network errors leave wallData null — the tool falls back to
+           free-click for every point, which is the documented
+           behavior. */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [tool, props.planPageId, wallData?.planPageId, setWallData]);
+
+  // Keyboard handling for the wall-path tool: Esc cancels the
+  // in-progress trace, Backspace removes the last point, Enter commits
+  // (same as double-click). Bound at window level so the user doesn't
+  // have to focus the canvas.
+  useEffect(() => {
+    if (tool !== "wall-path") return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setPathPoints([]);
+        setPathSnap(null);
+      } else if (e.key === "Backspace") {
+        // Prevent the browser from navigating back when the canvas is
+        // focused but no input is.
+        e.preventDefault();
+        setPathPoints((pts) => pts.slice(0, -1));
+      } else if (e.key === "Enter") {
+        if (pathPoints.length >= 2) {
+          void commitWallPath();
+        }
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tool, pathPoints]);
+
+  /**
+   * Snap probe shared by mouseDown (commit a point) and mouseMove
+   * (preview the candidate). Returns null when no wall is close enough,
+   * which the click handler interprets as a free-click fallback.
+   */
+  function snapFromPixel(pos: {
+    x: number;
+    y: number;
+  }): SnapResult | null {
+    if (!wallData || wallData.planPageId !== props.planPageId) return null;
+    if (wallData.segments.length === 0) return null;
+    const norm = pxToNorm(pos);
+    // 8 px is a comfortable snap radius — narrow enough that
+    // intentional free-clicks near a wall aren't hijacked, wide
+    // enough that a sloppy click near a corner still locks on.
+    const endpointR = screenRadiusToNorm(10, zoom, contentW || props.width);
+    const edgeR = screenRadiusToNorm(8, zoom, contentW || props.width);
+    return snapToWalls(norm, wallData.segments, {
+      endpointRadiusNorm: endpointR,
+      edgeRadiusNorm: edgeR,
+    });
   }
 
   async function persistManualSurface(
@@ -156,6 +269,19 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
       setDrawing({ start: pos, end: pos });
     } else if (tool === "polygon") {
       setPolyPoints((pts) => [...pts, pos]);
+    } else if (tool === "wall-path") {
+      // Probe the wall network. Endpoint snap > edge-projection >
+      // free-click fallback. Free-click is tagged so the breakdown
+      // panel can mark the segment as "not snapped to extracted
+      // geometry" — preserves the contractor's ability to inspect
+      // every number.
+      const snap = snapFromPixel(pos);
+      const norm = pxToNorm(pos);
+      const next: PathPoint =
+        snap !== null
+          ? { x: snap.x, y: snap.y, snap: snap.snap }
+          : { x: norm.x, y: norm.y, snap: "free" };
+      setPathPoints((pts) => [...pts, next]);
     } else if (tool === "eraser") {
       const id = e.target.attrs?.surfaceId ?? null;
       if (id) {
@@ -227,6 +353,11 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
       if (pos) setDrawing({ ...drawing, end: pos });
       return;
     }
+    if (tool === "wall-path") {
+      const pos = e.target.getStage()?.getPointerPosition();
+      if (pos) setPathSnap(snapFromPixel(pos));
+      return;
+    }
     if (panState && e.evt) {
       const dx = e.evt.clientX - panState.startClientX;
       const dy = e.evt.clientY - panState.startClientY;
@@ -281,6 +412,64 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
     setTool("select");
   }
 
+  async function commitWallPath() {
+    if (pathPoints.length < 2) return;
+    const points = pathPoints;
+    // Exact arithmetic: linear feet = sum of segment pt-lengths /
+    // ptPerFoot. Wall area = lf × ceiling. Both rounded only at
+    // display time; we persist the exact values.
+    let linearFt: number | null = null;
+    let sqft: number | null = null;
+    if (wallData && wallData.ptPerFoot && wallData.ptPerFoot > 0) {
+      linearFt = polylineLengthFt(
+        points,
+        wallData.pageWidthPt,
+        wallData.pageHeightPt,
+        wallData.ptPerFoot,
+      );
+      sqft = linearFt * props.ceilingHeightFt;
+    }
+    setPathPoints([]);
+    setPathSnap(null);
+    try {
+      const polygon = points.map((p) => ({ x: p.x, y: p.y }));
+      const res = await fetch("/api/surfaces", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          projectId: props.projectId,
+          planPageId: props.planPageId,
+          type: "wall-path",
+          polygon,
+          pathPoints: points,
+          linearFootage: linearFt,
+          squareFootage: sqft,
+          status: "manual",
+          source: "manual",
+          derivation: "traced",
+        }),
+      });
+      if (!res.ok) return;
+      const json = await res.json();
+      addSurface(json.surface);
+      props.onSurfaceCreated?.();
+      const newId = json.surface.id as string;
+      useUndoStore.getState().push({
+        label: `Traced a wall path`,
+        undo: async () => {
+          await fetch(`/api/surfaces/${newId}`, { method: "DELETE" });
+          useEditorStore.getState().removeSurface(newId);
+        },
+        redo: async () => {
+          /* re-tracing would duplicate work; user can draw again */
+        },
+      });
+    } catch {
+      /* leave the in-progress points cleared; next click starts fresh */
+    }
+    setTool("select");
+  }
+
   async function deleteSurface(id: string) {
     await fetch(`/api/surfaces/${id}`, { method: "DELETE" });
     removeSurface(id);
@@ -331,7 +520,11 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
         (s) =>
           s.status !== "excluded" &&
           s.type !== ("annotation:note" as SurfaceType) &&
-          s.polygon.length >= 3 &&
+          // wall-path surfaces are open polylines with ≥2 points; all
+          // other surface types render as closed polygons with ≥3.
+          (s.type === "wall-path"
+            ? s.polygon.length >= 2
+            : s.polygon.length >= 3) &&
           (showAiOverlay || s.source !== "ai") &&
           (visibleTypes[s.type as keyof typeof visibleTypes] ?? true),
       )
@@ -388,6 +581,7 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
         onMouseUp={onMouseUp}
         onDblClick={() => {
           if (tool === "polygon") void commitPolygon();
+          else if (tool === "wall-path") void commitWallPath();
         }}
       >
         <Layer>
@@ -415,15 +609,25 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
             // polygon while panning.
             const draggable = tool === "select" && isSelected;
 
+            // Wall-path surfaces are open polylines — no fill, no
+            // close. Render with a slightly heavier stroke than the
+            // closed-polygon defaults so the traced line reads as the
+            // measured boundary instead of a polygon edge.
+            const isWallPath = surface.type === "wall-path";
+            const wallPathStroke = isWallPath
+              ? Math.max(strokeWidth + 1, isSelected ? 4 : isHovered ? 3.5 : 2.5)
+              : strokeWidth;
             return (
               <Line
                 key={surface.id}
                 surfaceId={surface.id}
                 points={flatPoints}
-                closed
-                fill={`${color}${fillAlpha}`}
+                closed={!isWallPath}
+                fill={isWallPath ? undefined : `${color}${fillAlpha}`}
                 stroke={isLow ? "#dc2626" : color}
-                strokeWidth={strokeWidth}
+                strokeWidth={wallPathStroke}
+                lineCap={isWallPath ? "round" : undefined}
+                lineJoin={isWallPath ? "round" : undefined}
                 dash={isMid ? [8, 4] : undefined}
                 shadowEnabled={isLow || isHovered}
                 shadowColor={isLow ? "#dc2626" : color}
@@ -484,6 +688,78 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
               strokeWidth={2}
               dash={[4, 4]}
             />
+          )}
+
+          {/* In-progress wall path. Solid line through committed
+              points; dashed preview from the last point to the snap
+              candidate (or cursor if no snap). Snap indicator: small
+              filled circle whose color encodes endpoint vs. edge. */}
+          {tool === "wall-path" && pathPoints.length > 0 && (
+            <Line
+              points={pathPoints.flatMap((p) => {
+                const px = normToPx(p);
+                return [px.x, px.y];
+              })}
+              stroke={SURFACE_COLORS["wall-path"]}
+              strokeWidth={2.5}
+              lineCap="round"
+              lineJoin="round"
+            />
+          )}
+          {tool === "wall-path" &&
+            pathPoints.length > 0 &&
+            pathSnap !== null && (
+              (() => {
+                const last = pathPoints[pathPoints.length - 1];
+                const a = normToPx(last);
+                const b = normToPx({ x: pathSnap.x, y: pathSnap.y });
+                return (
+                  <Line
+                    points={[a.x, a.y, b.x, b.y]}
+                    stroke={SURFACE_COLORS["wall-path"]}
+                    strokeWidth={2}
+                    dash={[4, 4]}
+                    opacity={0.7}
+                  />
+                );
+              })()
+            )}
+          {tool === "wall-path" &&
+            pathPoints.map((p, i) => {
+              const px = normToPx(p);
+              return (
+                <Circle
+                  key={`wp-${i}`}
+                  x={px.x}
+                  y={px.y}
+                  radius={4}
+                  fill={
+                    p.snap === "free"
+                      ? "#f59e0b" // amber — free-click (not exact)
+                      : p.snap === "edge"
+                        ? "#60a5fa" // light blue — edge projection
+                        : "#0ea5e9" // bright blue — endpoint snap
+                  }
+                  stroke="#0c4a6e"
+                  strokeWidth={1}
+                />
+              );
+            })}
+          {tool === "wall-path" && pathSnap !== null && (
+            (() => {
+              const px = normToPx({ x: pathSnap.x, y: pathSnap.y });
+              return (
+                <Circle
+                  x={px.x}
+                  y={px.y}
+                  radius={6}
+                  fill={pathSnap.snap === "endpoint" ? "#0ea5e9" : "#60a5fa"}
+                  opacity={0.45}
+                  stroke={pathSnap.snap === "endpoint" ? "#0c4a6e" : "#1d4ed8"}
+                  strokeWidth={1.5}
+                />
+              );
+            })()
           )}
 
           {/* Scale-calibration line — visible while the user is picking
@@ -576,6 +852,67 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
           Click to add points. Double-click to finish ({polyPoints.length}{" "}
           point{polyPoints.length === 1 ? "" : "s"}).
         </div>
+      )}
+
+      {tool === "wall-path" && (
+        (() => {
+          // Live measurement HUD. Includes the snap preview as the
+          // would-be next vertex so the user sees what they'd commit
+          // before clicking. Exact arithmetic in pt; rounding only at
+          // display.
+          let liveLf = 0;
+          if (
+            wallData &&
+            wallData.ptPerFoot &&
+            wallData.ptPerFoot > 0 &&
+            pathPoints.length >= 1
+          ) {
+            const previewTail =
+              pathSnap !== null
+                ? { x: pathSnap.x, y: pathSnap.y }
+                : null;
+            const pts = previewTail
+              ? [...pathPoints, previewTail]
+              : pathPoints;
+            if (pts.length >= 2) {
+              liveLf = polylineLengthFt(
+                pts,
+                wallData.pageWidthPt,
+                wallData.pageHeightPt,
+                wallData.ptPerFoot,
+              );
+            }
+          }
+          const liveSqft = liveLf * props.ceilingHeightFt;
+          const hasScale =
+            wallData?.ptPerFoot != null && wallData.ptPerFoot > 0;
+          return (
+            <div className="absolute left-4 top-4 max-w-xs space-y-1 rounded-md bg-gray-900/90 px-3 py-2 text-[11px] leading-relaxed text-white">
+              <div className="font-medium">
+                {pathPoints.length === 0
+                  ? "Click along a wall to start a path."
+                  : `${pathPoints.length} point${pathPoints.length === 1 ? "" : "s"} — double-click or Enter to finish, Esc to cancel, Backspace to undo last.`}
+              </div>
+              {hasScale ? (
+                <div>
+                  {liveLf > 0
+                    ? `${liveLf.toFixed(1)} ft  ×  ${props.ceilingHeightFt.toFixed(1)} ft ceiling  =  ${liveSqft.toFixed(1)} sqft`
+                    : "Waiting for the next point to compute length."}
+                </div>
+              ) : (
+                <div className="text-amber-200">
+                  No page scale yet — set one to see lf / sqft.
+                </div>
+              )}
+              {wallData && wallData.segments.length === 0 ? (
+                <div className="text-amber-200">
+                  No wall geometry found on this page — every click is a
+                  free-click (not snapped to extracted geometry).
+                </div>
+              ) : null}
+            </div>
+          );
+        })()
       )}
     </div>
   );

@@ -7,6 +7,9 @@ export const DEFAULT_PRODUCTION_RATES: Record<SurfaceType, number> = {
   trim: 60,
   door: 3.6,
   window: 6,
+  // Wall-path is measured as wall area (linear ft × ceiling height),
+  // so production maps to the same rate as a wall surface.
+  "wall-path": 175,
 };
 
 export interface ComplexityFlags {

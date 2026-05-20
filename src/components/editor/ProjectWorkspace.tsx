@@ -53,6 +53,32 @@ export function ProjectWorkspace({
     surfaceId: string;
     position: { x: number; y: number };
   } | null>(null);
+  // Project ceiling height in feet — drives the live `lf × ceiling`
+  // readout and the persisted sqft on wall-path surfaces. Default
+  // mirrors the Prisma schema default; we refresh from the project
+  // once on mount.
+  const [ceilingHeightFt, setCeilingHeightFt] = useState<number>(9);
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await fetch(`/api/projects/${projectId}`);
+        if (!res.ok) return;
+        const json = (await res.json()) as {
+          project?: { ceilingHeightFt?: number | null };
+        };
+        const ch = json.project?.ceilingHeightFt;
+        if (!cancelled && typeof ch === "number" && ch > 0) {
+          setCeilingHeightFt(ch);
+        }
+      } catch {
+        /* default is 9 ft */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [projectId]);
 
   // Worksheet drag-to-resize: hold the top edge and drag to shrink/grow
   // the bottom panel, like the VSCode terminal.
@@ -140,6 +166,7 @@ export function ProjectWorkspace({
       if (e.key === "v" || e.key === "V") setTool("select");
       if (e.key === "r" || e.key === "R") setTool("rectangle");
       if (e.key === "p" || e.key === "P") setTool("polygon");
+      if (e.key === "w" || e.key === "W") setTool("wall-path");
       if (e.key === "e" || e.key === "E") setTool("eraser");
 
       if (e.key === "Escape") {
@@ -292,26 +319,38 @@ export function ProjectWorkspace({
             </div>
           ) : currentPlanPage ? (
             <>
-              <CanvasToolbar />
+              {/* Scale banner is a full-width bar at the top of the
+                  canvas column. The floating CanvasToolbar must NOT
+                  share this row — its right-aligned "Hide AI overlay"
+                  button used to cover the banner's "Set scale" button.
+                  So the toolbar lives inside the PDF wrapper below and
+                  floats over the canvas, not the banner. */}
               <ScaleBanner planPageId={currentPlanPage.id} />
-              <PdfViewer planId={plan.id} pageNumber={currentPage}>
-                {(size) => (
-                  <SurfaceOverlay
-                    width={size.width}
-                    height={size.height}
-                    surfaces={surfaces}
-                    planPageId={currentPlanPage.id}
-                    projectId={projectId}
-                    onSurfaceCreated={refreshSurfaces}
-                    onContextMenu={(surfaceId, pos) =>
-                      setContextMenu({
-                        surfaceId,
-                        position: pos,
-                      })
-                    }
-                  />
-                )}
-              </PdfViewer>
+              <div className="relative flex-1 overflow-hidden">
+                <CanvasToolbar
+                  planPageId={currentPlanPage.id}
+                  onAutoTraced={refreshSurfaces}
+                />
+                <PdfViewer planId={plan.id} pageNumber={currentPage}>
+                  {(size) => (
+                    <SurfaceOverlay
+                      width={size.width}
+                      height={size.height}
+                      surfaces={surfaces}
+                      planPageId={currentPlanPage.id}
+                      projectId={projectId}
+                      ceilingHeightFt={ceilingHeightFt}
+                      onSurfaceCreated={refreshSurfaces}
+                      onContextMenu={(surfaceId, pos) =>
+                        setContextMenu({
+                          surfaceId,
+                          position: pos,
+                        })
+                      }
+                    />
+                  )}
+                </PdfViewer>
+              </div>
             </>
           ) : null}
           {contextMenu && (

@@ -21,6 +21,7 @@ const TYPE_LABELS: Record<SurfaceType, string> = {
   trim: "Trim",
   door: "Door",
   window: "Window",
+  "wall-path": "Wall path",
 };
 
 export function EstimateWorksheet({ projectId }: Props) {

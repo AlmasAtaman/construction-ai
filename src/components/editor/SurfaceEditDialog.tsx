@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 
 const TYPE_OPTIONS = [
   { value: "wall", label: "Wall" },
+  { value: "wall-path", label: "Wall path" },
   { value: "ceiling", label: "Ceiling" },
   { value: "trim", label: "Trim" },
   { value: "door", label: "Door" },
@@ -48,6 +49,10 @@ interface Props {
 interface PageContext {
   scale: { ptPerFoot: number; method: string; label: string } | null;
   ceilingHeightFt: number;
+  // Page geometry — lets the wall-path breakdown convert normalized
+  // path coordinates to exact per-segment feet.
+  pageWidthPt: number | null;
+  pageHeightPt: number | null;
 }
 
 const DERIVATION_LABELS: Record<SurfaceDerivation, { label: string; cls: string; tip: string }> = {
@@ -112,15 +117,59 @@ function MeasurementBreakdown({
 }) {
   const derivation = (surface.derivation ?? "ai-fallback") as SurfaceDerivation;
   const meta = DERIVATION_LABELS[derivation];
+  const isWallPath = surface.type === "wall-path";
   const isWall = surface.type === "wall";
   const isCeiling = surface.type === "ceiling";
   const ceiling = ctx?.ceilingHeightFt ?? 9;
   const lf = surface.linearFootage;
   const sqft = surface.squareFootage;
   const hasMeasurement =
+    (isWallPath && (lf != null || sqft != null)) ||
     (isWall && (lf != null || sqft != null)) ||
     (isCeiling && sqft != null) ||
-    (!isWall && !isCeiling && surface.count != null);
+    (!isWallPath && !isWall && !isCeiling && surface.count != null);
+
+  // Wall-path: per-segment derivation table. A segment is exact when
+  // BOTH endpoints snapped to extracted wall geometry; it's approximate
+  // when either endpoint was a free-click. Lengths are computed in PDF
+  // pt then divided by ptPerFoot — exact arithmetic, rounded only here.
+  const wallPathSegments = (():
+    | {
+        idx: number;
+        lengthFt: number | null;
+        basis: "exact" | "approx";
+        fromSnap: string;
+        toSnap: string;
+      }[]
+    | null => {
+    if (!isWallPath || !surface.pathPoints || surface.pathPoints.length < 2)
+      return null;
+    const pts = surface.pathPoints;
+    const ptPerFoot = ctx?.scale?.ptPerFoot ?? null;
+    const wPt = ctx?.pageWidthPt ?? null;
+    const hPt = ctx?.pageHeightPt ?? null;
+    const out: {
+      idx: number;
+      lengthFt: number | null;
+      basis: "exact" | "approx";
+      fromSnap: string;
+      toSnap: string;
+    }[] = [];
+    for (let i = 0; i < pts.length - 1; i++) {
+      const a = pts[i];
+      const b = pts[i + 1];
+      let lengthFt: number | null = null;
+      if (ptPerFoot && ptPerFoot > 0 && wPt && hPt) {
+        const dxPt = (b.x - a.x) * wPt;
+        const dyPt = (b.y - a.y) * hPt;
+        lengthFt = Math.hypot(dxPt, dyPt) / ptPerFoot;
+      }
+      const basis: "exact" | "approx" =
+        a.snap !== "free" && b.snap !== "free" ? "exact" : "approx";
+      out.push({ idx: i + 1, lengthFt, basis, fromSnap: a.snap, toSnap: b.snap });
+    }
+    return out;
+  })();
 
   return (
     <div className="mt-3 rounded-[6px] border border-[hsl(var(--line))] bg-[hsl(var(--panel-2))] p-3">
@@ -149,6 +198,75 @@ function MeasurementBreakdown({
         </p>
       ) : (
         <div className="space-y-1 text-[12px] text-[hsl(var(--ink-2))]">
+          {isWallPath && (
+            <>
+              {lf != null && (
+                <div className="num">
+                  Traced length:{" "}
+                  <span className="font-semibold text-[hsl(var(--ink))]">
+                    {lf.toFixed(1)} lf
+                  </span>
+                </div>
+              )}
+              <div className="num">
+                Ceiling height:{" "}
+                <span className="font-semibold text-[hsl(var(--ink))]">
+                  {ceiling.toFixed(1)} ft
+                </span>
+              </div>
+              {sqft != null && lf != null && (
+                <div className="num pt-0.5">
+                  Wall area:{" "}
+                  <span className="font-semibold text-[hsl(var(--ink))]">
+                    {sqft.toFixed(1)} sqft
+                  </span>{" "}
+                  <span className="text-[hsl(var(--ink-3))]">
+                    = {lf.toFixed(1)} lf × {ceiling.toFixed(1)} ft
+                  </span>
+                </div>
+              )}
+              {wallPathSegments && (
+                <div className="mt-2 border-t border-[hsl(var(--line))] pt-2">
+                  <div className="mb-1 text-[11px] font-medium uppercase tracking-wide text-[hsl(var(--ink-3))]">
+                    Per-segment ({wallPathSegments.length})
+                  </div>
+                  <div className="max-h-40 space-y-0.5 overflow-y-auto">
+                    {wallPathSegments.map((s) => (
+                      <div
+                        key={s.idx}
+                        className="num flex items-center justify-between gap-2 text-[11px]"
+                      >
+                        <span className="text-[hsl(var(--ink-3))]">#{s.idx}</span>
+                        <span className="flex-1 text-right text-[hsl(var(--ink))]">
+                          {s.lengthFt != null ? `${s.lengthFt.toFixed(2)} ft` : "—"}
+                        </span>
+                        <span
+                          title={
+                            s.basis === "exact"
+                              ? "Both endpoints snapped to extracted wall geometry — exact."
+                              : `Contains a free-click endpoint (${s.fromSnap}→${s.toSnap}) — not snapped to extracted geometry, approximate.`
+                          }
+                          className={cn(
+                            "rounded border px-1 py-0 text-[9px] font-semibold uppercase",
+                            s.basis === "exact"
+                              ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                              : "border-amber-200 bg-amber-50 text-amber-800",
+                          )}
+                        >
+                          {s.basis === "exact" ? "snapped" : "free-click"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="mt-1 text-[10px] text-[hsl(var(--ink-3))]">
+                    &ldquo;Snapped&rdquo; segments sit exactly on extracted wall
+                    faces. &ldquo;Free-click&rdquo; segments were placed by hand
+                    where no wall was detected — verify those against the plan.
+                  </p>
+                </div>
+              )}
+            </>
+          )}
           {isWall && (
             <>
               {lf != null && (
@@ -252,8 +370,10 @@ export function SurfaceEditDialog({ surface, knownRoomLabels, onClose }: Props) 
         const scaleJson = scaleRes.ok
           ? ((await scaleRes.json()) as {
               scale: { ptPerFoot: number; method: string; label: string } | null;
+              pageWidthPt?: number | null;
+              pageHeightPt?: number | null;
             })
-          : { scale: null };
+          : { scale: null, pageWidthPt: null, pageHeightPt: null };
         const projJson = projRes.ok
           ? ((await projRes.json()) as {
               project: { ceilingHeightFt?: number } | null;
@@ -263,9 +383,17 @@ export function SurfaceEditDialog({ surface, knownRoomLabels, onClose }: Props) 
         setPageCtx({
           scale: scaleJson.scale,
           ceilingHeightFt: projJson.project?.ceilingHeightFt ?? 9,
+          pageWidthPt: scaleJson.pageWidthPt ?? null,
+          pageHeightPt: scaleJson.pageHeightPt ?? null,
         });
       } catch {
-        if (!cancelled) setPageCtx({ scale: null, ceilingHeightFt: 9 });
+        if (!cancelled)
+          setPageCtx({
+            scale: null,
+            ceilingHeightFt: 9,
+            pageWidthPt: null,
+            pageHeightPt: null,
+          });
       }
     }
     void load();
