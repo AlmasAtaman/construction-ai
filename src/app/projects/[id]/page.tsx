@@ -78,6 +78,8 @@ export default async function ProjectPage({
                 pages: latestPlan.pages.map((p) => ({
                   id: p.id,
                   pageNumber: p.pageNumber,
+                  pageType: p.pageType,
+                  hidden: p.hidden,
                 })),
               }
             : null

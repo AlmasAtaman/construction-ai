@@ -60,6 +60,17 @@ model PlanPage {
   // "1:200", "10 ft = 90 pt (set by you)".
   scaleLabel  String?
   aiProcessed Boolean   @default(false)
+  // Sheet classification from src/lib/ai/page-classifier.ts (Haiku):
+  // "floor_plan" | "rcp" | "elevation" | "section" | "schedule" |
+  // "detail" | "site_plan" | "cover" | "other". Null until classified.
+  // Used by the UI to surface floor plans and collapse the rest.
+  // A user override (promote/demote in the page rail) also writes here and
+  // is preserved across re-classification (only null pages get re-classified).
+  pageType    String?
+  // User explicitly hid this sheet from the working page list (duplicate,
+  // junk, irrelevant). Non-destructive — the page stays in the source PDF
+  // and can be restored from the "Hidden" group. Default visible.
+  hidden      Boolean   @default(false)
   // Cached cleaned wall network from src/lib/extract/wall-graph.ts.
   // JSON: { ptPerFoot, pageWidthPt, pageHeightPt, segments: [{x1,y1,x2,y2}, …] }
   // Coordinates are normalized 0..1 (y-down). Populated lazily by
@@ -87,6 +98,17 @@ model Surface {
   // Null for closed-polygon surfaces (every existing surface type).
   // See PathPoint in src/types/surface.ts.
   pathPoints    String?
+  // Wall-path finish scope (paint / frp / tile / wood / glazing / existing).
+  // Drives canvas color + whether it's billable paint work + which rate.
+  // Null for non-wall-path surfaces. See FinishType in types/surface.ts.
+  finishType    String?
+  // Per-wall height in feet used for wall-path area (length × height).
+  // The plan's WALL TYPES legend specifies different heights per wall
+  // (to ceiling / to deck / 13' AFF), so this is NOT a flat project value.
+  // Null falls back to the project ceiling height. heightBasis is the UI
+  // preset label that produced it.
+  wallHeightFt  Float?
+  heightBasis   String?
   squareFootage Float?
   linearFootage Float?
   count         Int?

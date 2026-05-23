@@ -31,6 +31,12 @@ const createSchema = z.object({
     .min(2)
     .optional()
     .nullable(),
+  finishType: z
+    .enum(["paint", "frp", "tile", "wood", "glazing", "existing"])
+    .optional()
+    .nullable(),
+  wallHeightFt: z.number().positive().optional().nullable(),
+  heightBasis: z.enum(["ceiling", "deck", "13ft", "custom"]).optional().nullable(),
   paintType: z.string().optional().nullable(),
   coats: z.number().int().min(1).max(10).default(2),
   substrate: z.string().optional().nullable(),
@@ -104,6 +110,9 @@ export async function POST(req: Request) {
       type: d.type,
       polygon: JSON.stringify(d.polygon),
       pathPoints: d.pathPoints ? JSON.stringify(d.pathPoints) : null,
+      finishType: d.finishType ?? null,
+      wallHeightFt: d.wallHeightFt ?? null,
+      heightBasis: d.heightBasis ?? null,
       paintType: d.paintType ?? null,
       coats: d.coats,
       substrate: d.substrate ?? null,

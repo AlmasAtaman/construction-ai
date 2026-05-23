@@ -147,6 +147,9 @@ export function DetectionQueue({ onAcceptAllHighConfidence }: Props) {
   );
 
   const highCount = proposed.filter((s) => s.confidence >= 0.8).length;
+  const lowCount = proposed.filter(
+    (s) => confidenceLabel(s.confidence) === "low",
+  ).length;
 
   // All known room labels in this project — for the edit dialog datalist
   // and the "reassign" affordance.
@@ -183,6 +186,64 @@ export function DetectionQueue({ onAcceptAllHighConfidence }: Props) {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: "accepted" }),
+    });
+    setPendingUndo({
+      label: `Accepted ${s.roomLabel || SURFACE_TYPE_LABELS[s.type]}.`,
+      expiresAt: Date.now() + 5000,
+      undo: async () => {
+        useEditorStore.getState().updateSurface(s.id, { status: "proposed" });
+        await fetch(`/api/surfaces/${s.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: "proposed" }),
+        });
+      },
+    });
+  }
+
+  /** Re-create a rejected surface as a fresh proposal (used by undo). */
+  async function recreateAsProposed(snap: SurfaceDTO) {
+    const res = await fetch("/api/surfaces", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        projectId: snap.projectId,
+        planPageId: snap.planPageId,
+        type: snap.type,
+        polygon: snap.polygon,
+        pathPoints: snap.pathPoints,
+        paintType: snap.paintType,
+        coats: snap.coats,
+        substrate: snap.substrate,
+        roomLabel: snap.roomLabel,
+        squareFootage: snap.squareFootage,
+        linearFootage: snap.linearFootage,
+        count: snap.count,
+        confidence: snap.confidence,
+        derivation: snap.derivation,
+        status: "proposed",
+        source: "ai",
+      }),
+    });
+    if (res.ok) {
+      const json = await res.json();
+      useEditorStore.getState().addSurface(json.surface);
+    }
+  }
+
+  async function rejectAllLow() {
+    const low = proposed.filter((s) => confidenceLabel(s.confidence) === "low");
+    if (low.length === 0) return;
+    for (const s of low) removeSurface(s.id);
+    await Promise.all(
+      low.map((s) => fetch(`/api/surfaces/${s.id}`, { method: "DELETE" })),
+    );
+    setPendingUndo({
+      label: `Removed ${low.length} low-confidence item${low.length === 1 ? "" : "s"}.`,
+      expiresAt: Date.now() + 6000,
+      undo: async () => {
+        await Promise.all(low.map((s) => recreateAsProposed(s)));
+      },
     });
   }
 
@@ -230,16 +291,29 @@ export function DetectionQueue({ onAcceptAllHighConfidence }: Props) {
           </span>{" "}
           to review
         </span>
-        {highCount > 0 && (
-          <Button
-            size="sm"
-            variant="accent"
-            onClick={() => void onAcceptAllHighConfidence()}
-            data-testid="accept-all-high"
-          >
-            Accept {highCount} high
-          </Button>
-        )}
+        <div className="flex items-center gap-1.5">
+          {lowCount > 0 && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => void rejectAllLow()}
+              data-testid="reject-all-low"
+              title="Remove all low-confidence proposals (you can undo)."
+            >
+              Reject {lowCount} low
+            </Button>
+          )}
+          {highCount > 0 && (
+            <Button
+              size="sm"
+              variant="accent"
+              onClick={() => void onAcceptAllHighConfidence()}
+              data-testid="accept-all-high"
+            >
+              Accept {highCount} high
+            </Button>
+          )}
+        </div>
       </div>
 
       <ul className="flex-1 divide-y divide-[hsl(var(--line-2))]">

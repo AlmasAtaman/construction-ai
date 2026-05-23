@@ -64,6 +64,55 @@ export interface PathPoint {
   snap: PathSnap;
 }
 
+// What finish a wall receives — the paint scope, per the plan's FINISH PLAN
+// notes / WALL TYPES legend. Only `paint` is billable paint work; the rest
+// are tracked (and color-coded) but excluded from the paint cost so the
+// estimate doesn't bill FRP/tile/glazing as paint.
+export type FinishType =
+  | "paint"
+  | "frp"
+  | "tile"
+  | "wood"
+  | "glazing"
+  | "existing";
+
+export const FINISH_TYPE_LABELS: Record<FinishType, string> = {
+  paint: "Paint",
+  frp: "FRP panel",
+  tile: "Tile",
+  wood: "Wood / shiplap",
+  glazing: "Storefront / glazing",
+  existing: "Existing — no work",
+};
+
+// Canvas + legend colors, mirroring how the answer PDF color-codes scopes.
+export const FINISH_TYPE_COLORS: Record<FinishType, string> = {
+  paint: "#22c55e", // green — billable paint
+  frp: "#f97316", // orange
+  tile: "#3b82f6", // blue
+  wood: "#a16207", // brown
+  glazing: "#94a3b8", // slate
+  existing: "#cbd5e1", // light gray — no work
+};
+
+/** Finish types that count as billable paint work in the estimate. */
+export const PAINTABLE_FINISHES: ReadonlySet<FinishType> = new Set<FinishType>([
+  "paint",
+]);
+
+export const DEFAULT_FINISH_TYPE: FinishType = "paint";
+
+// Height preset for a wall, since the plan specifies different heights per
+// wall type. Resolves to a number of feet used for area = length × height.
+export type HeightBasis = "ceiling" | "deck" | "13ft" | "custom";
+
+export const HEIGHT_BASIS_LABELS: Record<HeightBasis, string> = {
+  ceiling: "To finished ceiling",
+  deck: "To underside of deck",
+  "13ft": "To 13'-0\" A.F.F.",
+  custom: "Custom height",
+};
+
 export interface SurfaceDTO {
   id: string;
   projectId: string;
@@ -78,6 +127,11 @@ export interface SurfaceDTO {
   // other surface type. Coordinates are normalized 0..1 (y-down),
   // matching `polygon`. See PathPoint above.
   pathPoints: PathPoint[] | null;
+  // Wall-path finish scope + per-wall height. Null for non-wall-path
+  // surfaces (and for legacy wall-paths, where they fall back to defaults).
+  finishType: FinishType | null;
+  wallHeightFt: number | null;
+  heightBasis: HeightBasis | null;
   squareFootage: number | null;
   linearFootage: number | null;
   count: number | null;

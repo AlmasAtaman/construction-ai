@@ -48,13 +48,23 @@ export function CanvasToolbar({ planPageId, onAutoTraced }: CanvasToolbarProps =
   const [autoTracing, setAutoTracing] = useState(false);
   const [autoTraceMsg, setAutoTraceMsg] = useState<string | null>(null);
 
-  async function runAutoTrace() {
+  async function runAutoTrace(reset = false) {
     if (!planPageId || autoTracing) return;
+    if (
+      reset &&
+      !window.confirm(
+        "Reset all traced walls on this page back to the AI's version? Your manual edits to walls on this page will be discarded.",
+      )
+    ) {
+      return;
+    }
     setAutoTracing(true);
     setAutoTraceMsg(null);
     try {
       const res = await fetch(`/api/plan-pages/${planPageId}/auto-trace`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reset }),
       });
       if (!res.ok) {
         setAutoTraceMsg("Auto-trace failed.");
@@ -107,10 +117,10 @@ export function CanvasToolbar({ planPageId, onAutoTraced }: CanvasToolbarProps =
   return (
     <div
       data-testid="canvas-toolbar"
-      className="pointer-events-none absolute inset-x-0 top-2 z-20 flex items-start justify-between gap-2 px-3"
+      className="flex items-center justify-between gap-2 border-b border-[hsl(var(--line))] bg-white px-3 py-1.5"
     >
       {/* Left cluster — zoom controls */}
-      <div className="pointer-events-auto flex items-center gap-1 rounded-[8px] border border-[hsl(var(--line))] bg-white/95 px-1 py-1 shadow-sm backdrop-blur">
+      <div className="flex items-center gap-1 rounded-[8px] border border-[hsl(var(--line))] bg-white px-1 py-0.5">
         <ToolbarButton
           onClick={zoomOut}
           title="Zoom out (−)"
@@ -145,7 +155,7 @@ export function CanvasToolbar({ planPageId, onAutoTraced }: CanvasToolbarProps =
       </div>
 
       {/* Right cluster — auto-trace + counts + AI overlay toggle */}
-      <div className="pointer-events-auto flex items-center gap-2">
+      <div className="flex items-center gap-2">
         {planPageId && (
           <div className="flex items-center gap-1.5">
             {autoTraceMsg && (
@@ -155,7 +165,7 @@ export function CanvasToolbar({ planPageId, onAutoTraced }: CanvasToolbarProps =
             )}
             <button
               type="button"
-              onClick={() => void runAutoTrace()}
+              onClick={() => void runAutoTrace(false)}
               disabled={autoTracing}
               data-testid="auto-trace-walls"
               title="Propose a wall-path trace along the extracted walls. Review and edit the result; it does not replace room detection."
@@ -170,6 +180,19 @@ export function CanvasToolbar({ planPageId, onAutoTraced }: CanvasToolbarProps =
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 18 L9 18 L9 7 L17 7 L17 14 L21 14" />
               </svg>
               {autoTracing ? "Tracing…" : "Auto-trace walls"}
+            </button>
+            <button
+              type="button"
+              onClick={() => void runAutoTrace(true)}
+              disabled={autoTracing}
+              data-testid="reset-to-ai-walls"
+              title="Discard manual wall edits on this page and restore the AI's calculated walls."
+              className="inline-flex items-center gap-1 rounded-[8px] border border-[hsl(var(--line))] bg-white px-2 py-1.5 text-[11.5px] font-medium text-[hsl(var(--ink-2))] hover:bg-[hsl(var(--panel-2))]"
+            >
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 12a9 9 0 1 0 9-9 9 9 0 0 0-7 3.4M3 4v4h4" />
+              </svg>
+              Reset to AI
             </button>
           </div>
         )}

@@ -1,4 +1,9 @@
-import type { SurfaceDTO, SurfaceType } from "@/types/surface";
+import {
+  PAINTABLE_FINISHES,
+  type FinishType,
+  type SurfaceDTO,
+  type SurfaceType,
+} from "@/types/surface";
 import {
   productionRateFor,
   unitFor,
@@ -110,12 +115,16 @@ export function calculateBid(
     // Skip non-paintable surface kinds (annotations, symbol counts) so
     // they don't pollute the bid totals.
     if (s.type.startsWith("annotation:") || s.type.startsWith("symbol:")) continue;
-    // Wall-path traces are measured + reviewable but are NOT rolled
-    // into the bid yet — that's the dedicated "rolled-up totals" task.
-    // Including them now would double-count walls already measured as
-    // room polygons. Keeping them out preserves existing bid math
-    // exactly while the trace is reviewed.
-    if (s.type === "wall-path") continue;
+    // Wall-path traces: price only PAINT-scope walls. FRP / tile / glazing
+    // / wood / existing are tracked + color-coded on the plan but are NOT
+    // billed as paint (different trade/finish). Area = the per-wall
+    // length × height already stored in squareFootage. Excluded surfaces
+    // and non-wall-path types are unaffected, so existing bids that have
+    // no wall-paths produce byte-identical totals.
+    if (s.type === "wall-path") {
+      const finish = (s.finishType ?? "paint") as FinishType;
+      if (!PAINTABLE_FINISHES.has(finish)) continue;
+    }
 
     const unit = unitFor(s.type);
     let quantity = 0;

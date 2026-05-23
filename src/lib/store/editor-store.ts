@@ -12,6 +12,15 @@ export type EditorTool =
   | "note";
 
 /**
+ * Snap behavior for the wall-path tool, mirroring eTakeoff SnapAI:
+ *   - point:    click commits one snapped vertex (manual, most control)
+ *   - line:     click grabs the whole nearest wall segment (both ends)
+ *   - polyline: hover previews the connected wall run around corners;
+ *               one click traces & measures the entire run (fastest)
+ */
+export type SnapMode = "point" | "line" | "polyline";
+
+/**
  * One cleaned wall segment in normalized (0..1, y-down) page coords.
  * Streamed from GET /api/plan-pages/[id]/walls. Used by the wall-path
  * tool's snap engine and by the auto-trace UI.
@@ -34,6 +43,8 @@ interface EditorState {
   selectedSurfaceId: string | null;
   hoveredSurfaceId: string | null;
   tool: EditorTool;
+  /** Active snap mode for the wall-path tool. */
+  snapMode: SnapMode;
   pendingUndo: UndoEntry | null;
   // Canvas viewport state — zoom 1.0 fits the page, panX/panY are in CSS px.
   zoom: number;
@@ -87,6 +98,7 @@ interface EditorState {
   setSelected: (id: string | null) => void;
   setHovered: (id: string | null) => void;
   setTool: (tool: EditorTool) => void;
+  setSnapMode: (mode: SnapMode) => void;
   setPendingUndo: (entry: UndoEntry | null) => void;
   setViewport: (v: { zoom?: number; panX?: number; panY?: number }) => void;
   resetViewport: () => void;
@@ -154,6 +166,7 @@ export const useEditorStore = create<EditorState>((set) => ({
   selectedSurfaceId: null,
   hoveredSurfaceId: null,
   tool: "select",
+  snapMode: "polyline",
   pendingUndo: null,
   zoom: 1,
   panX: 0,
@@ -192,6 +205,7 @@ export const useEditorStore = create<EditorState>((set) => ({
   setSelected: (id) => set({ selectedSurfaceId: id }),
   setHovered: (id) => set({ hoveredSurfaceId: id }),
   setTool: (tool) => set({ tool }),
+  setSnapMode: (mode) => set({ snapMode: mode }),
   setPendingUndo: (entry) => set({ pendingUndo: entry }),
   setViewport: ({ zoom, panX, panY }) =>
     set((st) => {

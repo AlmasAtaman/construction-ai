@@ -17,6 +17,7 @@ import type { SurfaceDTO } from "@/types/surface";
 import { DetectionQueue } from "./DetectionQueue";
 import { CanvasToolbar } from "./CanvasToolbar";
 import { ScaleBanner } from "./ScaleBanner";
+import { PageRail } from "./PageRail";
 import { cn } from "@/lib/utils";
 
 const SurfaceOverlay = dynamic(
@@ -28,7 +29,12 @@ export interface PlanData {
   id: string;
   filename: string;
   pageCount: number;
-  pages: { id: string; pageNumber: number }[];
+  pages: {
+    id: string;
+    pageNumber: number;
+    pageType?: string | null;
+    hidden?: boolean;
+  }[];
 }
 
 type RightPanelTab = "queue" | "chat";
@@ -252,38 +258,50 @@ export function ProjectWorkspace({
           className="flex w-56 flex-shrink-0 flex-col border-r border-[hsl(var(--line))] bg-white"
         >
           <SectionHeader>Pages</SectionHeader>
-          <div className="flex-1 overflow-y-auto py-2">
-            {!plan ? (
+          {!plan ? (
+            <div className="flex-1 overflow-y-auto py-2">
               <p
                 data-testid="pages-placeholder"
                 className="px-3 text-[12px] text-[hsl(var(--ink-3))]"
               >
                 Pages appear here once you upload a blueprint.
               </p>
-            ) : (
-              <ul className="space-y-0.5 px-1.5" data-testid="pages-list">
-                {plan.pages.map((p) => (
-                  <li key={p.id}>
-                    <button
-                      onClick={() => setCurrentPage(p.pageNumber)}
-                      className={cn(
-                        "flex w-full items-center gap-2 rounded-[4px] px-2 py-1.5 text-left text-[13px] transition-colors",
-                        currentPage === p.pageNumber
-                          ? "bg-[hsl(var(--brand-soft))] text-[hsl(var(--brand))] font-medium"
-                          : "text-[hsl(var(--ink-2))] hover:bg-[hsl(var(--panel-2))]",
-                      )}
-                      data-testid={`page-button-${p.pageNumber}`}
-                    >
-                      <span className="num inline-block w-5 text-[12px] text-[hsl(var(--ink-3))]">
-                        {p.pageNumber}
-                      </span>
-                      <span>Page {p.pageNumber}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+            </div>
+          ) : (
+            <PageRail
+              planId={plan.id}
+              pages={plan.pages}
+              currentPage={currentPage}
+              onSelect={setCurrentPage}
+              onClassified={(classified) => {
+                setPlan((prev) =>
+                  prev
+                    ? {
+                        ...prev,
+                        pages: prev.pages.map((pg) => {
+                          const hit = classified.find(
+                            (c) => c.pageId === pg.id,
+                          );
+                          return hit ? { ...pg, pageType: hit.pageType } : pg;
+                        }),
+                      }
+                    : prev,
+                );
+              }}
+              onPageUpdate={(pageId, patch) => {
+                setPlan((prev) =>
+                  prev
+                    ? {
+                        ...prev,
+                        pages: prev.pages.map((pg) =>
+                          pg.id === pageId ? { ...pg, ...patch } : pg,
+                        ),
+                      }
+                    : prev,
+                );
+              }}
+            />
+          )}
 
           <div className="border-t border-[hsl(var(--line))] p-3">
             <div className="mb-2 flex items-center justify-between">
@@ -319,18 +337,15 @@ export function ProjectWorkspace({
             </div>
           ) : currentPlanPage ? (
             <>
-              {/* Scale banner is a full-width bar at the top of the
-                  canvas column. The floating CanvasToolbar must NOT
-                  share this row — its right-aligned "Hide AI overlay"
-                  button used to cover the banner's "Set scale" button.
-                  So the toolbar lives inside the PDF wrapper below and
-                  floats over the canvas, not the banner. */}
+              {/* Clean stacked header: scale bar, then the canvas toolbar
+                  (zoom / auto-trace / surface toggles), both in document
+                  flow above the canvas — no floating chrome over the plan. */}
               <ScaleBanner planPageId={currentPlanPage.id} />
+              <CanvasToolbar
+                planPageId={currentPlanPage.id}
+                onAutoTraced={refreshSurfaces}
+              />
               <div className="relative flex-1 overflow-hidden">
-                <CanvasToolbar
-                  planPageId={currentPlanPage.id}
-                  onAutoTraced={refreshSurfaces}
-                />
                 <PdfViewer planId={plan.id} pageNumber={currentPage}>
                   {(size) => (
                     <SurfaceOverlay

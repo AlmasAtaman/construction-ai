@@ -7,6 +7,12 @@ export const dynamic = "force-dynamic";
 const updateSchema = z.object({
   status: z.enum(["proposed", "accepted", "manual", "excluded"]).optional(),
   type: z.string().optional(),
+  finishType: z
+    .enum(["paint", "frp", "tile", "wood", "glazing", "existing"])
+    .nullable()
+    .optional(),
+  wallHeightFt: z.number().positive().nullable().optional(),
+  heightBasis: z.enum(["ceiling", "deck", "13ft", "custom"]).nullable().optional(),
   paintType: z.string().nullable().optional(),
   coats: z.number().int().min(1).max(10).optional(),
   substrate: z.string().nullable().optional(),

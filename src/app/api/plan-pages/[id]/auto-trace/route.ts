@@ -26,10 +26,20 @@ export const runtime = "nodejs";
  * Manually-traced or accepted wall-paths are left untouched.
  */
 export async function POST(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
+  // reset=true → "go back to AI walls": wipe ALL wall-paths on the page
+  // (manual + accepted + proposed) and regenerate the AI baseline. Default
+  // (false) only clears prior AI proposals, preserving the user's own work.
+  let reset = false;
+  try {
+    const body = await req.json();
+    reset = body?.reset === true;
+  } catch {
+    /* no body */
+  }
   const page = await db.planPage.findUnique({
     where: { id },
     include: { plan: { include: { project: true } } },
@@ -54,15 +64,23 @@ export async function POST(
   });
   const { kept } = filterStrayPolylines(graph, allPolylines);
 
-  // Clear prior AI proposals so re-running is clean.
+  // Clear prior wall-paths so re-running is clean. reset=true wipes the
+  // whole set (back-to-AI); otherwise only the prior AI proposals.
   await db.surface.deleteMany({
-    where: {
-      planPageId: id,
-      type: "wall-path",
-      source: "ai",
-      status: "proposed",
-    },
+    where: reset
+      ? { planPageId: id, type: "wall-path" }
+      : { planPageId: id, type: "wall-path", source: "ai", status: "proposed" },
   });
+
+  // Per-polyline confidence so the review queue's high/medium/low coding
+  // is meaningful: longer connected runs are far more likely to be real
+  // walls than short fragments. Scaled against the longest run on the page.
+  const maxLenPt = kept.reduce((m, pl) => Math.max(m, pl.lengthPt), 0);
+  const confidenceFor = (lengthPt: number): number => {
+    if (maxLenPt <= 0) return 0.6;
+    const score = lengthPt / maxLenPt; // 0..1
+    return Math.min(0.95, Math.max(0.55, 0.55 + 0.4 * score));
+  };
 
   const created = [];
   for (const pl of kept) {
@@ -86,7 +104,12 @@ export async function POST(
         pathPoints: JSON.stringify(pathPoints),
         linearFootage,
         squareFootage,
-        confidence: 0.75,
+        // Default every traced wall to Paint at the project ceiling height;
+        // the user reclassifies finish/height in review and the area updates.
+        finishType: "paint",
+        heightBasis: "ceiling",
+        wallHeightFt: ceilingHeightFt,
+        confidence: confidenceFor(pl.lengthPt),
         status: "proposed",
         source: "ai",
         derivation: "traced",

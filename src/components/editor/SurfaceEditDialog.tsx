@@ -2,8 +2,27 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useEditorStore } from "@/lib/store/editor-store";
-import type { SurfaceDTO, SurfaceDerivation } from "@/types/surface";
+import {
+  FINISH_TYPE_LABELS,
+  HEIGHT_BASIS_LABELS,
+  type FinishType,
+  type HeightBasis,
+  type SurfaceDTO,
+  type SurfaceDerivation,
+} from "@/types/surface";
 import { cn } from "@/lib/utils";
+
+/** Quick-fill height (ft) for a basis preset; user can still override. */
+function presetHeightFt(
+  basis: HeightBasis,
+  ceiling: number,
+  current: number | null,
+): number {
+  if (basis === "ceiling") return ceiling;
+  if (basis === "13ft") return 13;
+  if (basis === "deck") return 16; // typical; editable
+  return current && current > 0 ? current : ceiling; // custom
+}
 
 const TYPE_OPTIONS = [
   { value: "wall", label: "Wall" },
@@ -413,6 +432,9 @@ export function SurfaceEditDialog({ surface, knownRoomLabels, onClose }: Props) 
         count: surface.count,
         paintType: surface.paintType,
         coats: surface.coats,
+        finishType: surface.finishType,
+        wallHeightFt: surface.wallHeightFt,
+        heightBasis: surface.heightBasis,
       });
       setError(null);
       // Auto-focus room label for fast keyboard edit.
@@ -448,6 +470,24 @@ export function SurfaceEditDialog({ surface, knownRoomLabels, onClose }: Props) 
       if (draft.paintType !== surface!.paintType)
         patch.paintType = draft.paintType ?? null;
       if (draft.coats !== surface!.coats) patch.coats = draft.coats;
+
+      // Wall-path finish + height. Area is DERIVED from length × height,
+      // so changing either re-computes squareFootage.
+      if (surface!.type === "wall-path") {
+        if (draft.finishType !== surface!.finishType)
+          patch.finishType = draft.finishType ?? null;
+        if (draft.heightBasis !== surface!.heightBasis)
+          patch.heightBasis = draft.heightBasis ?? null;
+        if (draft.wallHeightFt !== surface!.wallHeightFt)
+          patch.wallHeightFt = draft.wallHeightFt ?? null;
+        const lf = draft.linearFootage ?? surface!.linearFootage;
+        const h = draft.wallHeightFt ?? surface!.wallHeightFt;
+        if (lf != null && h != null) {
+          const recomputed = lf * h;
+          if (recomputed !== surface!.squareFootage)
+            patch.squareFootage = recomputed;
+        }
+      }
 
       if (Object.keys(patch).length === 0) {
         onClose();
@@ -542,6 +582,98 @@ export function SurfaceEditDialog({ surface, knownRoomLabels, onClose }: Props) 
             </select>
           </label>
 
+          {/* Wall-path: finish scope + per-wall height (drives area) */}
+          {draft.type === "wall-path" && (
+            <>
+              <label className="block">
+                <span className="block text-[11px] font-medium text-[hsl(var(--ink-2))]">
+                  Finish (paint scope)
+                </span>
+                <select
+                  value={draft.finishType ?? "paint"}
+                  onChange={(e) =>
+                    setDraft({
+                      ...draft,
+                      finishType: e.target.value as FinishType,
+                    })
+                  }
+                  className="mt-1 w-full rounded-[6px] border border-[hsl(var(--line))] px-2 py-1.5 text-[13px]"
+                >
+                  {(Object.keys(FINISH_TYPE_LABELS) as FinishType[]).map((v) => (
+                    <option key={v} value={v}>
+                      {FINISH_TYPE_LABELS[v]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <label className="block">
+                  <span className="block text-[11px] font-medium text-[hsl(var(--ink-2))]">
+                    Wall height
+                  </span>
+                  <select
+                    value={draft.heightBasis ?? "ceiling"}
+                    onChange={(e) => {
+                      const basis = e.target.value as HeightBasis;
+                      setDraft({
+                        ...draft,
+                        heightBasis: basis,
+                        wallHeightFt: presetHeightFt(
+                          basis,
+                          pageCtx?.ceilingHeightFt ?? 9,
+                          draft.wallHeightFt ?? null,
+                        ),
+                      });
+                    }}
+                    className="mt-1 w-full rounded-[6px] border border-[hsl(var(--line))] px-2 py-1.5 text-[13px]"
+                  >
+                    {(Object.keys(HEIGHT_BASIS_LABELS) as HeightBasis[]).map(
+                      (v) => (
+                        <option key={v} value={v}>
+                          {HEIGHT_BASIS_LABELS[v]}
+                        </option>
+                      ),
+                    )}
+                  </select>
+                </label>
+                <label className="block">
+                  <span className="block text-[11px] font-medium text-[hsl(var(--ink-2))]">
+                    Height (ft)
+                  </span>
+                  <input
+                    type="number"
+                    step="0.5"
+                    min="0"
+                    value={draft.wallHeightFt ?? ""}
+                    onChange={(e) =>
+                      setDraft({
+                        ...draft,
+                        wallHeightFt:
+                          e.target.value === "" ? null : Number(e.target.value),
+                        heightBasis: "custom",
+                      })
+                    }
+                    className="mt-1 w-full rounded-[6px] border border-[hsl(var(--line))] px-2 py-1.5 text-[13px] tabular-nums"
+                  />
+                </label>
+              </div>
+              {draft.linearFootage != null && draft.wallHeightFt != null && (
+                <div className="rounded-[6px] bg-[hsl(var(--panel-2))] px-2 py-1.5 text-[11px] text-[hsl(var(--ink-3))]">
+                  Area = {draft.linearFootage.toFixed(1)} lf ×{" "}
+                  {draft.wallHeightFt.toFixed(1)} ft ={" "}
+                  <span className="font-semibold text-[hsl(var(--ink))]">
+                    {Math.round(draft.linearFootage * draft.wallHeightFt)} sqft
+                  </span>
+                  {draft.finishType && draft.finishType !== "paint" && (
+                    <span className="ml-1 text-amber-700">
+                      · not billed as paint
+                    </span>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+
           {/* Substrate */}
           <label className="block">
             <span className="block text-[11px] font-medium text-[hsl(var(--ink-2))]">
@@ -562,30 +694,33 @@ export function SurfaceEditDialog({ surface, knownRoomLabels, onClose }: Props) 
             </select>
           </label>
 
-          {/* Quantity (varies by type) */}
-          <label className="block">
-            <span className="block text-[11px] font-medium text-[hsl(var(--ink-2))]">
-              {qtyField === "squareFootage"
-                ? "Area (sqft)"
-                : qtyField === "linearFootage"
-                  ? "Linear feet"
-                  : "Count"}
-            </span>
-            <input
-              type="number"
-              step={qtyField === "count" ? 1 : 0.1}
-              min="0"
-              value={(draft[qtyField] as number | null) ?? ""}
-              onChange={(e) =>
-                setDraft({
-                  ...draft,
-                  [qtyField]:
-                    e.target.value === "" ? null : Number(e.target.value),
-                })
-              }
-              className="mt-1 w-full rounded-[6px] border border-[hsl(var(--line))] px-2 py-1.5 text-[13px] tabular-nums"
-            />
-          </label>
+          {/* Quantity (varies by type). Wall-paths derive area from
+              height above, so the manual quantity field is hidden for them. */}
+          {draft.type !== "wall-path" && (
+            <label className="block">
+              <span className="block text-[11px] font-medium text-[hsl(var(--ink-2))]">
+                {qtyField === "squareFootage"
+                  ? "Area (sqft)"
+                  : qtyField === "linearFootage"
+                    ? "Linear feet"
+                    : "Count"}
+              </span>
+              <input
+                type="number"
+                step={qtyField === "count" ? 1 : 0.1}
+                min="0"
+                value={(draft[qtyField] as number | null) ?? ""}
+                onChange={(e) =>
+                  setDraft({
+                    ...draft,
+                    [qtyField]:
+                      e.target.value === "" ? null : Number(e.target.value),
+                  })
+                }
+                className="mt-1 w-full rounded-[6px] border border-[hsl(var(--line))] px-2 py-1.5 text-[13px] tabular-nums"
+              />
+            </label>
+          )}
 
           {/* Paint type + coats (for paintable surfaces) */}
           {draft.type !== "door" && draft.type !== "window" && (
