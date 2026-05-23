@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useEditorStore } from "@/lib/store/editor-store";
 import { cn } from "@/lib/utils";
@@ -16,7 +16,10 @@ interface ScaleInfo {
 }
 
 interface ScaleResponse {
+  planPageId: string;
   scale: ScaleInfo | null;
+  /** One-time heads-up when an auto-detected scale passed a cross-check uneasily. */
+  warning?: string | null;
   pageWidthPt: number | null;
   pageHeightPt: number | null;
 }
@@ -37,6 +40,14 @@ export function ScaleBanner({ planPageId }: Props) {
   const startCalib = useEditorStore((s) => s.startScaleCalibration);
   const cancelCalib = useEditorStore((s) => s.cancelScaleCalibration);
 
+  // Guards against out-of-order responses: switching pages (or the
+  // auto-jump to the first floor plan) fires several /scale fetches, and
+  // a page whose scale must be auto-detected resolves slower than one
+  // already cached. Without this, a stale "no scale" response can land
+  // last and clobber the current page's detected scale.
+  const latestPageRef = useRef(planPageId);
+  latestPageRef.current = planPageId;
+
   const fetchScale = useCallback(async () => {
     setLoading(true);
     try {
@@ -45,7 +56,8 @@ export function ScaleBanner({ planPageId }: Props) {
       });
       if (res.ok) {
         const json = (await res.json()) as ScaleResponse;
-        setInfo(json);
+        // Only commit if this response is still for the active page.
+        if (json.planPageId === latestPageRef.current) setInfo(json);
       }
     } finally {
       setLoading(false);
@@ -152,6 +164,13 @@ export function ScaleBanner({ planPageId }: Props) {
           {scale ? "Edit" : "Set scale"}
         </Button>
       </div>
+
+      {scale && info?.warning && (
+        <div className="flex items-start gap-2 border-t border-amber-200 bg-amber-50 px-3 py-1.5 text-[11px] text-amber-800">
+          <span className="mt-0.5 inline-flex h-2 w-2 flex-shrink-0 rounded-full bg-amber-500" aria-hidden />
+          <span>{info.warning}</span>
+        </div>
+      )}
 
       {open && (
         <CalibrationPanel

@@ -112,7 +112,7 @@ export async function renderPdfPage(
  * Extract every text fragment from the PDF's vector text layer along with
  * its normalized center position. Skips empty strings and pure whitespace.
  */
-async function extractTextLayer(
+export async function extractTextLayer(
   pdfBuffer: Buffer,
   pageNumber: number,
 ): Promise<{
@@ -252,7 +252,7 @@ function detectTitleBlockBox(
   return boxes;
 }
 
-function pickRoomLabels(fragments: TextFragment[]): TextFragment[] {
+export function pickRoomLabels(fragments: TextFragment[]): TextFragment[] {
   const titleBlocks = detectTitleBlockBox(fragments);
   const candidates: TextFragment[] = [];
   for (const f of fragments) {

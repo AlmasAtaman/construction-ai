@@ -89,19 +89,22 @@ export function PageRail({
   // of a cover/schedule sheet — once per plan, so manual navigation sticks.
   const jumpedPlanId = useRef<string | null>(null);
   useEffect(() => {
-    if (jumpedPlanId.current === planId || needsClassify) return;
-    jumpedPlanId.current = planId;
+    // Fire once per plan, as soon as floor plans are known and classification
+    // isn't still running — even if a few pages failed to classify (so a
+    // stray unclassified sheet doesn't strand the user on the cover page).
+    if (jumpedPlanId.current === planId || classifying) return;
     const floors = pages
       .filter(
         (p) => p.pageType != null && FLOOR_TYPES.has(p.pageType) && !p.hidden,
       )
       .sort((a, b) => a.pageNumber - b.pageNumber);
-    if (floors.length === 0) return;
+    if (floors.length === 0) return; // no floor plan known yet; wait
+    jumpedPlanId.current = planId;
     const curType = pages.find((p) => p.pageNumber === currentPage)?.pageType;
     if (!curType || !FLOOR_TYPES.has(curType)) {
       onSelectRef.current(floors[0].pageNumber);
     }
-  }, [planId, needsClassify, pages, currentPage]);
+  }, [planId, classifying, pages, currentPage]);
 
   const updatePage = useCallback(
     (pageId: string, patch: PagePatch) => {

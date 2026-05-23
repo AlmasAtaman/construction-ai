@@ -4,8 +4,24 @@ import path from "node:path";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { ptPerFootFromTwoPoints } from "@/lib/extract/scale";
+import { detectPageScale } from "@/lib/extract/page-extract";
 
 const UPLOADS_DIR = path.join(process.cwd(), "uploads");
+
+/**
+ * Below these confidences we don't auto-persist a detected scale — the
+ * user is shown nothing and asked to calibrate, rather than silently
+ * measuring against a guess. (Wrong scale = wrong bid = lost money.)
+ *
+ * A printed "SCALE: 1/4\" = 1'-0\"" notation is the architect's own
+ * declaration and is authoritative on a vector PDF — so we trust it at a
+ * lower bar. The door cross-check (which assumes ~3 ft doors) routinely
+ * misfires on commercial sheets full of 2'-0"/2'-6" openings and only
+ * knocks a clean ~0.92 parse down to ~0.52; we still keep that. A
+ * scale-bar (geometry-only) needs the higher bar.
+ */
+const MIN_CONFIDENCE_TEXT = 0.45;
+const MIN_CONFIDENCE_OTHER = 0.6;
 
 async function pageDimensionsPt(
   planPageId: string,
@@ -47,29 +63,69 @@ export async function GET(
   const { id } = await params;
   const page = await db.planPage.findUnique({
     where: { id },
-    select: {
-      id: true,
-      pageNumber: true,
-      scaleRatio: true,
-      scaleMethod: true,
-      scaleLabel: true,
-    },
+    include: { plan: true },
   });
   if (!page) {
     return NextResponse.json({ error: "Page not found." }, { status: 404 });
   }
   const dims = await pageDimensionsPt(page.id);
+
+  let scale =
+    page.scaleRatio != null
+      ? {
+          ptPerFoot: page.scaleRatio,
+          method: page.scaleMethod ?? "user",
+          label: page.scaleLabel ?? "Set by you",
+        }
+      : null;
+
+  // A one-time, non-blocking heads-up returned only on the detection turn
+  // (once persisted, GET short-circuits above and never re-runs detection).
+  let warning: string | null = null;
+
+  // No stored scale → try to read it straight off the sheet (the
+  // architect's printed "SCALE: 1/4\" = 1'-0\"" notation or a scale bar).
+  // Persist confident hits so measurements use them and the banner shows
+  // the source; leave a low-confidence guess unset so the user calibrates.
+  if (scale == null) {
+    try {
+      const buf = await readFile(path.join(UPLOADS_DIR, page.plan.filePath));
+      const detected = await detectPageScale(buf, page.pageNumber);
+      const minConf =
+        detected?.method === "text-notation"
+          ? MIN_CONFIDENCE_TEXT
+          : MIN_CONFIDENCE_OTHER;
+      if (detected && detected.confidence >= minConf) {
+        await db.planPage.update({
+          where: { id },
+          data: {
+            scaleRatio: detected.ptPerFoot,
+            scaleMethod: detected.method,
+            scaleLabel: detected.label,
+          },
+        });
+        scale = {
+          ptPerFoot: detected.ptPerFoot,
+          method: detected.method,
+          label: detected.label,
+        };
+        // Trusted the printed scale but a cross-check was uneasy — tell the
+        // user so they can eyeball one measurement before bidding.
+        if (detected.confidence < MIN_CONFIDENCE_OTHER) {
+          warning =
+            "Auto-read from the sheet, but a cross-check was inconclusive. Double-check one known dimension; click Edit to recalibrate if it's off.";
+        }
+      }
+    } catch {
+      /* detection failed — fall through with scale = null */
+    }
+  }
+
   return NextResponse.json({
     planPageId: page.id,
     pageNumber: page.pageNumber,
-    scale:
-      page.scaleRatio != null
-        ? {
-            ptPerFoot: page.scaleRatio,
-            method: page.scaleMethod ?? "user",
-            label: page.scaleLabel ?? "Set by you",
-          }
-        : null,
+    scale,
+    warning,
     pageWidthPt: dims?.widthPt ?? null,
     pageHeightPt: dims?.heightPt ?? null,
   });

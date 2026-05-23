@@ -107,10 +107,17 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
   const [previewRun, setPreviewRun] = useState<WallRun | null>(null);
   // Room (magic-wand) mode: enclosed room boundaries for this page, and the
   // one currently under the cursor.
-  const [roomFaces, setRoomFaces] = useState<{ x: number; y: number }[][]>([]);
-  const [previewRoom, setPreviewRoom] = useState<
-    { x: number; y: number }[] | null
-  >(null);
+  interface RoomFace {
+    points: { x: number; y: number }[];
+    label: string | null;
+  }
+  const [roomFaces, setRoomFaces] = useState<RoomFace[]>([]);
+  const [previewRoom, setPreviewRoom] = useState<RoomFace | null>(null);
+  // Open-room wand: when a click lands in no enclosed face we ask the
+  // server to partition the open zone. `tracingOpen` gates concurrent
+  // requests; `openHint` carries a one-line result/failure message.
+  const [tracingOpen, setTracingOpen] = useState(false);
+  const [openHint, setOpenHint] = useState<string | null>(null);
 
   function pxToNorm(p: { x: number; y: number }) {
     return { x: p.x / props.width, y: p.y / props.height };
@@ -176,9 +183,15 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
         const res = await fetch(`/api/plan-pages/${props.planPageId}/rooms`);
         if (!res.ok) return;
         const data = (await res.json()) as {
-          rooms: { points: { x: number; y: number }[] }[];
+          rooms: {
+            points: { x: number; y: number }[];
+            label: string | null;
+          }[];
         };
-        if (!cancelled) setRoomFaces(data.rooms.map((r) => r.points));
+        if (!cancelled)
+          setRoomFaces(
+            data.rooms.map((r) => ({ points: r.points, label: r.label })),
+          );
       } catch {
         /* leave roomFaces empty — room mode just finds nothing */
       }
@@ -354,8 +367,14 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
       if (snapMode === "room") {
         // Magic wand: trace the boundary of the room under the cursor.
         const n = pxToNorm(pos);
-        const face = roomFaces.find((f) => pointInPolygon(f, n.x, n.y));
-        if (face) void commitRoom(face);
+        const face = roomFaces.find((f) => pointInPolygon(f.points, n.x, n.y));
+        if (face) {
+          setOpenHint(null);
+          void commitRoom(face);
+        } else {
+          // No enclosed walls here → try the open-plan partition tracer.
+          void traceOpenRoom(n);
+        }
         return;
       }
       const snap = snapFromPixel(pos);
@@ -463,7 +482,9 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
       if (!pos) return;
       if (snapMode === "room") {
         const n = pxToNorm(pos);
-        setPreviewRoom(roomFaces.find((f) => pointInPolygon(f, n.x, n.y)) ?? null);
+        setPreviewRoom(
+          roomFaces.find((f) => pointInPolygon(f.points, n.x, n.y)) ?? null,
+        );
         return;
       }
       const snap = snapFromPixel(pos);
@@ -539,7 +560,7 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
    * display; the exact values are stored. Shared by manual point/line
    * tracing (commitWallPath) and polyline "follow the wall" (commitRun).
    */
-  async function persistWallPath(points: PathPoint[]) {
+  async function persistWallPath(points: PathPoint[], roomLabel?: string) {
     if (points.length < 2) return;
     let linearFt: number | null = null;
     let sqft: number | null = null;
@@ -565,6 +586,7 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
           pathPoints: points,
           linearFootage: linearFt,
           squareFootage: sqft,
+          roomLabel: roomLabel ?? null,
           // Default to Paint @ ceiling height; user can reclassify in review.
           finishType: "paint",
           heightBasis: "ceiling",
@@ -625,16 +647,65 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
    * The ring is closed (first point repeated) so the perimeter — and thus
    * linear footage / wall area — includes the closing edge.
    */
-  async function commitRoom(face: { x: number; y: number }[]) {
-    if (face.length < 3) return;
-    const ring = [...face, face[0]];
+  async function commitRoom(face: RoomFace) {
+    if (face.points.length < 3) return;
+    const ring = [...face.points, face.points[0]];
     const points: PathPoint[] = ring.map((p) => ({
       x: p.x,
       y: p.y,
       snap: "endpoint" as const,
     }));
     setPreviewRoom(null);
-    await persistWallPath(points);
+    await persistWallPath(points, face.label ?? undefined);
+  }
+
+  /**
+   * Open-plan fallback for the magic wand: the click hit no enclosed
+   * face, so ask the server to partition the open zone around the click
+   * into a measured boundary. On success we commit it like any room
+   * (honestly tagged as an estimated boundary server-side). On failure
+   * we leave a one-line hint so the user knows to draw it manually.
+   */
+  async function traceOpenRoom(clickNorm: { x: number; y: number }) {
+    if (tracingOpen) return;
+    setTracingOpen(true);
+    setOpenHint("Tracing open area…");
+    try {
+      const res = await fetch(
+        `/api/plan-pages/${props.planPageId}/trace-open`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(clickNorm),
+        },
+      );
+      if (res.status === 409) {
+        setOpenHint("Set the page scale first, then try the wand again.");
+        return;
+      }
+      if (!res.ok) {
+        setOpenHint("Couldn't trace here — draw the room manually.");
+        return;
+      }
+      const data = (await res.json()) as {
+        room: {
+          points: { x: number; y: number }[];
+          label: string | null;
+        } | null;
+      };
+      if (!data.room || data.room.points.length < 3) {
+        setOpenHint(
+          "No open room found here — click nearer its center, or draw it manually.",
+        );
+        return;
+      }
+      setOpenHint(null);
+      await commitRoom({ points: data.room.points, label: data.room.label });
+    } catch {
+      setOpenHint("Couldn't trace here — draw the room manually.");
+    } finally {
+      setTracingOpen(false);
+    }
   }
 
   async function deleteSurface(id: string) {
@@ -973,9 +1044,9 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
           {tool === "wall-path" &&
             snapMode === "room" &&
             previewRoom &&
-            previewRoom.length >= 3 && (
+            previewRoom.points.length >= 3 && (
               <Line
-                points={previewRoom.flatMap((p) => {
+                points={previewRoom.points.flatMap((p) => {
                   const px = normToPx(p);
                   return [px.x, px.y];
                 })}
@@ -1091,10 +1162,10 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
             if (
               snapMode === "room" &&
               previewRoom &&
-              previewRoom.length >= 3
+              previewRoom.points.length >= 3
             ) {
               liveLf = polylineLengthFt(
-                [...previewRoom, previewRoom[0]],
+                [...previewRoom.points, previewRoom.points[0]],
                 wallData.pageWidthPt,
                 wallData.pageHeightPt,
                 wallData.ptPerFoot,
@@ -1152,7 +1223,7 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
               </div>
               <div className="font-medium">
                 {snapMode === "room"
-                  ? "Click inside a room to trace its whole wall boundary."
+                  ? "Click inside a room to trace its boundary — works on open-plan areas too."
                   : snapMode === "polyline"
                   ? "Hover a wall, then click to trace the whole connected run."
                   : snapMode === "line"
@@ -1179,6 +1250,9 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
                   No wall geometry found on this page — every click is a
                   free-click (not snapped to extracted geometry).
                 </div>
+              ) : null}
+              {snapMode === "room" && openHint ? (
+                <div className="text-amber-200">{openHint}</div>
               ) : null}
             </div>
           );

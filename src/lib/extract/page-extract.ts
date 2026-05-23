@@ -1813,6 +1813,172 @@ function runStrategyB(
 }
 
 // ---------------------------------------------------------------------------
+// Scale-only entry point
+// ---------------------------------------------------------------------------
+
+/**
+ * Resolve a page's scale without running the full takeoff. Mirrors the
+ * scale step inside {@link extractPage} exactly — same text fragments,
+ * same door cross-check — so the auto-detected value matches what the
+ * measurement engine would use. Returns null when no source is
+ * confident enough (callers MUST NOT invent a fallback).
+ *
+ * Light enough to run on page load: one vector scan (for door
+ * candidates) plus one text-layer read.
+ */
+export async function detectPageScale(
+  pdfBuffer: Buffer,
+  pageNumber: number,
+  userScale?: UserSuppliedScale | null,
+): Promise<EstablishedScale | null> {
+  const [{ scan }, textResult] = await Promise.all([
+    scanVectorPaths(pdfBuffer, pageNumber),
+    extractTextFragments(pdfBuffer, pageNumber),
+  ]);
+  return establishScale({
+    fragments: textResult.fragments.map((f) => ({
+      text: f.text,
+      x: f.xPt,
+      y: f.yPt,
+    })),
+    doorCandidates: scan.doorCandidates.map((d) => ({
+      x: d.x,
+      y: d.y,
+      size: d.size,
+    })),
+    userScale: userScale ?? null,
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Open-room wand (per-click)
+// ---------------------------------------------------------------------------
+
+export interface OpenRoomTrace {
+  /** Traced boundary as a rectangle, in PDF pt (y-up). */
+  polygonPt: { x: number; y: number }[];
+  pageWidthPt: number;
+  pageHeightPt: number;
+  /** Nearest room label, when one sits close to the click. */
+  label: string | null;
+  widthFt: number;
+  heightFt: number;
+  areaSqft: number;
+  /** Honest note — this boundary is computed, not enclosed by walls. */
+  warning: string;
+}
+
+/**
+ * Trace an OPEN-PLAN room around a single click. The click-a-room wand
+ * calls this only when the click landed in no enclosed wall face (open
+ * kitchen/living/dining). It reuses the {@link virtualPartition} engine:
+ * the click is the target, every other room label is a partition peer,
+ * so the result is the local sub-area around the click — not the whole
+ * great room. Returns null when the open zone can't be bounded
+ * confidently (the wand then tells the user to draw it manually).
+ *
+ * `clickNorm` is in the overlay's space: normalized 0..1, y-down.
+ */
+export async function traceOpenRoomAt(
+  pdfBuffer: Buffer,
+  pageNumber: number,
+  clickNorm: { x: number; y: number },
+  ptPerFt: number,
+): Promise<OpenRoomTrace | null> {
+  if (!(ptPerFt > 0)) return null;
+
+  const [{ scan, pageWidthPt, pageHeightPt }, textResult] = await Promise.all([
+    scanVectorPaths(pdfBuffer, pageNumber),
+    extractTextFragments(pdfBuffer, pageNumber),
+  ]);
+  // Overlay coords (0..1, y-down) → PDF pt (y-up), the wall geometry space.
+  const clickPt = {
+    x: clickNorm.x * pageWidthPt,
+    y: (1 - clickNorm.y) * pageHeightPt,
+  };
+  const fragments = textResult.fragments;
+  const callouts = parseDimensionCallouts(
+    fragments.map((f) => ({
+      text: f.text,
+      x: f.xPt,
+      y: f.yPt,
+      rotation: f.rotation,
+    })),
+  );
+
+  // Room-label clusters → partition peers. The one nearest the click
+  // names the room (and tunes the plausible-size check); the rest carve
+  // the open zone so the click only claims its local sub-area.
+  const clusters = clusterRoomLabels(fragments);
+  let nearest: { text: string; dist2: number } | null = null;
+  for (const c of clusters) {
+    const dx = c.cxPt - clickPt.x;
+    const dy = c.cyPt - clickPt.y;
+    const d2 = dx * dx + dy * dy;
+    if (!nearest || d2 < nearest.dist2) nearest = { text: c.text, dist2: d2 };
+  }
+  // Only adopt the label when it's genuinely close (~150 pt) — otherwise
+  // the click is in a label-less open area and stays a generic "ROOM".
+  const NEAR_LABEL_PT = 150;
+  const targetText =
+    nearest && nearest.dist2 <= NEAR_LABEL_PT * NEAR_LABEL_PT
+      ? nearest.text
+      : "ROOM";
+
+  const failed: FailedLabel[] = [
+    { id: "__click__", text: targetText, cxPt: clickPt.x, cyPt: clickPt.y, roomsIndex: 0 },
+  ];
+  // Peers = every cluster except one essentially at the click point.
+  const claimed: ClaimedPeer[] = clusters
+    .filter((c) => {
+      const dx = c.cxPt - clickPt.x;
+      const dy = c.cyPt - clickPt.y;
+      return dx * dx + dy * dy > 20 * 20;
+    })
+    .map((c, i) => ({
+      id: `peer-${i}`,
+      text: c.text,
+      cxPt: c.cxPt,
+      cyPt: c.cyPt,
+      bboxPt: { x: c.cxPt, y: c.cyPt, width: 1, height: 1 },
+      areaSqft: null,
+      roomsIndex: 1 + i,
+    }));
+
+  const results = virtualPartition({
+    failed,
+    claimed,
+    walls: scan.walls,
+    callouts,
+    ptPerFt,
+    pageWidthPt,
+    pageHeightPt,
+    segmentBboxPt: scan.segmentBboxPt,
+    minPlausibleSqft: minPlausibleSqftForLabel,
+  });
+
+  const mine = results.find((r) => r.roomsIndex === 0);
+  if (!mine) return null;
+
+  const b = mine.bboxPt;
+  return {
+    polygonPt: [
+      { x: b.x, y: b.y },
+      { x: b.x + b.width, y: b.y },
+      { x: b.x + b.width, y: b.y + b.height },
+      { x: b.x, y: b.y + b.height },
+    ],
+    pageWidthPt,
+    pageHeightPt,
+    label: targetText === "ROOM" ? null : targetText,
+    widthFt: mine.widthFt,
+    heightFt: mine.heightFt,
+    areaSqft: mine.areaSqft,
+    warning: mine.measurementWarning,
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Entry point
 // ---------------------------------------------------------------------------
 
