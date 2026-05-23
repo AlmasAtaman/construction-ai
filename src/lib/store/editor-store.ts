@@ -17,8 +17,10 @@ export type EditorTool =
  *   - line:     click grabs the whole nearest wall segment (both ends)
  *   - polyline: hover previews the connected wall run around corners;
  *               one click traces & measures the entire run (fastest)
+ *   - room:     hover highlights the enclosing room; one click traces that
+ *               room's whole wall boundary (the magic wand)
  */
-export type SnapMode = "point" | "line" | "polyline";
+export type SnapMode = "point" | "line" | "polyline" | "room";
 
 /**
  * One cleaned wall segment in normalized (0..1, y-down) page coords.

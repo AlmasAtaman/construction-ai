@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Stage, Layer, Line, Rect, Circle } from "react-konva";
 import {
   SURFACE_COLORS,
@@ -47,6 +47,25 @@ interface InProgressShape {
   end: { x: number; y: number };
 }
 
+/** Even-odd point-in-polygon test (normalized coords). */
+function pointInPolygon(
+  poly: { x: number; y: number }[],
+  x: number,
+  y: number,
+): boolean {
+  let inside = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const xi = poly[i].x;
+    const yi = poly[i].y;
+    const xj = poly[j].x;
+    const yj = poly[j].y;
+    if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) {
+      inside = !inside;
+    }
+  }
+  return inside;
+}
+
 export function SurfaceOverlay(props: SurfaceOverlayProps) {
   const tool = useEditorStore((s) => s.tool);
   const setTool = useEditorStore((s) => s.setTool);
@@ -86,6 +105,12 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
   // Polyline mode: the connected wall run currently under the cursor,
   // previewed before the user clicks to commit it.
   const [previewRun, setPreviewRun] = useState<WallRun | null>(null);
+  // Room (magic-wand) mode: enclosed room boundaries for this page, and the
+  // one currently under the cursor.
+  const [roomFaces, setRoomFaces] = useState<{ x: number; y: number }[][]>([]);
+  const [previewRoom, setPreviewRoom] = useState<
+    { x: number; y: number }[] | null
+  >(null);
 
   function pxToNorm(p: { x: number; y: number }) {
     return { x: p.x / props.width, y: p.y / props.height };
@@ -138,6 +163,31 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
     };
   }, [tool, props.planPageId, wallData?.planPageId, setWallData]);
 
+  // Room magic-wand: lazy-fetch enclosed room boundaries the first time the
+  // user enters "room" snap mode on a page.
+  const roomsPageRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (tool !== "wall-path" || snapMode !== "room") return;
+    if (roomsPageRef.current === props.planPageId) return;
+    roomsPageRef.current = props.planPageId;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await fetch(`/api/plan-pages/${props.planPageId}/rooms`);
+        if (!res.ok) return;
+        const data = (await res.json()) as {
+          rooms: { points: { x: number; y: number }[] }[];
+        };
+        if (!cancelled) setRoomFaces(data.rooms.map((r) => r.points));
+      } catch {
+        /* leave roomFaces empty — room mode just finds nothing */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [tool, snapMode, props.planPageId]);
+
   // Keyboard handling for the wall-path tool: Esc cancels the
   // in-progress trace, Backspace removes the last point, Enter commits
   // (same as double-click). Bound at window level so the user doesn't
@@ -149,6 +199,7 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
         setPathPoints([]);
         setPathSnap(null);
         setPreviewRun(null);
+        setPreviewRoom(null);
       } else if (e.key === "Backspace") {
         // Prevent the browser from navigating back when the canvas is
         // focused but no input is.
@@ -164,6 +215,8 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
         setSnapMode("line");
       } else if (e.key === "3") {
         setSnapMode("polyline");
+      } else if (e.key === "4") {
+        setSnapMode("room");
       }
     }
     window.addEventListener("keydown", onKey);
@@ -298,6 +351,13 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
     } else if (tool === "polygon") {
       setPolyPoints((pts) => [...pts, pos]);
     } else if (tool === "wall-path") {
+      if (snapMode === "room") {
+        // Magic wand: trace the boundary of the room under the cursor.
+        const n = pxToNorm(pos);
+        const face = roomFaces.find((f) => pointInPolygon(f, n.x, n.y));
+        if (face) void commitRoom(face);
+        return;
+      }
       const snap = snapFromPixel(pos);
       if (snapMode === "polyline") {
         // One click traces the whole connected wall run around corners.
@@ -401,6 +461,11 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
     if (tool === "wall-path") {
       const pos = e.target.getStage()?.getPointerPosition();
       if (!pos) return;
+      if (snapMode === "room") {
+        const n = pxToNorm(pos);
+        setPreviewRoom(roomFaces.find((f) => pointInPolygon(f, n.x, n.y)) ?? null);
+        return;
+      }
       const snap = snapFromPixel(pos);
       setPathSnap(snap);
       if (snapMode === "polyline") {
@@ -552,6 +617,23 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
     }));
     setPreviewRun(null);
     setPathSnap(null);
+    await persistWallPath(points);
+  }
+
+  /**
+   * Room magic-wand: commit the clicked room's boundary as a closed wall-path.
+   * The ring is closed (first point repeated) so the perimeter — and thus
+   * linear footage / wall area — includes the closing edge.
+   */
+  async function commitRoom(face: { x: number; y: number }[]) {
+    if (face.length < 3) return;
+    const ring = [...face, face[0]];
+    const points: PathPoint[] = ring.map((p) => ({
+      x: p.x,
+      y: p.y,
+      snap: "endpoint" as const,
+    }));
+    setPreviewRoom(null);
     await persistWallPath(points);
   }
 
@@ -886,6 +968,26 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
               </>
             )}
 
+          {/* Room magic-wand preview: highlight the enclosing room the
+              click will trace. */}
+          {tool === "wall-path" &&
+            snapMode === "room" &&
+            previewRoom &&
+            previewRoom.length >= 3 && (
+              <Line
+                points={previewRoom.flatMap((p) => {
+                  const px = normToPx(p);
+                  return [px.x, px.y];
+                })}
+                closed
+                stroke="#22c55e"
+                strokeWidth={3}
+                fill="#22c55e22"
+                opacity={0.95}
+                lineJoin="round"
+              />
+            )}
+
           {/* Scale-calibration line — visible while the user is picking
               the two points and after both are set. */}
           {scaleCalib.p1 && (
@@ -987,6 +1089,17 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
           let liveLf = 0;
           if (wallData && wallData.ptPerFoot && wallData.ptPerFoot > 0) {
             if (
+              snapMode === "room" &&
+              previewRoom &&
+              previewRoom.length >= 3
+            ) {
+              liveLf = polylineLengthFt(
+                [...previewRoom, previewRoom[0]],
+                wallData.pageWidthPt,
+                wallData.pageHeightPt,
+                wallData.ptPerFoot,
+              );
+            } else if (
               snapMode === "polyline" &&
               previewRun &&
               previewRun.points.length >= 2
@@ -1018,9 +1131,9 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
           const hasScale =
             wallData?.ptPerFoot != null && wallData.ptPerFoot > 0;
           return (
-            <div className="absolute left-4 top-4 max-w-xs space-y-1.5 rounded-md bg-gray-900/90 px-3 py-2 text-[11px] leading-relaxed text-white">
+            <div className="absolute bottom-4 left-4 z-20 max-w-xs space-y-1.5 rounded-md bg-gray-900/90 px-3 py-2 text-[11px] leading-relaxed text-white">
               <div className="flex items-center gap-1" data-testid="snap-mode-toggle">
-                {(["point", "line", "polyline"] as const).map((m, i) => (
+                {(["point", "line", "polyline", "room"] as const).map((m, i) => (
                   <button
                     key={m}
                     type="button"
@@ -1038,7 +1151,9 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
                 ))}
               </div>
               <div className="font-medium">
-                {snapMode === "polyline"
+                {snapMode === "room"
+                  ? "Click inside a room to trace its whole wall boundary."
+                  : snapMode === "polyline"
                   ? "Hover a wall, then click to trace the whole connected run."
                   : snapMode === "line"
                     ? pathPoints.length === 0
