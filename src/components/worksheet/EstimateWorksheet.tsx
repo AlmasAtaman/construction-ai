@@ -30,6 +30,7 @@ export function EstimateWorksheet({ projectId }: Props) {
   const [config, setConfig] = useState<BidConfig>(DEFAULT_CONFIG);
   const [ceilingHeightFt, setCeilingHeightFt] = useState<number>(9);
   const [loading, setLoading] = useState(true);
+  const [detailed, setDetailed] = useState(false);
   const [savingCeiling, setSavingCeiling] = useState(false);
   const [pendingAccepted, setPendingAccepted] = useState<{
     count: number;
@@ -169,13 +170,26 @@ export function EstimateWorksheet({ projectId }: Props) {
     );
   }
 
+  // Columns: compact by default (Room · Type · Qty · Cost), full breakdown
+  // behind the "Details" toggle. nCols drives footer colSpans.
+  const nCols = detailed ? 9 : 4;
   return (
     <div className="overflow-x-auto" data-testid="worksheet">
-      <CeilingHeightControl
-        valueFt={ceilingHeightFt}
-        saving={savingCeiling}
-        onSave={saveCeiling}
-      />
+      <div className="flex items-center gap-3 border-b border-[hsl(var(--line))] bg-[hsl(var(--panel-2))] px-4 py-2">
+        <CeilingHeightControl
+          valueFt={ceilingHeightFt}
+          saving={savingCeiling}
+          onSave={saveCeiling}
+        />
+        <button
+          type="button"
+          onClick={() => setDetailed((v) => !v)}
+          data-testid="worksheet-details-toggle"
+          className="ml-auto rounded border border-[hsl(var(--line))] bg-white px-2 py-0.5 text-[11px] font-medium text-[hsl(var(--ink-2))] hover:bg-white"
+        >
+          {detailed ? "Hide details" : "Show details"}
+        </button>
+      </div>
       {pendingAccepted && (
         <AcceptedSurfacesPrompt
           count={pendingAccepted.count}
@@ -187,24 +201,25 @@ export function EstimateWorksheet({ projectId }: Props) {
       <table className="sheet">
         <thead>
           <tr>
-            <th className="w-[18%]">Room</th>
-            <th className="w-[10%]">Type</th>
-            <th className="w-[16%]">Paint</th>
-            <th className="w-[6%] text-right">Coats</th>
-            <th className="w-[10%] text-right">Size</th>
-            <th className="w-[10%] text-right" title="Painting speed — square feet per hour">Speed</th>
-            <th className="w-[8%] text-right">Hours</th>
-            <th className="w-[10%] text-right">Paint $</th>
-            <th className="w-[12%] text-right">Labor $</th>
+            <th className="w-[24%]">Room</th>
+            <th className="w-[12%]">Type</th>
+            {detailed && <th className="w-[16%]">Paint</th>}
+            {detailed && <th className="w-[6%] text-right">Coats</th>}
+            <th className="text-right">Size</th>
+            {detailed && (
+              <th className="text-right" title="Painting speed — square feet per hour">
+                Speed
+              </th>
+            )}
+            {detailed && <th className="text-right">Hours</th>}
+            {detailed && <th className="text-right">Paint $</th>}
+            <th className="text-right">{detailed ? "Labor $" : "Cost"}</th>
           </tr>
         </thead>
         <tbody>
           {bid.lineItems.map((li) => {
-            // A line item with quantity 0 from a surface whose underlying
-            // measurement is null is NOT a $0 line — it's a room that
-            // genuinely needs the user to set its measurement. Render it
-            // distinctly so estimators don't unknowingly bid $0 for a
-            // real room.
+            // quantity 0 with a null measurement = a row that genuinely
+            // needs a size set, not a real $0 line. Flag it distinctly.
             const s = surfaces.find((s) => s.id === li.surfaceId);
             const needsMeasurement =
               s != null &&
@@ -212,6 +227,7 @@ export function EstimateWorksheet({ projectId }: Props) {
               ((li.unit === "sqft" && s.squareFootage == null) ||
                 (li.unit === "lf" && s.linearFootage == null) ||
                 (li.unit === "ea" && s.count == null));
+            const rowCost = li.materialCost + li.laborCost;
             return (
               <tr key={li.surfaceId} data-testid="worksheet-row">
                 <td className="font-medium text-[hsl(var(--ink))]">
@@ -220,17 +236,21 @@ export function EstimateWorksheet({ projectId }: Props) {
                 <td className="text-[hsl(var(--ink-2))]">
                   {TYPE_LABELS[li.type]}
                 </td>
-                <td className="text-[hsl(var(--ink-2))]">
-                  {li.paintType ?? <span className="text-[hsl(var(--ink-3))]">—</span>}
-                </td>
-                <td className="num text-right">{li.coats}</td>
+                {detailed && (
+                  <td className="text-[hsl(var(--ink-2))]">
+                    {li.paintType ?? (
+                      <span className="text-[hsl(var(--ink-3))]">—</span>
+                    )}
+                  </td>
+                )}
+                {detailed && <td className="num text-right">{li.coats}</td>}
                 <td className="num text-right">
                   {needsMeasurement ? (
                     <span
                       className="text-[10px] font-semibold uppercase tracking-wide text-orange-700"
-                      title="The engine couldn't measure this room. Click the row in the queue to set its size — until then it's not contributing to the bid."
+                      title="The engine couldn't measure this — set its size in the queue. Not in the bid until then."
                     >
-                      Needs measurement
+                      Needs size
                     </span>
                   ) : (
                     <>
@@ -238,24 +258,30 @@ export function EstimateWorksheet({ projectId }: Props) {
                     </>
                   )}
                 </td>
-                <td className="num text-right text-[hsl(var(--ink-3))]">
-                  {li.productionRate.toFixed(0)} {li.unit}/h
-                </td>
-                <td className="num text-right text-[hsl(var(--ink-2))]">
-                  {needsMeasurement ? "—" : li.laborHours.toFixed(1)}
-                </td>
-                <td className="num text-right">
+                {detailed && (
+                  <td className="num text-right text-[hsl(var(--ink-3))]">
+                    {li.productionRate.toFixed(0)} {li.unit}/h
+                  </td>
+                )}
+                {detailed && (
+                  <td className="num text-right text-[hsl(var(--ink-2))]">
+                    {needsMeasurement ? "—" : li.laborHours.toFixed(1)}
+                  </td>
+                )}
+                {detailed && (
+                  <td className="num text-right">
+                    {needsMeasurement ? (
+                      <span className="text-[hsl(var(--ink-3))]">—</span>
+                    ) : (
+                      formatCurrency(li.materialCost)
+                    )}
+                  </td>
+                )}
+                <td className="num text-right font-medium">
                   {needsMeasurement ? (
                     <span className="text-[hsl(var(--ink-3))]">—</span>
                   ) : (
-                    formatCurrency(li.materialCost)
-                  )}
-                </td>
-                <td className="num text-right">
-                  {needsMeasurement ? (
-                    <span className="text-[hsl(var(--ink-3))]">—</span>
-                  ) : (
-                    formatCurrency(li.laborCost)
+                    formatCurrency(detailed ? li.laborCost : rowCost)
                   )}
                 </td>
               </tr>
@@ -266,23 +292,25 @@ export function EstimateWorksheet({ projectId }: Props) {
           className="bg-[hsl(var(--panel-2))] text-[hsl(var(--ink))]"
           data-testid="worksheet-totals"
         >
+          {detailed && (
+            <tr>
+              <td colSpan={7} className="text-right text-[12px] font-medium text-[hsl(var(--ink-2))]">
+                Subtotal
+              </td>
+              <td className="num text-right">{formatCurrency(bid.totalMaterial)}</td>
+              <td className="num text-right">{formatCurrency(bid.totalLabor)}</td>
+            </tr>
+          )}
+          {!detailed && (
+            <tr>
+              <td colSpan={nCols - 1} className="text-right text-[12px] font-medium text-[hsl(var(--ink-2))]">
+                Subtotal
+              </td>
+              <td className="num text-right">{formatCurrency(bid.subtotal)}</td>
+            </tr>
+          )}
           <tr>
-            <td
-              colSpan={7}
-              className="text-right text-[12px] font-medium text-[hsl(var(--ink-2))]"
-            >
-              Subtotal
-            </td>
-            <td className="num text-right">
-              {formatCurrency(bid.totalMaterial)}
-            </td>
-            <td className="num text-right">{formatCurrency(bid.totalLabor)}</td>
-          </tr>
-          <tr>
-            <td
-              colSpan={8}
-              className="text-right text-[12px] font-medium text-[hsl(var(--ink-2))]"
-            >
+            <td colSpan={nCols - 1} className="text-right text-[12px] font-medium text-[hsl(var(--ink-2))]">
               Overhead
             </td>
             <td className="num text-right" data-testid="worksheet-overhead">
@@ -290,19 +318,13 @@ export function EstimateWorksheet({ projectId }: Props) {
             </td>
           </tr>
           <tr>
-            <td
-              colSpan={8}
-              className="text-right text-[12px] font-medium text-[hsl(var(--ink-2))]"
-            >
+            <td colSpan={nCols - 1} className="text-right text-[12px] font-medium text-[hsl(var(--ink-2))]">
               Markup
             </td>
             <td className="num text-right">{formatCurrency(bid.totalMarkup)}</td>
           </tr>
           <tr className="border-t-2 border-[hsl(var(--ink))]">
-            <td
-              colSpan={8}
-              className="py-2.5 text-right text-[13px] font-bold uppercase tracking-wide text-[hsl(var(--ink))]"
-            >
+            <td colSpan={nCols - 1} className="py-2.5 text-right text-[13px] font-bold uppercase tracking-wide text-[hsl(var(--ink))]">
               Grand Total
             </td>
             <td
@@ -334,7 +356,7 @@ function CeilingHeightControl({
   const dirty = parseFloat(draft) !== valueFt && draft !== "";
 
   return (
-    <div className="flex items-center gap-3 border-b border-[hsl(var(--line))] bg-[hsl(var(--panel-2))] px-4 py-2 text-[12px]">
+    <div className="flex items-center gap-3 text-[12px]">
       <label className="flex items-center gap-2">
         <span className="text-[hsl(var(--ink-2))]">Ceiling height:</span>
         <input
@@ -358,8 +380,7 @@ function CeilingHeightControl({
         <span className="text-[hsl(var(--ink-3))]">ft</span>
       </label>
       <span className="text-[11px] text-[hsl(var(--ink-3))]">
-        Used for wall area = perimeter × ceiling height. Per-project for now;
-        per-room override is a follow-up.
+        Default wall height — override per wall in its edit panel.
       </span>
       {dirty && (
         <button

@@ -48,7 +48,10 @@ export function CanvasToolbar({ planPageId, onAutoTraced }: CanvasToolbarProps =
   const [autoTracing, setAutoTracing] = useState(false);
   const [autoTraceMsg, setAutoTraceMsg] = useState<string | null>(null);
 
-  async function runAutoTrace(reset = false) {
+  async function runAutoTrace(
+    opts: { reset?: boolean; autoClean?: boolean } = {},
+  ) {
+    const { reset = false, autoClean = false } = opts;
     if (!planPageId || autoTracing) return;
     if (
       reset &&
@@ -64,22 +67,32 @@ export function CanvasToolbar({ planPageId, onAutoTraced }: CanvasToolbarProps =
       const res = await fetch(`/api/plan-pages/${planPageId}/auto-trace`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reset }),
+        body: JSON.stringify({ reset, autoClean }),
       });
       if (!res.ok) {
-        setAutoTraceMsg("Auto-trace failed.");
+        setAutoTraceMsg("AI takeoff failed.");
         return;
       }
-      const json = (await res.json()) as { count: number; hasScale: boolean };
+      const json = (await res.json()) as {
+        count: number;
+        cleanedOut?: number;
+        hasScale: boolean;
+      };
+      const cleaned =
+        autoClean && json.cleanedOut
+          ? ` (${json.cleanedOut} low-confidence hidden)`
+          : "";
       setAutoTraceMsg(
-        `${json.count} wall path${json.count === 1 ? "" : "s"} proposed${json.hasScale ? "" : " (set scale for ft)"}.`,
+        json.count === 0
+          ? "No walls detected on this page."
+          : `${json.count} wall${json.count === 1 ? "" : "s"} found${cleaned}${json.hasScale ? " — review & price below." : " — set scale to price."}`,
       );
       onAutoTraced?.();
     } catch {
-      setAutoTraceMsg("Auto-trace failed.");
+      setAutoTraceMsg("AI takeoff failed.");
     } finally {
       setAutoTracing(false);
-      window.setTimeout(() => setAutoTraceMsg(null), 6000);
+      window.setTimeout(() => setAutoTraceMsg(null), 7000);
     }
   }
 
@@ -165,34 +178,33 @@ export function CanvasToolbar({ planPageId, onAutoTraced }: CanvasToolbarProps =
             )}
             <button
               type="button"
-              onClick={() => void runAutoTrace(false)}
+              onClick={() => void runAutoTrace({ autoClean: true })}
               disabled={autoTracing}
-              data-testid="auto-trace-walls"
-              title="Propose a wall-path trace along the extracted walls. Review and edit the result; it does not replace room detection."
+              data-testid="ai-takeoff"
+              title="One click: detect the walls, measure them, and drop them into Review priced and ready to check."
               className={cn(
-                "inline-flex items-center gap-1.5 rounded-[8px] border px-2.5 py-1.5 text-[11.5px] font-medium shadow-sm backdrop-blur transition-colors",
+                "inline-flex items-center gap-1.5 rounded-[8px] px-3 py-1.5 text-[12px] font-semibold text-white shadow-sm transition-colors",
                 autoTracing
-                  ? "border-[hsl(var(--line))] bg-white/95 text-[hsl(var(--ink-3))]"
-                  : "border-[hsl(var(--brand))] bg-[hsl(var(--brand-soft))] text-[hsl(var(--brand))] hover:brightness-95",
+                  ? "bg-[hsl(var(--ink-3))]"
+                  : "bg-[hsl(var(--accent))] hover:brightness-95",
               )}
             >
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 18 L9 18 L9 7 L17 7 L17 14 L21 14" />
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4M4 19h4M13 3l2.5 6.5L22 12l-6.5 2.5L13 21l-2.5-6.5L4 12l6.5-2.5z" />
               </svg>
-              {autoTracing ? "Tracing…" : "Auto-trace walls"}
+              {autoTracing ? "Working…" : "AI Takeoff"}
             </button>
             <button
               type="button"
-              onClick={() => void runAutoTrace(true)}
+              onClick={() => void runAutoTrace({ reset: true, autoClean: true })}
               disabled={autoTracing}
               data-testid="reset-to-ai-walls"
-              title="Discard manual wall edits on this page and restore the AI's calculated walls."
-              className="inline-flex items-center gap-1 rounded-[8px] border border-[hsl(var(--line))] bg-white px-2 py-1.5 text-[11.5px] font-medium text-[hsl(var(--ink-2))] hover:bg-[hsl(var(--panel-2))]"
+              title="Discard manual wall edits on this page and re-run the AI takeoff."
+              className="inline-flex h-[30px] w-[30px] items-center justify-center rounded-[8px] border border-[hsl(var(--line))] bg-white text-[hsl(var(--ink-3))] hover:bg-[hsl(var(--panel-2))] hover:text-[hsl(var(--ink))]"
             >
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 12a9 9 0 1 0 9-9 9 9 0 0 0-7 3.4M3 4v4h4" />
               </svg>
-              Reset to AI
             </button>
           </div>
         )}

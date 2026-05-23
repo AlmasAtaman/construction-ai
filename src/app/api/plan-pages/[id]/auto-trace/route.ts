@@ -34,9 +34,14 @@ export async function POST(
   // (manual + accepted + proposed) and regenerate the AI baseline. Default
   // (false) only clears prior AI proposals, preserving the user's own work.
   let reset = false;
+  // autoClean (used by one-click "AI Takeoff") drops low-confidence noise at
+  // creation so the user lands on a clean set instead of hundreds of stray
+  // fragments to reject by hand.
+  let autoClean = false;
   try {
     const body = await req.json();
     reset = body?.reset === true;
+    autoClean = body?.autoClean === true;
   } catch {
     /* no body */
   }
@@ -83,7 +88,14 @@ export async function POST(
   };
 
   const created = [];
+  let cleanedOut = 0;
   for (const pl of kept) {
+    // One-click AI Takeoff: skip low-confidence (short / stray) runs so the
+    // review starts clean. Manual "Auto-trace" keeps everything.
+    if (autoClean && confidenceFor(pl.lengthPt) < 0.6) {
+      cleanedOut += 1;
+      continue;
+    }
     // Normalize to 0..1, y-down (matches the overlay + walls API).
     const pathPoints: PathPoint[] = pl.points.map((p) => ({
       x: p.x / pageWidthPt,
@@ -133,6 +145,7 @@ export async function POST(
   return NextResponse.json({
     surfaces: created,
     count: created.length,
+    cleanedOut,
     hasScale: ptPerFoot != null,
   });
 }

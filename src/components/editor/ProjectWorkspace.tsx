@@ -55,6 +55,7 @@ export function ProjectWorkspace({
   const [worksheetOpen, setWorksheetOpen] = useState(true);
   const [worksheetHeight, setWorksheetHeight] = useState(WORKSHEET_DEFAULT_PX);
   const [rightTab, setRightTab] = useState<RightPanelTab>("queue");
+  const [rightPanelOpen, setRightPanelOpen] = useState(true);
   const [contextMenu, setContextMenu] = useState<{
     surfaceId: string;
     position: { x: number; y: number };
@@ -343,7 +344,11 @@ export function ProjectWorkspace({
               <ScaleBanner planPageId={currentPlanPage.id} />
               <CanvasToolbar
                 planPageId={currentPlanPage.id}
-                onAutoTraced={refreshSurfaces}
+                onAutoTraced={() => {
+                  void refreshSurfaces();
+                  setRightTab("queue"); // drop the user into Review
+                  setRightPanelOpen(true);
+                }}
               />
               <div className="relative flex-1 overflow-hidden">
                 <PdfViewer planId={plan.id} pageNumber={currentPage}>
@@ -377,46 +382,82 @@ export function ProjectWorkspace({
           )}
         </main>
 
-        {/* Right panel: tabbed queue / chat */}
+        {/* Right panel: tabbed queue / chat — collapsible to free the canvas */}
         <aside
           data-testid="right-sidebar"
-          className="flex w-80 flex-shrink-0 flex-col border-l border-[hsl(var(--line))] bg-white"
+          className={cn(
+            "flex flex-shrink-0 flex-col border-l border-[hsl(var(--line))] bg-white transition-[width] duration-150",
+            rightPanelOpen ? "w-80" : "w-9",
+          )}
         >
-          <div className="flex border-b border-[hsl(var(--line))]">
-            <TabButton
-              active={rightTab === "queue"}
-              onClick={() => setRightTab("queue")}
-              testId="tab-queue"
+          {rightPanelOpen ? (
+            <>
+              <div className="flex items-center border-b border-[hsl(var(--line))]">
+                <TabButton
+                  active={rightTab === "queue"}
+                  onClick={() => setRightTab("queue")}
+                  testId="tab-queue"
+                >
+                  Review
+                  {proposedCount > 0 && (
+                    <span className="ml-1.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[hsl(var(--accent))] px-1 text-[10px] font-semibold text-white">
+                      {proposedCount}
+                    </span>
+                  )}
+                </TabButton>
+                <TabButton
+                  active={rightTab === "chat"}
+                  onClick={() => setRightTab("chat")}
+                  testId="tab-chat"
+                >
+                  Chat
+                </TabButton>
+                <button
+                  onClick={() => setRightPanelOpen(false)}
+                  title="Collapse panel"
+                  data-testid="collapse-right-panel"
+                  className="flex h-8 w-8 flex-shrink-0 items-center justify-center text-[hsl(var(--ink-3))] hover:text-[hsl(var(--ink))]"
+                >
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m9 6 6 6-6 6" />
+                  </svg>
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto">
+                {rightTab === "queue" && (
+                  <DetectionQueue
+                    onAcceptAllHighConfidence={onAcceptAllHighConfidence}
+                  />
+                )}
+                {rightTab === "chat" && (
+                  <ChatSidebar
+                    projectId={projectId}
+                    hasPlan={!!plan}
+                    onAfterAction={refreshSurfaces}
+                  />
+                )}
+              </div>
+            </>
+          ) : (
+            <button
+              onClick={() => setRightPanelOpen(true)}
+              title="Show review panel"
+              data-testid="expand-right-panel"
+              className="flex h-full w-full flex-col items-center gap-2 py-3 text-[hsl(var(--ink-3))] hover:bg-[hsl(var(--panel-2))]"
             >
-              Review
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m15 6-6 6 6 6" />
+              </svg>
               {proposedCount > 0 && (
-                <span className="ml-1.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[hsl(var(--accent))] px-1 text-[10px] font-semibold text-white">
+                <span className="inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[hsl(var(--accent))] px-1 text-[10px] font-semibold text-white">
                   {proposedCount}
                 </span>
               )}
-            </TabButton>
-            <TabButton
-              active={rightTab === "chat"}
-              onClick={() => setRightTab("chat")}
-              testId="tab-chat"
-            >
-              Chat
-            </TabButton>
-          </div>
-          <div className="flex-1 overflow-y-auto">
-            {rightTab === "queue" && (
-              <DetectionQueue
-                onAcceptAllHighConfidence={onAcceptAllHighConfidence}
-              />
-            )}
-            {rightTab === "chat" && (
-              <ChatSidebar
-                projectId={projectId}
-                hasPlan={!!plan}
-                onAfterAction={refreshSurfaces}
-              />
-            )}
-          </div>
+              <span className="text-[11px] [writing-mode:vertical-rl]">
+                Review
+              </span>
+            </button>
+          )}
         </aside>
       </div>
 
