@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useEditorStore, MIN_ZOOM, MAX_ZOOM } from "@/lib/store/editor-store";
+import { TakeoffLayersPanel } from "./TakeoffLayersPanel";
 import { cn } from "@/lib/utils";
 
 interface CanvasToolbarProps {
@@ -49,9 +50,9 @@ export function CanvasToolbar({ planPageId, onAutoTraced }: CanvasToolbarProps =
   const [autoTraceMsg, setAutoTraceMsg] = useState<string | null>(null);
 
   async function runAutoTrace(
-    opts: { reset?: boolean; autoClean?: boolean } = {},
+    opts: { reset?: boolean; autoClean?: boolean; wallLayers?: string[] } = {},
   ) {
-    const { reset = false, autoClean = false } = opts;
+    const { reset = false, autoClean = false, wallLayers } = opts;
     if (!planPageId || autoTracing) return;
     if (
       reset &&
@@ -67,7 +68,7 @@ export function CanvasToolbar({ planPageId, onAutoTraced }: CanvasToolbarProps =
       const res = await fetch(`/api/plan-pages/${planPageId}/auto-trace`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reset, autoClean }),
+        body: JSON.stringify({ reset, autoClean, wallLayers }),
       });
       if (!res.ok) {
         setAutoTraceMsg("AI takeoff failed.");
@@ -77,15 +78,17 @@ export function CanvasToolbar({ planPageId, onAutoTraced }: CanvasToolbarProps =
         count: number;
         cleanedOut?: number;
         hasScale: boolean;
+        method?: "layers" | "geometry";
       };
       const cleaned =
         autoClean && json.cleanedOut
           ? ` (${json.cleanedOut} low-confidence hidden)`
           : "";
+      const fromLayers = json.method === "layers" ? " from CAD layers" : "";
       setAutoTraceMsg(
         json.count === 0
           ? "No walls detected on this page."
-          : `${json.count} wall${json.count === 1 ? "" : "s"} found${cleaned}${json.hasScale ? " — review & price below." : " — set scale to price."}`,
+          : `${json.count} wall${json.count === 1 ? "" : "s"} found${fromLayers}${cleaned}${json.hasScale ? " — review & price below." : " — set scale to price."}`,
       );
       onAutoTraced?.();
     } catch {
@@ -194,6 +197,13 @@ export function CanvasToolbar({ planPageId, onAutoTraced }: CanvasToolbarProps =
               </svg>
               {autoTracing ? "Working…" : "AI Takeoff"}
             </button>
+            <TakeoffLayersPanel
+              planPageId={planPageId}
+              busy={autoTracing}
+              onRunTakeoff={(layers) =>
+                void runAutoTrace({ autoClean: true, wallLayers: layers })
+              }
+            />
             <button
               type="button"
               onClick={() => void runAutoTrace({ reset: true, autoClean: true })}

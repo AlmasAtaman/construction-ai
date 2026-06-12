@@ -77,6 +77,12 @@ model PlanPage {
   // GET /api/plan-pages/[id]/walls. Walls don't change unless the
   // PDF is replaced, so caching is safe.
   wallsJson   String?
+  // Cached CAD layer (PDF OCG) summary from src/lib/extract/layer-scan.ts.
+  // JSON: { layers: [{ name, role, segments }, …] } where role is a
+  // LayerRole from src/lib/extract/layer-classify.ts and segments is the
+  // count drawn on THIS page. Empty array = PDF has no usable layers.
+  // Populated lazily by GET /api/plan-pages/[id]/layers and auto-trace.
+  layersJson  String?
   surfaces    Surface[]
 }
 
@@ -119,6 +125,11 @@ model Surface {
   // whether a box is a true traced wall outline or a rectangle sized from
   // a printed dimensions table. See SurfaceDerivation in types/surface.ts.
   derivation    String?
+  // CAD layer (PDF OCG) the geometry came from, for layer-derived traces —
+  // e.g. "2103118_Base|FP-N-WALL". Provenance the contractor can audit;
+  // also lets the UI group new vs existing vs half-height walls. Null for
+  // manual traces and geometry-derived (no-layer) AI traces.
+  sourceLayer   String?
   notes         String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

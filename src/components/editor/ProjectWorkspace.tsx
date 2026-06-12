@@ -10,7 +10,6 @@ import { EstimateWorksheet } from "@/components/worksheet/EstimateWorksheet";
 import { CommandPalette } from "@/components/command/CommandPalette";
 import { useEditorStore } from "@/lib/store/editor-store";
 import { useUndoStore } from "@/lib/store/undo-store";
-import { TakeoffButton } from "./TakeoffButton";
 import { UndoToast } from "./UndoToast";
 import { SurfaceContextMenu } from "./SurfaceContextMenu";
 import type { SurfaceDTO } from "@/types/surface";
@@ -311,10 +310,14 @@ export function ProjectWorkspace({
                 {acceptedCount} kept · {proposedCount} to review
               </span>
             </div>
-            <TakeoffButton
-              planPageId={currentPlanPage?.id ?? null}
-              onComplete={refreshSurfaces}
-            />
+            {/* The Opus vision takeoff ("Measure my plan") is retired: on
+                dense plans it guessed coordinates at real API cost. Wall
+                takeoff now runs through the AI Takeoff button (CAD-layer
+                path with geometry fallback) in the canvas toolbar. */}
+            <p className="text-[11px] leading-snug text-[hsl(var(--ink-3))]">
+              Use <span className="font-semibold">AI Takeoff</span> in the
+              toolbar above the plan, then review the traced walls here.
+            </p>
           </div>
         </aside>
 

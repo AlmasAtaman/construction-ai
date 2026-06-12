@@ -13,6 +13,17 @@ import {
 } from "@/lib/extract/wall-autotrace";
 import { detectWallRegions, type WallRegion } from "@/lib/ai/wall-region";
 import { hasApiKey } from "@/lib/anthropic";
+import { scanSegmentsByLayer } from "@/lib/extract/layer-scan";
+import {
+  classifyLayers,
+  type LayerRole,
+} from "@/lib/extract/layer-classify";
+import {
+  traceWallsFromLayers,
+  LAYER_TRACE_CONFIDENCE,
+  type LayerPolyline,
+} from "@/lib/extract/layer-takeoff";
+import { classifyLayerNamesWithAi } from "@/lib/ai/layer-names";
 import type { PathPoint } from "@/types/surface";
 
 const UPLOADS_DIR = path.join(process.cwd(), "uploads");
@@ -124,10 +135,19 @@ export async function POST(
   // creation so the user lands on a clean set instead of hundreds of stray
   // fragments to reject by hand.
   let autoClean = false;
+  // Explicit CAD-layer selection from the layers panel; null = use the
+  // classified default (wall-new + wall-existing layers).
+  let wallLayers: string[] | null = null;
   try {
     const body = await req.json();
     reset = body?.reset === true;
     autoClean = body?.autoClean === true;
+    if (
+      Array.isArray(body?.wallLayers) &&
+      body.wallLayers.every((l: unknown) => typeof l === "string")
+    ) {
+      wallLayers = body.wallLayers;
+    }
   } catch {
     /* no body */
   }
@@ -143,49 +163,115 @@ export async function POST(
   const ceilingHeightFt = project.ceilingHeightFt;
 
   const buf = await readFile(path.join(UPLOADS_DIR, page.plan.filePath));
-  const { scan, pageWidthPt, pageHeightPt } = await scanVectorPaths(
-    buf,
-    page.pageNumber,
-  );
-  const raw: RawSegment[] = [...scan.walls, ...scan.diagonalWalls];
-  const graph = buildWallGraph(raw);
-  const allPolylines = autoTraceWalls(graph, {
-    // Drop sub-foot stubs when a scale is known; else fall back to pt.
-    minPolylineLengthPt: ptPerFoot ? ptPerFoot : 12,
-  });
-  const { kept } = filterStrayPolylines(graph, allPolylines);
 
-  // AI region filter (one-click AI Takeoff): keep only walls inside the single
-  // best floor-plan footprint, dropping the duplicate stacked plan, schedules,
-  // and margin dimension strings — the dense-commercial over-count fix.
-  let regionScoped = kept;
+  // ---- Preferred path: CAD layers (PDF optional content). When the PDF
+  // preserves the architect's layer structure, walls vs dimensions vs
+  // hatching is a metadata lookup — deterministic, exact, and free. Any
+  // failure here falls through to the geometry+AI path unchanged.
+  let layerPolylines: LayerPolyline[] | null = null;
+  let layerSummary: Array<{
+    name: string;
+    role: LayerRole;
+    segments: number;
+  }> = [];
+  let wallLayersUsed: string[] = [];
+  let pageWidthPt = 0;
+  let pageHeightPt = 0;
+  try {
+    const layerScan = await scanSegmentsByLayer(buf, page.pageNumber);
+    pageWidthPt = layerScan.pageWidthPt;
+    pageHeightPt = layerScan.pageHeightPt;
+    if (layerScan.layerNames.length > 0) {
+      const present = Object.keys(layerScan.segmentsPerLayer);
+      const classified = classifyLayers(present);
+      const roleFor: Record<string, LayerRole> = Object.fromEntries(
+        classified.map((c) => [c.name, c.role]),
+      );
+      const hasWallLayer = classified.some(
+        (c) => c.role === "wall-new" || c.role === "wall-existing",
+      );
+      if (!hasWallLayer && hasApiKey()) {
+        // Exotic/foreign naming the regex doesn't know — one cached,
+        // text-only Haiku call over the unmatched names.
+        const aiRoles = await classifyLayerNamesWithAi(
+          classified.filter((c) => c.role === "other").map((c) => c.name),
+        );
+        Object.assign(roleFor, aiRoles);
+      }
+      layerSummary = present.map((name) => ({
+        name,
+        role: roleFor[name] ?? "other",
+        segments: layerScan.segmentsPerLayer[name],
+      }));
+      const result = traceWallsFromLayers(layerScan, roleFor, {
+        wallLayers: wallLayers ?? undefined,
+        ptPerFoot,
+      });
+      if (result.ok) {
+        layerPolylines = result.polylines;
+        wallLayersUsed = result.wallLayersUsed;
+      }
+    }
+    // Cache the layer summary for the layers panel (cheap to rebuild, but
+    // this saves a full vector scan per panel open).
+    await db.planPage.update({
+      where: { id },
+      data: { layersJson: JSON.stringify({ layers: layerSummary }) },
+    });
+  } catch (err) {
+    console.error("[auto-trace] layer path failed, using geometry:", err);
+  }
+
+  // ---- Fallback path: full-sheet geometry + AI region scoping (flattened
+  // PDFs with no layer metadata).
+  let regionScoped: TracedPolyline[] = [];
   let regionUsed = false;
-  if (autoClean && hasApiKey()) {
-    const imageBase64 = await renderPageJpeg(buf, page.pageNumber);
-    if (imageBase64) {
-      try {
-        const { regions } = await detectWallRegions({
-          imageBase64,
-          imageMediaType: "image/jpeg",
-        });
-        if (regions.length > 0) {
-          const { polylines: scoped } = filterToBestRegion(
-            kept,
-            regions,
-            pageWidthPt,
-            pageHeightPt,
-          );
-          if (scoped.length > 0) {
-            // Region scoping drops the duplicate plan + schedules. (A 2nd
-            // vision-classification pass was tried and removed: at the
-            // density of dimension/tile noise on commercial plans the model
-            // can't separate walls from dimensions, so it didn't filter.)
-            regionScoped = scoped;
-            regionUsed = true;
+  if (!layerPolylines) {
+    const { scan, pageWidthPt: w, pageHeightPt: h } = await scanVectorPaths(
+      buf,
+      page.pageNumber,
+    );
+    pageWidthPt = w;
+    pageHeightPt = h;
+    const raw: RawSegment[] = [...scan.walls, ...scan.diagonalWalls];
+    const graph = buildWallGraph(raw);
+    const allPolylines = autoTraceWalls(graph, {
+      // Drop sub-foot stubs when a scale is known; else fall back to pt.
+      minPolylineLengthPt: ptPerFoot ? ptPerFoot : 12,
+    });
+    const { kept } = filterStrayPolylines(graph, allPolylines);
+
+    // AI region filter (one-click AI Takeoff): keep only walls inside the
+    // single best floor-plan footprint, dropping the duplicate stacked plan,
+    // schedules, and margin dimension strings.
+    regionScoped = kept;
+    if (autoClean && hasApiKey()) {
+      const imageBase64 = await renderPageJpeg(buf, page.pageNumber);
+      if (imageBase64) {
+        try {
+          const { regions } = await detectWallRegions({
+            imageBase64,
+            imageMediaType: "image/jpeg",
+          });
+          if (regions.length > 0) {
+            const { polylines: scoped } = filterToBestRegion(
+              kept,
+              regions,
+              pageWidthPt,
+              pageHeightPt,
+            );
+            if (scoped.length > 0) {
+              // Region scoping drops the duplicate plan + schedules. (A 2nd
+              // vision-classification pass was tried and removed: at the
+              // density of dimension/tile noise on commercial plans the model
+              // can't separate walls from dimensions, so it didn't filter.)
+              regionScoped = scoped;
+              regionUsed = true;
+            }
           }
+        } catch {
+          /* fall back to the unfiltered set */
         }
-      } catch {
-        /* fall back to the unfiltered set */
       }
     }
   }
@@ -199,8 +285,9 @@ export async function POST(
   });
 
   // Per-polyline confidence so the review queue's high/medium/low coding
-  // is meaningful: longer connected runs are far more likely to be real
-  // walls than short fragments. Scaled against the longest run on the page.
+  // is meaningful. Geometry-derived runs scale with length (longer
+  // connected runs are far more likely to be real walls); layer-derived
+  // runs carry deterministic provenance and get a flat high confidence.
   const maxLenPt = regionScoped.reduce((m, pl) => Math.max(m, pl.lengthPt), 0);
   const confidenceFor = (lengthPt: number): number => {
     if (maxLenPt <= 0) return 0.6;
@@ -208,19 +295,44 @@ export async function POST(
     return Math.min(0.95, Math.max(0.55, 0.55 + 0.4 * score));
   };
 
+  const toPersist: Array<{
+    points: { x: number; y: number }[];
+    lengthPt: number;
+    sourceLayer: string | null;
+    confidence: number;
+  }> = layerPolylines
+    ? layerPolylines.map((pl) => ({
+        points: pl.points,
+        lengthPt: pl.lengthPt,
+        sourceLayer: pl.sourceLayer,
+        confidence: LAYER_TRACE_CONFIDENCE,
+      }))
+    : regionScoped.map((pl) => ({
+        points: pl.points,
+        lengthPt: pl.lengthPt,
+        sourceLayer: null,
+        confidence: confidenceFor(pl.lengthPt),
+      }));
+
   const created = [];
   let cleanedOut = 0;
-  for (const pl of regionScoped) {
-    // One-click AI Takeoff: skip low-confidence (short / stray) runs so the
-    // review starts clean. Manual "Auto-trace" keeps everything.
-    if (autoClean && confidenceFor(pl.lengthPt) < 0.6) {
+  for (const pl of toPersist) {
+    // One-click AI Takeoff on the geometry path: skip low-confidence
+    // (short / stray) runs so the review starts clean. Layer-derived runs
+    // are already clean — nothing to drop.
+    if (autoClean && !layerPolylines && pl.confidence < 0.6) {
       cleanedOut += 1;
       continue;
     }
-    // Normalize to 0..1, y-down (matches the overlay + walls API).
+    // Normalize to 0..1. The mupdf walk device emits TOP-LEFT-origin
+    // y-DOWN coordinates (verified by overlaying raw scan segments on the
+    // rendered raster — they align pixel-perfectly), and the editor's
+    // normToPx applies no flip, so the normalized y passes through
+    // unflipped. The previous `1 - y` here drew every AI trace
+    // vertically mirrored onto empty sheet space.
     const pathPoints: PathPoint[] = pl.points.map((p) => ({
       x: p.x / pageWidthPt,
-      y: 1 - p.y / pageHeightPt,
+      y: p.y / pageHeightPt,
       // Auto-trace vertices are real wall-graph vertices → endpoint snap.
       snap: "endpoint",
     }));
@@ -242,10 +354,11 @@ export async function POST(
         finishType: "paint",
         heightBasis: "ceiling",
         wallHeightFt: ceilingHeightFt,
-        confidence: confidenceFor(pl.lengthPt),
+        confidence: pl.confidence,
         status: "proposed",
         source: "ai",
         derivation: "traced",
+        sourceLayer: pl.sourceLayer,
       },
     });
     created.push({
@@ -258,7 +371,7 @@ export async function POST(
   await db.auditEntry.create({
     data: {
       projectId: project.id,
-      action: `Auto-traced ${created.length} wall path${created.length === 1 ? "" : "s"} on page ${page.pageNumber}.`,
+      action: `Auto-traced ${created.length} wall path${created.length === 1 ? "" : "s"} on page ${page.pageNumber}${layerPolylines ? " from CAD layers" : ""}.`,
       source: "ai",
     },
   });
@@ -269,5 +382,10 @@ export async function POST(
     cleanedOut,
     regionUsed,
     hasScale: ptPerFoot != null,
+    // "layers" = deterministic CAD-layer takeoff; "geometry" = full-sheet
+    // vector trace + AI region scoping (flattened PDFs).
+    method: layerPolylines ? "layers" : "geometry",
+    wallLayersUsed,
+    layers: layerSummary,
   });
 }
