@@ -77,6 +77,7 @@ export function CanvasToolbar({ planPageId, onAutoTraced }: CanvasToolbarProps =
       const json = (await res.json()) as {
         count: number;
         cleanedOut?: number;
+        skippedExisting?: number;
         hasScale: boolean;
         method?: "layers" | "geometry";
       };
@@ -87,7 +88,9 @@ export function CanvasToolbar({ planPageId, onAutoTraced }: CanvasToolbarProps =
       const fromLayers = json.method === "layers" ? " from CAD layers" : "";
       setAutoTraceMsg(
         json.count === 0
-          ? "No walls detected on this page."
+          ? json.skippedExisting
+            ? `All ${json.skippedExisting} walls already kept — nothing new.`
+            : "No walls detected on this page."
           : `${json.count} wall${json.count === 1 ? "" : "s"} found${fromLayers}${cleaned}${json.hasScale ? " — review & price below." : " — set scale to price."}`,
       );
       onAutoTraced?.();

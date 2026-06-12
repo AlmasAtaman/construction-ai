@@ -69,10 +69,11 @@ export async function POST(
     return NextResponse.json({ room: null });
   }
 
-  // PDF pt (y-up) → normalized 0..1 (y-down), matching SurfaceOverlay.
+  // traceOpenRoomAt works in wall-scan space (top-left origin, y-down),
+  // so normalization is a straight divide — no flip.
   const points = trace.polygonPt.map((p) => ({
     x: p.x / trace.pageWidthPt,
-    y: 1 - p.y / trace.pageHeightPt,
+    y: p.y / trace.pageHeightPt,
   }));
 
   return NextResponse.json({

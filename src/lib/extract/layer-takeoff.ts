@@ -39,6 +39,19 @@ export const WALL_FACE_OVERLAP_FRAC = 0.6;
 /** Deterministic provenance → high confidence, but still "proposed". */
 export const LAYER_TRACE_CONFIDENCE = 0.9;
 
+/**
+ * Default height for walls traced from half-wall layers (HWALL — knee
+ * walls, counters, partial partitions; typically 42–48"). Full-height
+ * walls default to the project ceiling height. Both are review-stage
+ * defaults the contractor can edit per wall.
+ */
+export const HALF_WALL_DEFAULT_HEIGHT_FT = 4;
+
+/** Half-height wall layers: "FP-N-HWALL", "FP-E-HWALL", … */
+export function isHalfWallLayer(layerName: string): boolean {
+  return /HWALL/i.test(layerName);
+}
+
 export interface LayerPolyline extends TracedPolyline {
   sourceLayer: string;
 }

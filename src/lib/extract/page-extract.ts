@@ -1891,17 +1891,23 @@ export async function traceOpenRoomAt(
     scanVectorPaths(pdfBuffer, pageNumber),
     extractTextFragments(pdfBuffer, pageNumber),
   ]);
-  // Overlay coords (0..1, y-down) → PDF pt (y-up), the wall geometry space.
+  // Everything inside this function works in the WALL geometry space:
+  // top-left origin, y-down (what the mupdf scan emits). The overlay click
+  // is already y-down, so it passes through; pdfjs text positions are
+  // y-up (raw PDF transform) and get flipped so label proximity and
+  // dimension callouts land on the same side of the sheet as the walls.
+  // (Clustering runs on the raw y-up fragments — its reading-order sort
+  // assumes y-up — and only the resulting centroids are flipped.)
   const clickPt = {
     x: clickNorm.x * pageWidthPt,
-    y: (1 - clickNorm.y) * pageHeightPt,
+    y: clickNorm.y * pageHeightPt,
   };
   const fragments = textResult.fragments;
   const callouts = parseDimensionCallouts(
     fragments.map((f) => ({
       text: f.text,
       x: f.xPt,
-      y: f.yPt,
+      y: pageHeightPt - f.yPt,
       rotation: f.rotation,
     })),
   );
@@ -1909,7 +1915,11 @@ export async function traceOpenRoomAt(
   // Room-label clusters → partition peers. The one nearest the click
   // names the room (and tunes the plausible-size check); the rest carve
   // the open zone so the click only claims its local sub-area.
-  const clusters = clusterRoomLabels(fragments);
+  // Centroids flipped y-up → y-down to match the wall space.
+  const clusters = clusterRoomLabels(fragments).map((c) => ({
+    ...c,
+    cyPt: pageHeightPt - c.cyPt,
+  }));
   let nearest: { text: string; dist2: number } | null = null;
   for (const c of clusters) {
     const dx = c.cxPt - clickPt.x;

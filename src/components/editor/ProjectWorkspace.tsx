@@ -15,6 +15,7 @@ import { SurfaceContextMenu } from "./SurfaceContextMenu";
 import type { SurfaceDTO } from "@/types/surface";
 import { DetectionQueue } from "./DetectionQueue";
 import { CanvasToolbar } from "./CanvasToolbar";
+import { PlanTakeoffButton } from "./PlanTakeoffButton";
 import { ScaleBanner } from "./ScaleBanner";
 import { PageRail } from "./PageRail";
 import { cn } from "@/lib/utils";
@@ -312,11 +313,16 @@ export function ProjectWorkspace({
             </div>
             {/* The Opus vision takeoff ("Measure my plan") is retired: on
                 dense plans it guessed coordinates at real API cost. Wall
-                takeoff now runs through the AI Takeoff button (CAD-layer
-                path with geometry fallback) in the canvas toolbar. */}
-            <p className="text-[11px] leading-snug text-[hsl(var(--ink-3))]">
-              Use <span className="font-semibold">AI Takeoff</span> in the
-              toolbar above the plan, then review the traced walls here.
+                takeoff runs through the deterministic CAD-layer path
+                (geometry fallback) — per page via the toolbar's AI Takeoff,
+                or every floor plan at once via this button. */}
+            <PlanTakeoffButton
+              planId={plan?.id ?? null}
+              onComplete={refreshSurfaces}
+            />
+            <p className="mt-2 text-[11px] leading-snug text-[hsl(var(--ink-3))]">
+              Or use <span className="font-semibold">AI Takeoff</span> in the
+              toolbar for just the current page.
             </p>
           </div>
         </aside>

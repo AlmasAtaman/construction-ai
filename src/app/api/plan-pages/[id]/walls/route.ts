@@ -14,6 +14,9 @@ const UPLOADS_DIR = path.join(process.cwd(), "uploads");
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
+/** Bump when the cached payload format/coordinate convention changes. */
+const WALLS_PAYLOAD_VERSION = 2;
+
 interface WallsPayloadSegment {
   x1: number;
   y1: number;
@@ -24,6 +27,11 @@ interface WallsPayloadSegment {
 interface WallsPayload {
   planPageId: string;
   pageNumber: number;
+  /**
+   * Cache-format version. v2 = unflipped y (scan space is already
+   * y-down); v1 caches hold mirrored segments and must be rebuilt.
+   */
+  version?: number;
   /** Normalized (0..1, y-down). The snap engine on the client uses these. */
   segments: WallsPayloadSegment[];
   /** PDF pt per real foot, mirrored from PlanPage.scaleRatio for convenience. */
@@ -64,17 +72,20 @@ export async function GET(
   if (page.wallsJson) {
     try {
       const cached = JSON.parse(page.wallsJson) as WallsPayload;
-      // Always refresh ptPerFoot from the row (scale can change after
-      // walls were cached) — keeps the client honest without
-      // re-extracting geometry.
-      const fresh: WallsPayload = {
-        ...cached,
-        planPageId: id,
-        pageNumber: page.pageNumber,
-        ptPerFoot: page.scaleRatio ?? null,
-        source: "cache",
-      };
-      return NextResponse.json(fresh);
+      // v1 caches hold mirrored-y segments — rebuild those.
+      if (cached.version === WALLS_PAYLOAD_VERSION) {
+        // Always refresh ptPerFoot from the row (scale can change after
+        // walls were cached) — keeps the client honest without
+        // re-extracting geometry.
+        const fresh: WallsPayload = {
+          ...cached,
+          planPageId: id,
+          pageNumber: page.pageNumber,
+          ptPerFoot: page.scaleRatio ?? null,
+          source: "cache",
+        };
+        return NextResponse.json(fresh);
+      }
     } catch {
       // Corrupted cache — fall through and rebuild.
     }
@@ -89,20 +100,21 @@ export async function GET(
   const graph = buildWallGraph(raw);
   const cleanedPt = wallGraphSegments(graph);
 
-  // Normalize to 0..1 with y-down (page-extract emits y-up; the
-  // overlay convention is y-down). Mirror the convention used by
-  // ExtractedRoom.polygonNorm so the editor sees the same coord space
-  // everywhere.
+  // Normalize to 0..1 y-down. The mupdf walk device emits top-left-origin
+  // y-down coordinates already (verified by overlaying raw scan segments
+  // on the rendered raster), so y passes through unflipped — the old
+  // `1 - y` published every snap segment vertically mirrored.
   const segments: WallsPayloadSegment[] = cleanedPt.map((s) => ({
     x1: s.x1 / pageWidthPt,
-    y1: 1 - s.y1 / pageHeightPt,
+    y1: s.y1 / pageHeightPt,
     x2: s.x2 / pageWidthPt,
-    y2: 1 - s.y2 / pageHeightPt,
+    y2: s.y2 / pageHeightPt,
   }));
 
   const payload: WallsPayload = {
     planPageId: id,
     pageNumber: page.pageNumber,
+    version: WALLS_PAYLOAD_VERSION,
     segments,
     ptPerFoot: page.scaleRatio ?? null,
     pageWidthPt,

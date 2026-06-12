@@ -87,11 +87,14 @@ export async function GET(
   }
 
   // Normalize each face polygon to 0..1, y-down (matches SurfaceOverlay), and
-  // attach the room label whose position falls inside the face.
+  // attach the room label whose position falls inside the face. The mupdf
+  // scan already emits top-left-origin y-down coordinates, so y passes
+  // through unflipped (the old `1 - y` mirrored every face vertically —
+  // the wand only highlighted when hovering at the mirrored position).
   const rooms = faces.map((f) => {
     const points = f.polygon.map((p) => ({
       x: p.x / pageWidthPt,
-      y: 1 - p.y / pageHeightPt,
+      y: p.y / pageHeightPt,
     }));
     const hit = labels.find((l) => inPoly(points, l.xNorm, l.yNorm));
     return { points, areaPt: Math.abs(f.area), label: hit?.text ?? null };
