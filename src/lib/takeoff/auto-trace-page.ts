@@ -32,6 +32,8 @@ import {
   type LayerPolyline,
 } from "@/lib/extract/layer-takeoff";
 import { classifyLayerNamesWithAi } from "@/lib/ai/layer-names";
+import { extractTextLayer } from "@/lib/pdf-render";
+import { parseDimensionCallouts } from "@/lib/dimension-callouts";
 import type { PathPoint } from "@/types/surface";
 
 const UPLOADS_DIR = path.join(process.cwd(), "uploads");
@@ -253,9 +255,29 @@ export async function runAutoTraceForPage(
         role: roleFor[name] ?? "other",
         segments: layerScan.segmentsPerLayer[name],
       }));
+      // Dimension-callout text positions, for rejecting dimension chains
+      // drawn on a wall layer (pt, y-down — extractTextLayer already
+      // flips pdfjs y-up coordinates).
+      let dimensionTextPt: { x: number; y: number }[] = [];
+      try {
+        const { textFragments } = await extractTextLayer(
+          buf,
+          page.pageNumber,
+        );
+        dimensionTextPt = parseDimensionCallouts(
+          textFragments.map((f) => ({
+            text: f.text,
+            x: f.xNorm * pageWidthPt,
+            y: f.yNorm * pageHeightPt,
+          })),
+        ).map((c) => ({ x: c.x, y: c.y }));
+      } catch {
+        /* no text layer — polluted wall layers just over-count */
+      }
       const result = traceWallsFromLayers(layerScan, roleFor, {
         wallLayers: wallLayers ?? undefined,
         ptPerFoot,
+        dimensionTextPt,
       });
       if (result.ok) {
         layerPolylines = result.polylines;

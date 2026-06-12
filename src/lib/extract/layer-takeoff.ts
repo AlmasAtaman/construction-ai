@@ -36,6 +36,28 @@ export const WALL_FACE_MAX_THICKNESS_PT_FALLBACK = 14;
 /** A segment is a duplicate face when ≥ this fraction of it shadows a kept segment. */
 export const WALL_FACE_OVERLAP_FRAC = 0.6;
 
+/**
+ * Polluted-wall-layer defense: some drawings put dimension lines ON the
+ * wall layer (observed on the DP-BP residential set, where "Wall
+ * Standard" carries the dimension ladders). A dimension structure passes
+ * through its own measurement text; walls never do. A traced polyline
+ * with a dimension callout this close (pt) to any of its segments is a
+ * dimension chain, not a wall.
+ */
+export const DIM_TEXT_REJECT_PT = 9;
+
+/**
+ * Second polluted-layer defense: drafters give walls a printable
+ * lineweight, while annotation rides the CAD default hairline (stroke
+ * width 0). When a wall layer carries BOTH, the hairline strokes are the
+ * pollution (measured on DP-BP: hairlines = exactly the dimension
+ * ladders, 440 lf; weighted strokes = the real walls, 231 lf). Hairlines
+ * are only dropped when the weighted geometry is substantial — a layer
+ * drawn entirely at width 0 keeps everything.
+ */
+export const HAIRLINE_WIDTH_MAX_PT = 0.05;
+export const HAIRLINE_DROP_MIN_REAL_FRAC = 0.25;
+
 /** Deterministic provenance → high confidence, but still "proposed". */
 export const LAYER_TRACE_CONFIDENCE = 0.9;
 
@@ -136,6 +158,40 @@ export function dedupeParallelFaces<T extends LayerSegment>(
   return kept;
 }
 
+/** Distance from a point to a line segment. */
+function pointSegDist(
+  px: number,
+  py: number,
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+): number {
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const len2 = dx * dx + dy * dy;
+  let t = len2 === 0 ? 0 : ((px - x1) * dx + (py - y1) * dy) / len2;
+  t = Math.max(0, Math.min(1, t));
+  return Math.hypot(px - (x1 + t * dx), py - (y1 + t * dy));
+}
+
+/** True when any segment of the polyline runs through a dimension text. */
+function touchesDimensionText(
+  points: { x: number; y: number }[],
+  dimTexts: { x: number; y: number }[],
+): boolean {
+  for (let i = 1; i < points.length; i++) {
+    const a = points[i - 1];
+    const b = points[i];
+    for (const t of dimTexts) {
+      if (pointSegDist(t.x, t.y, a.x, a.y, b.x, b.y) <= DIM_TEXT_REJECT_PT) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 /** Agglomerative bbox clustering — fine at wall-segment counts (~500). */
 function clusterSegments(segs: LayerSegment[], gap: number): Cluster[] {
   let clusters: Cluster[] = segs.map((s) => ({
@@ -174,7 +230,17 @@ function clusterSegments(segs: LayerSegment[], gap: number): Cluster[] {
 export function traceWallsFromLayers(
   scan: LayerScanResult,
   roleFor: Record<string, LayerRole>,
-  opts: { wallLayers?: string[]; ptPerFoot: number | null },
+  opts: {
+    wallLayers?: string[];
+    ptPerFoot: number | null;
+    /**
+     * Dimension-callout text positions (pt, y-down). Traced polylines
+     * running through one are dimension chains drawn on a wall layer
+     * and get rejected. Optional — without it, polluted wall layers
+     * over-count.
+     */
+    dimensionTextPt?: { x: number; y: number }[];
+  },
 ): LayerTakeoffResult {
   const role = (name: string): LayerRole =>
     roleFor[name] ?? classifyLayerName(name);
@@ -231,17 +297,78 @@ export function traceWallsFromLayers(
   const faceGapPt = opts.ptPerFoot
     ? opts.ptPerFoot * WALL_FACE_MAX_THICKNESS_FT
     : WALL_FACE_MAX_THICKNESS_PT_FALLBACK;
+  const dimTexts = opts.dimensionTextPt ?? [];
   const polylines: LayerPolyline[] = [];
   for (const [layer, segs] of byLayer) {
-    const singleFace = dedupeParallelFaces(segs, faceGapPt);
+    // Hairline drop: when the layer has substantial weighted-stroke
+    // geometry, its width-0 strokes are annotation pollution — EXCEPT a
+    // hairline running parallel to a weighted segment at wall-face
+    // distance, which is the sloppily-drawn second face of a real wall
+    // (observed on DP-BP's left perimeter wall).
+    const isHairline = (s: LayerSegment): boolean =>
+      s.strokeWidthPt != null && s.strokeWidthPt <= HAIRLINE_WIDTH_MAX_PT;
+    const weightedSegs = segs.filter((s) => !isHairline(s));
+    const weightedLen = weightedSegs.reduce((t, s) => t + segLen(s), 0);
+    const totalLen = segs.reduce((t, s) => t + segLen(s), 0);
+    const dropHairlines =
+      totalLen > 0 && weightedLen / totalLen >= HAIRLINE_DROP_MIN_REAL_FRAC;
+    const pairsWithWeighted = (s: LayerSegment): boolean => {
+      const len = segLen(s);
+      if (len === 0) return false;
+      const ux = (s.x2 - s.x1) / len;
+      const uy = (s.y2 - s.y1) / len;
+      for (const k of weightedSegs) {
+        const kLen = segLen(k);
+        const kux = (k.x2 - k.x1) / kLen;
+        const kuy = (k.y2 - k.y1) / kLen;
+        if (Math.abs(ux * kuy - uy * kux) > 0.03) continue;
+        const perp = Math.abs((s.x1 - k.x1) * -kuy + (s.y1 - k.y1) * kux);
+        if (perp < 0.5 || perp > faceGapPt) continue;
+        const p1 = (s.x1 - k.x1) * kux + (s.y1 - k.y1) * kuy;
+        const p2 = (s.x2 - k.x1) * kux + (s.y2 - k.y1) * kuy;
+        const lo = Math.max(Math.min(p1, p2), 0);
+        const hi = Math.min(Math.max(p1, p2), kLen);
+        if (hi - lo >= 0.5 * Math.min(len, kLen)) return true;
+      }
+      return false;
+    };
+    const weighted = dropHairlines
+      ? segs.filter((s) => !isHairline(s) || pairsWithWeighted(s))
+      : segs;
+
+    // Drop dimension lines BEFORE graph building — once a dim chain is in
+    // the graph, gap-bridging fuses it with real walls and the polyline-
+    // level check can no longer separate them.
+    const noDims =
+      dimTexts.length > 0
+        ? weighted.filter(
+            (s) =>
+              !touchesDimensionText(
+                [
+                  { x: s.x1, y: s.y1 },
+                  { x: s.x2, y: s.y2 },
+                ],
+                dimTexts,
+              ),
+          )
+        : weighted;
+    const singleFace = dedupeParallelFaces(noDims, faceGapPt);
     const graph = buildWallGraph(singleFace);
     const traced = autoTraceWalls(graph, {
       // Drop sub-foot stubs when a scale is known; else fall back to pt.
       minPolylineLengthPt: opts.ptPerFoot ? opts.ptPerFoot : 12,
     });
     // Input is layer-clean — no stray filter (it was tuned for noisy
-    // full-sheet scans and deletes real walls on clean input).
-    for (const pl of traced) polylines.push({ ...pl, sourceLayer: layer });
+    // full-sheet scans and deletes real walls on clean input). A second
+    // dimension-text check at polyline level catches chains the segment
+    // pass missed (e.g. a long dim line whose text sits over a bridged
+    // gap rather than over a raw segment).
+    for (const pl of traced) {
+      if (dimTexts.length > 0 && touchesDimensionText(pl.points, dimTexts)) {
+        continue;
+      }
+      polylines.push({ ...pl, sourceLayer: layer });
+    }
   }
 
   return {

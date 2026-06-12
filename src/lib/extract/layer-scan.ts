@@ -26,6 +26,12 @@ export interface LayerSegment {
   /** OCG name the segment was drawn under; null = not layer-wrapped. */
   layer: string | null;
   diagonal: boolean;
+  /**
+   * Device-space stroke width (pt). 0 = hairline (the CAD default weight,
+   * typically annotation: dimension lines, leaders). Fill-derived
+   * segments get null — fills are never hairlines.
+   */
+  strokeWidthPt: number | null;
 }
 
 export interface LayerScanResult {
@@ -96,6 +102,9 @@ export async function scanSegmentsByLayer(
   let cy = 0;
   let sx = 0;
   let sy = 0;
+  // Stroke width of the path currently being walked; null while walking
+  // a fill.
+  let strokeWidthPt: number | null = null;
   const tx = (ctm: number[], x: number, y: number): [number, number] => [
     ctm[0] * x + ctm[2] * y + ctm[4],
     ctm[1] * x + ctm[3] * y + ctm[5],
@@ -108,11 +117,11 @@ export async function scanSegmentsByLayer(
     const layer = currentLayer();
     let seg: LayerSegment | null = null;
     if (dy < AXIS_TOLERANCE_PT && dx > AXIS_TOLERANCE_PT) {
-      seg = { x1, y1, x2, y2: y1, layer, diagonal: false };
+      seg = { x1, y1, x2, y2: y1, layer, diagonal: false, strokeWidthPt };
     } else if (dx < AXIS_TOLERANCE_PT && dy > AXIS_TOLERANCE_PT) {
-      seg = { x1, y1, x2: x1, y2, layer, diagonal: false };
+      seg = { x1, y1, x2: x1, y2, layer, diagonal: false, strokeWidthPt };
     } else if (len >= DIAGONAL_MIN_PT) {
-      seg = { x1, y1, x2, y2, layer, diagonal: true };
+      seg = { x1, y1, x2, y2, layer, diagonal: true, strokeWidthPt };
     }
     if (seg) {
       segments.push(seg);
@@ -159,13 +168,20 @@ export async function scanSegmentsByLayer(
     endLayer: () => {
       layerStack.pop();
     },
-    fillPath: (p: { walk: (v: unknown) => void }, _: unknown, ctm: number[]) =>
-      collect(p, ctm),
+    fillPath: (p: { walk: (v: unknown) => void }, _: unknown, ctm: number[]) => {
+      strokeWidthPt = null;
+      collect(p, ctm);
+    },
     strokePath: (
       p: { walk: (v: unknown) => void },
-      _: unknown,
+      stroke: { getLineWidth?: () => number },
       ctm: number[],
-    ) => collect(p, ctm),
+    ) => {
+      const raw = stroke?.getLineWidth ? stroke.getLineWidth() : 0;
+      // Width is in path space — scale into device pt.
+      strokeWidthPt = raw * Math.hypot(ctm[0], ctm[1]);
+      collect(p, ctm);
+    },
   });
   page.run(device, (mupdf as unknown as { Matrix: { identity: unknown } }).Matrix.identity);
 
