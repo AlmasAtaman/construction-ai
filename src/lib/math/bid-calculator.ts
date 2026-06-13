@@ -29,6 +29,10 @@ export interface BidLineItem {
   surfaceId: string;
   type: SurfaceType;
   roomLabel: string | null;
+  // Finish scope for wall-path items (paint / frp / tile / …). Null for
+  // non-wall-path surfaces. Lets the worksheet group billed walls by
+  // finish the way a contractor's takeoff tree does.
+  finishType: FinishType | null;
   paintType: string | null;
   coats: number;
   quantity: number;
@@ -173,6 +177,7 @@ export function calculateBid(
       surfaceId: s.id,
       type: s.type,
       roomLabel: s.roomLabel,
+      finishType: s.type === "wall-path" ? (s.finishType ?? "paint") : null,
       paintType: s.paintType,
       coats: s.coats,
       quantity,

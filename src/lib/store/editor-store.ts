@@ -1,7 +1,7 @@
 "use client";
 
 import { create } from "zustand";
-import type { SurfaceDTO } from "@/types/surface";
+import type { SurfaceDTO, FinishType } from "@/types/surface";
 
 export type EditorTool =
   | "select"
@@ -47,6 +47,8 @@ interface EditorState {
   tool: EditorTool;
   /** Active snap mode for the wall-path tool. */
   snapMode: SnapMode;
+  /** Finish scope applied to the next wall-path trace (wand / manual). */
+  wallFinish: FinishType;
   pendingUndo: UndoEntry | null;
   // Canvas viewport state — zoom 1.0 fits the page, panX/panY are in CSS px.
   zoom: number;
@@ -101,6 +103,7 @@ interface EditorState {
   setHovered: (id: string | null) => void;
   setTool: (tool: EditorTool) => void;
   setSnapMode: (mode: SnapMode) => void;
+  setWallFinish: (finish: FinishType) => void;
   setPendingUndo: (entry: UndoEntry | null) => void;
   setViewport: (v: { zoom?: number; panX?: number; panY?: number }) => void;
   resetViewport: () => void;
@@ -169,6 +172,7 @@ export const useEditorStore = create<EditorState>((set) => ({
   hoveredSurfaceId: null,
   tool: "select",
   snapMode: "polyline",
+  wallFinish: "paint",
   pendingUndo: null,
   zoom: 1,
   panX: 0,
@@ -208,6 +212,7 @@ export const useEditorStore = create<EditorState>((set) => ({
   setHovered: (id) => set({ hoveredSurfaceId: id }),
   setTool: (tool) => set({ tool }),
   setSnapMode: (mode) => set({ snapMode: mode }),
+  setWallFinish: (finish) => set({ wallFinish: finish }),
   setPendingUndo: (entry) => set({ pendingUndo: entry }),
   setViewport: ({ zoom, panX, panY }) =>
     set((st) => {

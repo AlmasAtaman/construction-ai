@@ -9,7 +9,14 @@ import {
   type BidConfig,
 } from "@/lib/math/bid-calculator";
 import { formatCurrency } from "@/lib/utils";
-import type { SurfaceDTO, SurfaceType } from "@/types/surface";
+import {
+  FINISH_TYPE_LABELS,
+  FINISH_TYPE_COLORS,
+  PAINTABLE_FINISHES,
+  type FinishType,
+  type SurfaceDTO,
+  type SurfaceType,
+} from "@/types/surface";
 
 interface Props {
   projectId: string;
@@ -198,6 +205,7 @@ export function EstimateWorksheet({ projectId }: Props) {
           onDismiss={() => setPendingAccepted(null)}
         />
       )}
+      <ScopeSummary surfaces={surfaces} />
       <table className="sheet">
         <thead>
           <tr>
@@ -336,6 +344,116 @@ export function EstimateWorksheet({ projectId }: Props) {
           </tr>
         </tfoot>
       </table>
+    </div>
+  );
+}
+
+/**
+ * Wall-scope rollup, grouped by finish then room — mirrors how a
+ * contractor's takeoff tree reads (e.g. "Paint walls — Overstock 840 sq
+ * ft, Sales 1,541 sq ft" + tracked-only FRP/tile/glazing). Reads surfaces
+ * directly (not bid line items) so it can show the non-billed finishes the
+ * bid math skips. Only shown when wall-path traces exist.
+ */
+function ScopeSummary({ surfaces }: { surfaces: SurfaceDTO[] }) {
+  const walls = surfaces.filter(
+    (s) => s.type === "wall-path" && s.status !== "excluded",
+  );
+  if (walls.length === 0) return null;
+
+  // finish → room → { sqft, lf, count }
+  const byFinish = new Map<
+    FinishType,
+    Map<string, { sqft: number; lf: number; count: number }>
+  >();
+  for (const s of walls) {
+    const finish = (s.finishType ?? "paint") as FinishType;
+    const room = s.roomLabel ?? "Unlabeled walls";
+    const fg = byFinish.get(finish) ?? new Map();
+    const rg = fg.get(room) ?? { sqft: 0, lf: 0, count: 0 };
+    rg.sqft += s.squareFootage ?? 0;
+    rg.lf += s.linearFootage ?? 0;
+    rg.count += 1;
+    fg.set(room, rg);
+    byFinish.set(finish, fg);
+  }
+
+  // Paint first, then the rest in label order, so billable scope leads.
+  const finishes = [...byFinish.keys()].sort((a, b) => {
+    if (a === "paint") return -1;
+    if (b === "paint") return 1;
+    return FINISH_TYPE_LABELS[a].localeCompare(FINISH_TYPE_LABELS[b]);
+  });
+
+  return (
+    <div
+      data-testid="scope-summary"
+      className="border-b border-[hsl(var(--line))] bg-white px-4 py-3"
+    >
+      <div className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-[hsl(var(--ink-2))]">
+        Wall scope by finish
+      </div>
+      <div className="flex flex-col gap-2">
+        {finishes.map((finish) => {
+          const rooms = byFinish.get(finish)!;
+          const billed = PAINTABLE_FINISHES.has(finish);
+          const totSqft = [...rooms.values()].reduce((a, r) => a + r.sqft, 0);
+          const totLf = [...rooms.values()].reduce((a, r) => a + r.lf, 0);
+          const roomRows = [...rooms.entries()].sort(
+            (a, b) => b[1].sqft - a[1].sqft,
+          );
+          return (
+            <div
+              key={finish}
+              data-testid={`scope-finish-${finish}`}
+              className="rounded-[8px] border border-[hsl(var(--line))]"
+            >
+              <div className="flex items-center gap-2 border-b border-[hsl(var(--line))] bg-[hsl(var(--panel-2))] px-2.5 py-1.5">
+                <span
+                  className="inline-block h-2.5 w-2.5 rounded-sm"
+                  style={{ backgroundColor: FINISH_TYPE_COLORS[finish] }}
+                />
+                <span className="text-[12px] font-semibold text-[hsl(var(--ink))]">
+                  {FINISH_TYPE_LABELS[finish]}
+                </span>
+                {!billed && (
+                  <span
+                    className="rounded bg-[hsl(var(--line))] px-1.5 py-0.5 text-[9.5px] font-medium uppercase tracking-wide text-[hsl(var(--ink-2))]"
+                    title="Tracked on the plan but not billed as paint — different trade/finish."
+                  >
+                    tracked, not billed
+                  </span>
+                )}
+                <span className="num ml-auto text-[12px] font-semibold tabular-nums text-[hsl(var(--ink))]">
+                  {Math.round(totSqft).toLocaleString()} sq ft
+                </span>
+                <span className="num text-[11px] tabular-nums text-[hsl(var(--ink-3))]">
+                  {Math.round(totLf).toLocaleString()} lf
+                </span>
+              </div>
+              <div className="flex flex-col">
+                {roomRows.map(([room, r]) => (
+                  <div
+                    key={room}
+                    className="flex items-center gap-2 px-2.5 py-1 text-[11.5px]"
+                  >
+                    <span className="text-[hsl(var(--ink-2))]">{room}</span>
+                    <span className="text-[hsl(var(--ink-3))]">
+                      · {r.count} run{r.count === 1 ? "" : "s"}
+                    </span>
+                    <span className="num ml-auto tabular-nums text-[hsl(var(--ink))]">
+                      {Math.round(r.sqft).toLocaleString()} sq ft
+                    </span>
+                    <span className="num w-16 text-right tabular-nums text-[hsl(var(--ink-3))]">
+                      {Math.round(r.lf).toLocaleString()} lf
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

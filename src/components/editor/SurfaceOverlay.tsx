@@ -5,7 +5,9 @@ import { Stage, Layer, Line, Rect, Circle } from "react-konva";
 import {
   SURFACE_COLORS,
   FINISH_TYPE_COLORS,
+  FINISH_TYPE_LABELS,
   DEFAULT_FINISH_TYPE,
+  type FinishType,
   type PathPoint,
   type SurfaceDTO,
   type SurfaceType,
@@ -84,6 +86,8 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
   const setWallData = useEditorStore((s) => s.setWallData);
   const snapMode = useEditorStore((s) => s.snapMode);
   const setSnapMode = useEditorStore((s) => s.setSnapMode);
+  const wallFinish = useEditorStore((s) => s.wallFinish);
+  const setWallFinish = useEditorStore((s) => s.setWallFinish);
   const zoom = useEditorStore((s) => s.zoom);
   const contentW = useEditorStore((s) => s.contentW);
 
@@ -587,8 +591,9 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
           linearFootage: linearFt,
           squareFootage: sqft,
           roomLabel: roomLabel ?? null,
-          // Default to Paint @ ceiling height; user can reclassify in review.
-          finishType: "paint",
+          // Finish chosen on the wand HUD (paint by default); the height
+          // follows the project ceiling. Both editable per wall in review.
+          finishType: wallFinish,
           heightBasis: "ceiling",
           wallHeightFt: props.ceilingHeightFt,
           status: "manual",
@@ -1218,6 +1223,37 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
                     }`}
                   >
                     {m}
+                  </button>
+                ))}
+              </div>
+              {/* Finish scope applied to the next trace, so washrooms can be
+                  tagged FRP/tile and only Paint runs bill — the same per-
+                  finish split a contractor's takeoff tree uses. */}
+              <div
+                className="flex items-center gap-1"
+                data-testid="wall-finish-toggle"
+              >
+                <span className="text-[10px] text-white/50">Finish:</span>
+                {(
+                  ["paint", "frp", "tile", "glazing"] as const satisfies readonly FinishType[]
+                ).map((f) => (
+                  <button
+                    key={f}
+                    type="button"
+                    onClick={() => setWallFinish(f)}
+                    title={FINISH_TYPE_LABELS[f]}
+                    data-testid={`wall-finish-${f}`}
+                    className={`flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors ${
+                      wallFinish === f
+                        ? "bg-white/25 text-white"
+                        : "bg-white/10 text-white/70 hover:bg-white/20"
+                    }`}
+                  >
+                    <span
+                      className="inline-block h-2 w-2 rounded-sm"
+                      style={{ backgroundColor: FINISH_TYPE_COLORS[f] }}
+                    />
+                    {f === "glazing" ? "glaze" : f}
                   </button>
                 ))}
               </div>
