@@ -195,16 +195,19 @@ export async function countSymbolsOnPage(
     ],
   });
 
-  let toolInput: { symbols?: Array<{
-    type: SymbolType;
-    count: number;
-    confidence: number;
-    by_room?: Array<{ room_label: string; count: number }>;
-    notes?: string;
-  }> } | null = null;
+  type ReportSymbolCountsInput = {
+    symbols?: Array<{
+      type: SymbolType;
+      count: number;
+      confidence: number;
+      by_room?: Array<{ room_label: string; count: number }>;
+      notes?: string;
+    }>;
+  };
+  let toolInput: ReportSymbolCountsInput | null = null;
   for (const block of msg.content) {
     if (block.type === "tool_use" && block.name === "report_symbol_counts") {
-      toolInput = block.input as typeof toolInput;
+      toolInput = block.input as ReportSymbolCountsInput;
     }
   }
 

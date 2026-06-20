@@ -278,15 +278,16 @@ export async function runHighResTakeoff(
     ],
   });
 
-  let tool: {
+  type ReportTakeoffInput = {
     scale?: string;
     rooms?: HighResRoomMeasurement[];
     symbols?: { type: string; count: number }[];
     notes?: string;
-  } | null = null;
+  };
+  let tool: ReportTakeoffInput | null = null;
   for (const b of msg.content) {
     if (b.type === "tool_use" && b.name === "report_takeoff") {
-      tool = b.input as typeof tool;
+      tool = b.input as ReportTakeoffInput;
     }
   }
 

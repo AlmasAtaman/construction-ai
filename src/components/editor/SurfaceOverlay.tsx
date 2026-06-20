@@ -842,7 +842,11 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
   const annotations = useMemo(
     () =>
       props.surfaces
-        .filter((s) => s.type === "annotation:note" && s.status !== "excluded")
+        .filter(
+          (s) =>
+            s.type === ("annotation:note" as SurfaceType) &&
+            s.status !== "excluded",
+        )
         .map((s) => {
           // Note position: centroid of the polygon.
           let cx = 0, cy = 0;
