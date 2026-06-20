@@ -90,6 +90,8 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
   const setWallFinish = useEditorStore((s) => s.setWallFinish);
   const zoom = useEditorStore((s) => s.zoom);
   const contentW = useEditorStore((s) => s.contentW);
+  const paintScopeNonce = useEditorStore((s) => s.paintScopeNonce);
+  const setPaintScopeActive = useEditorStore((s) => s.setPaintScopeActive);
 
   // Endpoint-adjacency index for "follow the wall" (polyline mode). Rebuilt
   // only when the page's wall network changes.
@@ -165,6 +167,7 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
         const d = (await res.json()) as PaintScopeData & { available: boolean };
         if (d.available) {
           setPaintScope(d);
+          setAppliedScope(false); // fresh scope — not yet applied
           paintScopePageRef.current = props.planPageId;
           setShowPaintScope(true);
         } else {
@@ -181,6 +184,82 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
       setLoadingScope(false);
     }
   }
+
+  // Apply the scoped paint takeoff to the estimate: commits each painted room
+  // as a named wall-path surface (clearing this page's unreviewed proposals) so
+  // the worksheet + bid show one coherent room-labeled paint number.
+  const [applyingScope, setApplyingScope] = useState(false);
+  const [appliedScope, setAppliedScope] = useState(false);
+  async function applyPaintScope() {
+    setApplyingScope(true);
+    setOpenHint(null);
+    try {
+      const res = await fetch(
+        `/api/plan-pages/${props.planPageId}/paint-scope`,
+        { method: "POST" },
+      );
+      if (res.ok) {
+        const d = (await res.json()) as {
+          committed: number;
+          surfaceIds?: string[];
+        };
+        setAppliedScope(true);
+        props.onSurfaceCreated?.(); // refresh surfaces → worksheet + bid update
+        setOpenHint(
+          `Applied ${d.committed} painted room${d.committed === 1 ? "" : "s"} to the estimate.`,
+        );
+        // Reversible: undo removes the committed scoped rooms. (The replaced
+        // AI proposals are regenerable via "AI Takeoff", so undo just lifts
+        // the scoped set back out of the estimate.)
+        const ids = d.surfaceIds ?? [];
+        if (ids.length > 0) {
+          useUndoStore.getState().push({
+            label: "Applied paint scope to estimate",
+            undo: async () => {
+              await Promise.all(
+                ids.map((sid) =>
+                  fetch(`/api/surfaces/${sid}`, { method: "DELETE" }),
+                ),
+              );
+              for (const sid of ids)
+                useEditorStore.getState().removeSurface(sid);
+              setAppliedScope(false);
+              props.onSurfaceCreated?.();
+            },
+            redo: async () => {
+              await applyPaintScope();
+            },
+          });
+        }
+      } else {
+        const e = (await res.json().catch(() => null)) as { error?: string } | null;
+        setOpenHint(e?.error ?? "Couldn’t apply paint scope to the estimate.");
+      }
+    } catch {
+      setOpenHint("Couldn’t apply paint scope (network).");
+    } finally {
+      setApplyingScope(false);
+    }
+  }
+
+  // The toolbar's primary "Paint takeoff" button bumps paintScopeNonce to
+  // request a load/toggle. React to it here (the overlay owns the panel).
+  // Skip the initial 0 so it doesn't auto-open on mount.
+  const lastPaintNonce = useRef(0);
+  useEffect(() => {
+    if (paintScopeNonce === 0 || paintScopeNonce === lastPaintNonce.current)
+      return;
+    lastPaintNonce.current = paintScopeNonce;
+    void loadPaintScope();
+    // loadPaintScope is stable enough for this trigger; deps intentionally
+    // limited to the nonce so only an explicit toolbar press fires it.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paintScopeNonce]);
+
+  // Report panel visibility up so the toolbar button can label itself.
+  useEffect(() => {
+    setPaintScopeActive(showPaintScope);
+  }, [showPaintScope, setPaintScopeActive]);
 
   function pxToNorm(p: { x: number; y: number }) {
     return { x: p.x / props.width, y: p.y / props.height };
@@ -1128,8 +1207,9 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
             )}
 
           {/* Paint-scope overlay — read-only shading of the scoped takeoff.
-              Paint rooms blue (to-deck rooms a deeper blue), excluded rooms
-              muted grey. Drawn under everything else and non-interactive. */}
+              Paint rooms use the app's paint-green finish color (matching every
+              other paint indicator + traced wall-path); excluded rooms are a
+              muted slate. Drawn under everything else and non-interactive. */}
           {showPaintScope &&
             paintScope &&
             [
@@ -1141,12 +1221,9 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
                 const px = normToPx(p);
                 return [px.x, px.y];
               });
-              const fill = paint
-                ? r.heightBasis === "to-deck"
-                  ? "#1d4ed855" // deeper blue = painted to deck
-                  : "#3b82f655" // blue = painted to ceiling
-                : "#9ca3af3a"; // grey = excluded
-              const stroke = paint ? "#1d4ed8" : "#6b7280";
+              // Paint = the app's finish-green (#22c55e); excluded = slate.
+              const fill = paint ? "#22c55e33" : "#94a3b826";
+              const stroke = paint ? FINISH_TYPE_COLORS.paint : "#94a3b8";
               return (
                 <Line
                   key={`scope-${i}-${r.label}`}
@@ -1230,56 +1307,117 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
       </Stage>
 
       {/* Paint-scope control + summary — the contractor-style deliverable:
-          which rooms are painted and the scoped total. */}
-      <div className="absolute bottom-4 right-4 z-20 flex max-w-[16rem] flex-col-reverse items-end gap-2">
-        <button
-          type="button"
-          data-testid="paint-scope-toggle"
-          onClick={() => void loadPaintScope()}
-          className="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white shadow hover:bg-blue-700"
-        >
-          {loadingScope
-            ? "Scoping…"
-            : showPaintScope
-              ? "Hide paint scope"
-              : "Paint takeoff"}
-        </button>
+          which rooms are painted and the scoped total. Themed to match the
+          app's industrial Bluebeam/Procore design tokens. */}
+      <div className="pointer-events-none absolute bottom-4 right-4 top-4 z-20 flex w-[15rem] flex-col-reverse items-stretch gap-2">
+        {loadingScope && !showPaintScope && (
+          <span className="pointer-events-auto self-end rounded-[var(--radius)] border border-[hsl(var(--line))] bg-[hsl(var(--panel))] px-3 py-1.5 text-[12px] font-medium text-[hsl(var(--ink-2))] shadow-sm">
+            Scoping…
+          </span>
+        )}
         {showPaintScope && paintScope && (
           <div
             data-testid="paint-scope-summary"
-            className="w-full rounded-md bg-white/95 px-3 py-2 text-[11px] leading-relaxed text-gray-800 shadow-md ring-1 ring-gray-200"
+            className="pointer-events-auto flex min-h-0 flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[hsl(var(--line))] bg-[hsl(var(--panel))] shadow-lg"
           >
-            <div className="mb-1 flex items-baseline justify-between">
-              <span className="font-semibold">Paint scope</span>
-              <span className="font-mono font-semibold text-blue-700">
-                {Math.round(paintScope.paintSqft).toLocaleString()} sf
+            {/* Header — title + scoped total + close */}
+            <div className="flex shrink-0 items-center justify-between gap-2 border-b border-[hsl(var(--line))] bg-[hsl(var(--panel-2))] px-3 py-2">
+              <span className="text-[10.5px] font-semibold uppercase tracking-[0.06em] text-[hsl(var(--ink-2))]">
+                Paint scope
+              </span>
+              <span className="flex items-baseline gap-2">
+                <span className="text-[hsl(var(--ink))]">
+                  <span className="num text-[14px] font-semibold tabular-nums">
+                    {Math.round(paintScope.paintSqft).toLocaleString()}
+                  </span>
+                  <span className="ml-1 text-[10px] text-[hsl(var(--ink-3))]">
+                    sq ft
+                  </span>
+                </span>
+                <button
+                  type="button"
+                  data-testid="paint-scope-close"
+                  onClick={() => setShowPaintScope(false)}
+                  title="Hide paint scope"
+                  className="-mr-1 self-center rounded-[3px] px-1 text-[14px] leading-none text-[hsl(var(--ink-3))] hover:bg-[hsl(var(--line))] hover:text-[hsl(var(--ink))]"
+                >
+                  ✕
+                </button>
               </span>
             </div>
-            {paintScope.paintRooms.map((r) => (
-              <div
-                key={`pr-${r.label}`}
-                className="flex items-baseline justify-between gap-2"
-              >
-                <span className="truncate">
-                  <span className="mr-1 inline-block h-2 w-2 rounded-sm bg-blue-500 align-middle" />
-                  {r.label}
-                  {r.heightBasis === "to-deck" && (
-                    <span className="ml-1 text-[9px] text-blue-600">
-                      ↑deck
+            {/* Painted rooms — scrolls if the list is long / window is short */}
+            <div className="min-h-0 overflow-y-auto px-3 py-1.5">
+              {paintScope.paintRooms.map((r) => (
+                <div
+                  key={`pr-${r.label}`}
+                  className="flex items-center justify-between gap-2 py-0.5 text-[12px]"
+                >
+                  <span className="flex min-w-0 items-center gap-1.5">
+                    <span
+                      className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
+                      style={{ backgroundColor: FINISH_TYPE_COLORS.paint }}
+                    />
+                    <span className="truncate font-medium text-[hsl(var(--ink))]">
+                      {r.label.charAt(0) + r.label.slice(1).toLowerCase()}
                     </span>
-                  )}
-                </span>
-                <span className="font-mono text-gray-500">
-                  {Math.round(r.paintAreaSqft).toLocaleString()}
-                </span>
-              </div>
-            ))}
+                    {r.heightBasis === "to-deck" && (
+                      <span
+                        title={`Painted to deck (~${r.heightFt} ft) — confirm vs. elevation`}
+                        className="shrink-0 rounded-full bg-[hsl(var(--brand-soft))] px-1.5 py-px text-[9px] font-semibold uppercase tracking-wide text-[hsl(var(--brand))]"
+                      >
+                        deck
+                      </span>
+                    )}
+                  </span>
+                  <span className="num shrink-0 tabular-nums text-[hsl(var(--ink-2))]">
+                    {Math.round(r.paintAreaSqft).toLocaleString()}
+                  </span>
+                </div>
+              ))}
+            </div>
+            {/* Excluded rooms — tracked, not painted */}
             {paintScope.excludedRooms.length > 0 && (
-              <div className="mt-1 border-t border-gray-200 pt-1 text-gray-400">
-                excluded:{" "}
-                {paintScope.excludedRooms.map((r) => r.label).join(", ")}
+              <div className="shrink-0 border-t border-[hsl(var(--line))] bg-[hsl(var(--panel-2))] px-3 py-1.5">
+                <div className="text-[9.5px] font-semibold uppercase tracking-[0.06em] text-[hsl(var(--ink-3))]">
+                  Excluded
+                </div>
+                <div className="mt-0.5 flex flex-wrap gap-1">
+                  {paintScope.excludedRooms.map((r) => (
+                    <span
+                      key={`ex-${r.label}`}
+                      className="inline-flex items-center gap-1 rounded-[3px] border border-[hsl(var(--line))] bg-[hsl(var(--panel))] px-1.5 py-px text-[10px] text-[hsl(var(--ink-3))]"
+                    >
+                      <span className="h-1.5 w-1.5 rounded-[1px] bg-[hsl(var(--ink-3))] opacity-50" />
+                      {r.label.charAt(0) + r.label.slice(1).toLowerCase()}
+                    </span>
+                  ))}
+                </div>
               </div>
             )}
+            {/* Footer — push the scoped result into the estimate */}
+            <div className="shrink-0 border-t border-[hsl(var(--line))] px-3 py-2">
+              <button
+                type="button"
+                data-testid="paint-scope-apply"
+                onClick={() => void applyPaintScope()}
+                disabled={applyingScope}
+                className={`w-full rounded-[var(--radius)] px-3 py-1.5 text-[12px] font-semibold transition-colors disabled:opacity-70 ${
+                  appliedScope
+                    ? "bg-[hsl(var(--success))]/10 text-[hsl(var(--success))]"
+                    : "bg-[hsl(var(--brand))] text-[hsl(var(--brand-on))] hover:bg-[hsl(var(--brand-hover))]"
+                }`}
+              >
+                {applyingScope
+                  ? "Applying…"
+                  : appliedScope
+                    ? "✓ Applied to estimate"
+                    : "Apply to estimate"}
+              </button>
+              <p className="mt-1 text-[10px] leading-snug text-[hsl(var(--ink-3))]">
+                Writes these rooms to the worksheet &amp; bid, replacing
+                unreviewed wall proposals on this page.
+              </p>
+            </div>
           </div>
         )}
       </div>

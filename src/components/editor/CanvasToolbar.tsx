@@ -18,6 +18,8 @@ export function CanvasToolbar({ planPageId, onAutoTraced }: CanvasToolbarProps =
   const resetViewport = useEditorStore((s) => s.resetViewport);
   const showAiOverlay = useEditorStore((s) => s.showAiOverlay);
   const setShowAiOverlay = useEditorStore((s) => s.setShowAiOverlay);
+  const requestPaintScope = useEditorStore((s) => s.requestPaintScope);
+  const paintScopeActive = useEditorStore((s) => s.paintScopeActive);
   const visibleTypes = useEditorStore((s) => s.visibleTypes);
   const toggleType = useEditorStore((s) => s.toggleType);
   const surfaces = useEditorStore((s) => s.surfaces);
@@ -182,23 +184,41 @@ export function CanvasToolbar({ planPageId, onAutoTraced }: CanvasToolbarProps =
                 {autoTraceMsg}
               </span>
             )}
+            {/* PRIMARY — scoped paint takeoff: named rooms, correct finishes
+                and heights, one coherent total. The accurate deliverable. */}
             <button
               type="button"
-              onClick={() => void runAutoTrace({ autoClean: true })}
-              disabled={autoTracing}
-              data-testid="ai-takeoff"
-              title="One click: detect the walls, measure them, and drop them into Review priced and ready to check."
+              onClick={() => requestPaintScope()}
+              data-testid="paint-takeoff"
+              title="Scoped paint takeoff: reads the finish schedule + plan notes, measures each painted room (correct finish + height), and shows one coherent total you can apply to the estimate."
               className={cn(
                 "inline-flex items-center gap-1.5 rounded-[8px] px-3 py-1.5 text-[12px] font-semibold text-white shadow-sm transition-colors",
-                autoTracing
-                  ? "bg-[hsl(var(--ink-3))]"
+                paintScopeActive
+                  ? "bg-[hsl(var(--accent-hover))]"
                   : "bg-[hsl(var(--accent))] hover:brightness-95",
               )}
             >
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4M4 19h4M13 3l2.5 6.5L22 12l-6.5 2.5L13 21l-2.5-6.5L4 12l6.5-2.5z" />
               </svg>
-              {autoTracing ? "Working…" : "AI Takeoff"}
+              {paintScopeActive ? "Hide paint scope" : "Paint takeoff"}
+            </button>
+            {/* SECONDARY — raw wall trace (every wall, unscoped). Power-user /
+                fallback path; demoted so the scoped flow reads as primary. */}
+            <button
+              type="button"
+              onClick={() => void runAutoTrace({ autoClean: true })}
+              disabled={autoTracing}
+              data-testid="ai-takeoff"
+              title="Trace every wall on this sheet (unscoped) and drop them into Review. Use when there's no finish schedule, or to audit the raw geometry."
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-[8px] border px-3 py-1.5 text-[12px] font-medium shadow-sm transition-colors",
+                autoTracing
+                  ? "border-[hsl(var(--line))] bg-[hsl(var(--panel-2))] text-[hsl(var(--ink-3))]"
+                  : "border-[hsl(var(--line))] bg-[hsl(var(--panel))] text-[hsl(var(--ink-2))] hover:bg-[hsl(var(--panel-2))]",
+              )}
+            >
+              {autoTracing ? "Working…" : "Trace all walls"}
             </button>
             <TakeoffLayersPanel
               planPageId={planPageId}

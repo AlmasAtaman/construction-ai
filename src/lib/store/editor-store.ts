@@ -64,6 +64,13 @@ interface EditorState {
   // Toggle that hides AI-detected polygons so the user can read the
   // bare blueprint when validating.
   showAiOverlay: boolean;
+  // Paint-scope coordination between the toolbar (primary entry point) and
+  // the SurfaceOverlay (which owns the preview + panel). The toolbar bumps
+  // `paintScopeNonce` to request a load/toggle; the overlay reports back
+  // whether the panel is currently shown via `paintScopeActive` so the
+  // toolbar button can label itself.
+  paintScopeNonce: number;
+  paintScopeActive: boolean;
   // Per-surface-type visibility. On dense plans, every room produces 4-5
   // overlapping polygons (wall + ceiling + trim + door + window) and the
   // canvas becomes unreadable. Default to walls-only and let the user
@@ -114,6 +121,8 @@ interface EditorState {
     contentH?: number;
   }) => void;
   setShowAiOverlay: (v: boolean) => void;
+  requestPaintScope: () => void;
+  setPaintScopeActive: (v: boolean) => void;
   toggleType: (t: keyof EditorState["visibleTypes"]) => void;
   startScaleCalibration: () => void;
   cancelScaleCalibration: () => void;
@@ -182,6 +191,8 @@ export const useEditorStore = create<EditorState>((set) => ({
   contentW: 0,
   contentH: 0,
   showAiOverlay: true,
+  paintScopeNonce: 0,
+  paintScopeActive: false,
   visibleTypes: {
     wall: true,
     ceiling: false,
@@ -241,6 +252,9 @@ export const useEditorStore = create<EditorState>((set) => ({
       contentH: contentH ?? st.contentH,
     })),
   setShowAiOverlay: (v) => set({ showAiOverlay: v }),
+  requestPaintScope: () =>
+    set((st) => ({ paintScopeNonce: st.paintScopeNonce + 1 })),
+  setPaintScopeActive: (v) => set({ paintScopeActive: v }),
   toggleType: (t) =>
     set((st) => ({
       visibleTypes: { ...st.visibleTypes, [t]: !st.visibleTypes[t] },
