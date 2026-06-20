@@ -123,6 +123,65 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
   const [tracingOpen, setTracingOpen] = useState(false);
   const [openHint, setOpenHint] = useState<string | null>(null);
 
+  // Paint-scope overlay: the deterministic scoped takeoff (finish notes +
+  // schedule → per-room paint/excluded decision + per-room height). Paint
+  // rooms shade blue like a contractor's takeoff; excluded (tile/FRP/wet)
+  // rooms shade muted. Independent of the magic wand — a read-only view.
+  interface PaintScopeRoom {
+    label: string;
+    decision: "paint" | "excluded";
+    paintAreaSqft: number;
+    wallPerimeterFt: number;
+    heightFt: number;
+    heightBasis: string;
+    needsReview: boolean;
+    reason: string;
+    points: { x: number; y: number }[];
+  }
+  interface PaintScopeData {
+    paintRooms: PaintScopeRoom[];
+    excludedRooms: PaintScopeRoom[];
+    paintSqft: number;
+    paintLf: number;
+  }
+  const [paintScope, setPaintScope] = useState<PaintScopeData | null>(null);
+  const [showPaintScope, setShowPaintScope] = useState(false);
+  const [loadingScope, setLoadingScope] = useState(false);
+  const paintScopePageRef = useRef<string | null>(null);
+
+  async function loadPaintScope() {
+    // Toggle off if already shown; toggle back on if cached for this page.
+    if (paintScope && paintScopePageRef.current === props.planPageId) {
+      setShowPaintScope((v) => !v);
+      return;
+    }
+    setLoadingScope(true);
+    setOpenHint(null);
+    try {
+      const res = await fetch(
+        `/api/plan-pages/${props.planPageId}/paint-scope`,
+      );
+      if (res.ok) {
+        const d = (await res.json()) as PaintScopeData & { available: boolean };
+        if (d.available) {
+          setPaintScope(d);
+          paintScopePageRef.current = props.planPageId;
+          setShowPaintScope(true);
+        } else {
+          setOpenHint(
+            "Paint scope needs CAD wall layers + room tags — not available on this page.",
+          );
+        }
+      } else {
+        setOpenHint("Paint-scope takeoff failed.");
+      }
+    } catch {
+      setOpenHint("Paint-scope takeoff failed (network).");
+    } finally {
+      setLoadingScope(false);
+    }
+  }
+
   function pxToNorm(p: { x: number; y: number }) {
     return { x: p.x / props.width, y: p.y / props.height };
   }
@@ -1064,6 +1123,40 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
               />
             )}
 
+          {/* Paint-scope overlay — read-only shading of the scoped takeoff.
+              Paint rooms blue (to-deck rooms a deeper blue), excluded rooms
+              muted grey. Drawn under everything else and non-interactive. */}
+          {showPaintScope &&
+            paintScope &&
+            [
+              ...paintScope.excludedRooms.map((r) => ({ r, paint: false })),
+              ...paintScope.paintRooms.map((r) => ({ r, paint: true })),
+            ].map(({ r, paint }, i) => {
+              if (r.points.length < 3) return null;
+              const flat = r.points.flatMap((p) => {
+                const px = normToPx(p);
+                return [px.x, px.y];
+              });
+              const fill = paint
+                ? r.heightBasis === "to-deck"
+                  ? "#1d4ed855" // deeper blue = painted to deck
+                  : "#3b82f655" // blue = painted to ceiling
+                : "#9ca3af3a"; // grey = excluded
+              const stroke = paint ? "#1d4ed8" : "#6b7280";
+              return (
+                <Line
+                  key={`scope-${i}-${r.label}`}
+                  points={flat}
+                  closed
+                  fill={fill}
+                  stroke={stroke}
+                  strokeWidth={2}
+                  lineJoin="round"
+                  listening={false}
+                />
+              );
+            })}
+
           {/* Scale-calibration line — visible while the user is picking
               the two points and after both are set. */}
           {scaleCalib.p1 && (
@@ -1131,6 +1224,61 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
           ))}
         </Layer>
       </Stage>
+
+      {/* Paint-scope control + summary — the contractor-style deliverable:
+          which rooms are painted and the scoped total. */}
+      <div className="absolute bottom-4 right-4 z-20 flex max-w-[16rem] flex-col-reverse items-end gap-2">
+        <button
+          type="button"
+          data-testid="paint-scope-toggle"
+          onClick={() => void loadPaintScope()}
+          className="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white shadow hover:bg-blue-700"
+        >
+          {loadingScope
+            ? "Scoping…"
+            : showPaintScope
+              ? "Hide paint scope"
+              : "Paint takeoff"}
+        </button>
+        {showPaintScope && paintScope && (
+          <div
+            data-testid="paint-scope-summary"
+            className="w-full rounded-md bg-white/95 px-3 py-2 text-[11px] leading-relaxed text-gray-800 shadow-md ring-1 ring-gray-200"
+          >
+            <div className="mb-1 flex items-baseline justify-between">
+              <span className="font-semibold">Paint scope</span>
+              <span className="font-mono font-semibold text-blue-700">
+                {Math.round(paintScope.paintSqft).toLocaleString()} sf
+              </span>
+            </div>
+            {paintScope.paintRooms.map((r) => (
+              <div
+                key={`pr-${r.label}`}
+                className="flex items-baseline justify-between gap-2"
+              >
+                <span className="truncate">
+                  <span className="mr-1 inline-block h-2 w-2 rounded-sm bg-blue-500 align-middle" />
+                  {r.label}
+                  {r.heightBasis === "to-deck" && (
+                    <span className="ml-1 text-[9px] text-blue-600">
+                      ↑deck
+                    </span>
+                  )}
+                </span>
+                <span className="font-mono text-gray-500">
+                  {Math.round(r.paintAreaSqft).toLocaleString()}
+                </span>
+              </div>
+            ))}
+            {paintScope.excludedRooms.length > 0 && (
+              <div className="mt-1 border-t border-gray-200 pt-1 text-gray-400">
+                excluded:{" "}
+                {paintScope.excludedRooms.map((r) => r.label).join(", ")}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       {hoveredNote &&
         (() => {
