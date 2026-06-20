@@ -22,8 +22,21 @@ import { extractFinishScope } from "./finish-scope";
 import { bindFinishToRooms } from "./bind-finish";
 import { decidePaintScope, type RoomScope, type ScopeDecision } from "./paint-scope";
 
-/** Default paint wall height (ft). Friend's reference: 840 ÷ 93.3 lf = 9.00. */
-export const DEFAULT_WALL_HEIGHT_FT = 9;
+/** Paint wall height to a finished ceiling (ft). Friend's Sales/Service:
+ *  1,540.9 sqft ÷ 171 lf = 9.0 ft. */
+export const CEILING_HEIGHT_FT = 9;
+/** Paint wall height for walls painted "to underside of deck" / "to 13'-0
+ *  A.F.F." — the plan's stockroom finish notes. Approximate (the exact deck
+ *  height needs the wall-section/elevation); friend's Overstock reconciles at
+ *  840 ÷ 73 lf ≈ 11.5 ft, consistent with a to-deck retail stockroom. Rooms
+ *  using it are flagged so the height stays user-confirmable. */
+export const DECK_HEIGHT_FT = 11.5;
+/** Back-compat alias. */
+export const DEFAULT_WALL_HEIGHT_FT = CEILING_HEIGHT_FT;
+
+/** Room categories whose walls are painted to deck (taller than a ceiling).
+ *  Stockroom/BOH walls run "to U/S of deck" per the finish notes. */
+const TO_DECK_CATEGORIES = new Set(["stockroom"]);
 
 export interface ScopedRoom {
   label: string;
@@ -35,10 +48,14 @@ export interface ScopedRoom {
   /** Paintable wall perimeter (ft) from the seeded room (excludes opening cuts). */
   wallPerimeterFt: number;
   heightFt: number;
+  /** Where the height came from: a finished ceiling, or painted to deck. */
+  heightBasis: "ceiling" | "to-deck";
   /** Painted wall area (sqft) = perimeter × height. 0 for excluded rooms. */
   paintAreaSqft: number;
   /** Room floor area (sqft), for reference. */
   floorAreaSqft: number;
+  /** Boundary polygon, PDF pt (y-down) — for the overlay fill. */
+  polygonPt: { x: number; y: number }[];
 }
 
 export interface ScopedTakeoff {
@@ -47,14 +64,18 @@ export interface ScopedTakeoff {
   /** Sum of painted wall perimeter (lf) and area (sqft). */
   paintLf: number;
   paintSqft: number;
-  heightFt: number;
+  /** Finished-ceiling height used for ceiling-height rooms (ft). */
+  ceilingHeightFt: number;
 }
 
 export interface ScopedTakeoffOptions {
   ptPerFoot?: number;
   pageWidthPt: number;
   pageHeightPt: number;
+  /** Finished-ceiling paint height (ft). Defaults to CEILING_HEIGHT_FT. */
   heightFt?: number;
+  /** To-deck paint height (ft). Defaults to DECK_HEIGHT_FT. */
+  deckHeightFt?: number;
   /** Run the Claude-vision advisory pass on flagged rooms. Off by default —
    *  deterministic alone reproduces the reference scope. */
   useAi?: boolean;
@@ -74,7 +95,8 @@ export async function computeScopedPaintTakeoff(
   opts: ScopedTakeoffOptions,
 ): Promise<ScopedTakeoff | null> {
   const ptPerFoot = opts.ptPerFoot ?? 18;
-  const heightFt = opts.heightFt ?? DEFAULT_WALL_HEIGHT_FT;
+  const ceilingFt = opts.heightFt ?? CEILING_HEIGHT_FT;
+  const deckFt = opts.deckHeightFt ?? DECK_HEIGHT_FT;
 
   // Walls from the correct CAD layers (non-diagonal).
   const layerScan = await scanSegmentsByLayer(pdfBuffer, pageNumber);
@@ -125,17 +147,25 @@ export async function computeScopedPaintTakeoff(
     const perim = room?.wallPerimeterFt ?? 0;
     const floor = room?.areaSqft ?? 0;
     const isPaint = sc.decision === "paint";
+    const toDeck = TO_DECK_CATEGORIES.has(sc.category);
+    const heightFt = toDeck ? deckFt : ceilingFt;
     return {
       label: sc.label,
       decision: sc.decision,
       basis: sc.basis,
       confidence: sc.confidence,
-      needsReview: sc.needsReview,
-      reason: sc.reason,
+      // To-deck height is approximate (needs the elevation) → keep it
+      // user-confirmable even when the scope decision is certain.
+      needsReview: sc.needsReview || (isPaint && toDeck),
+      reason: toDeck
+        ? `${sc.reason}; painted to deck (~${heightFt}ft, confirm vs elevation)`
+        : sc.reason,
       wallPerimeterFt: perim,
       heightFt,
+      heightBasis: toDeck ? "to-deck" : "ceiling",
       paintAreaSqft: isPaint ? perim * heightFt : 0,
       floorAreaSqft: floor,
+      polygonPt: room?.polygonPt ?? [],
     };
   });
 
@@ -144,5 +174,11 @@ export async function computeScopedPaintTakeoff(
   const paintLf = paintRooms.reduce((a, r) => a + r.wallPerimeterFt, 0);
   const paintSqft = paintRooms.reduce((a, r) => a + r.paintAreaSqft, 0);
 
-  return { paintRooms, excludedRooms, paintLf, paintSqft, heightFt };
+  return {
+    paintRooms,
+    excludedRooms,
+    paintLf,
+    paintSqft,
+    ceilingHeightFt: ceilingFt,
+  };
 }

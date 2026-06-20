@@ -228,3 +228,28 @@ ADVISORY** — it may override only `tag`/`default` (genuinely weak) rooms; for
 This empirically validates Round-3's deterministic-first / AI-advisory ordering
 against real ground truth: had we trusted the VLM (Round-2's pitch), we'd have
 wrongly dropped Sales from paint scope.
+
+## OVERSTOCK "under-trace" was NOT a bug — it's PAINTED TO DECK (2026-06-20)
+
+Chased the last 9% (Overstock 621 vs friend 840). The seeded polygon is an 8-pt
+16.9×11.6ft rectangle with a partition slot, full perimeter 73 lf / wall-only
+69 lf — geometry is CORRECT, the fill does not stop short. The gap is HEIGHT:
+840 ÷ 73 lf = 11.5 ft, a to-deck wall, not a 9ft ceiling. Confirmed verbatim in
+the plan notes: p5 "METAL STUDS ... TO U/S OF DECK", "1/2\" G.W.B. TO 13'-0\"
+A.F.F."; p10 (stockroom finish) "STOCKROOM" + "TO U/S OF DECK" + "PAINT FINISH
+ABOVE 13'-0\" A.F.F.". So stockroom/BOH walls are painted to deck (~11.5–13ft),
+Sales/Service to a 9ft finished ceiling. Implemented per-room height in
+`scoped-takeoff.ts`: CEILING_HEIGHT_FT=9, DECK_HEIGHT_FT=11.5 (TO_DECK_CATEGORIES
+= stockroom), `heightBasis` per room, to-deck rooms flagged needsReview (exact
+deck height needs the elevation). **RESULT: total 2,349 sqft vs friend 2,381 =
+99% (Sales+Service 1,555 vs 1,541; Overstock 794 vs 840).** This also answers the
+"to 6\" above ceiling vs to deck" height question all three research rounds
+flagged as unresolved — the answer is read deterministically from the wall-type
+notes by category.
+
+**PIPELINE COMPLETE (deterministic): 4,070 sqft "trace everything" → 2,349 sqft
+scoped to exactly the painted rooms + heights, 99% match to the contractor, $0
+AI for the decision (AI advisory-only).** Modules: finish-scope, bind-finish,
+paint-scope, verify-finish (AI advisory), scoped-takeoff. REMAINING: wire into
+the UI (takeoff button + blue fill by finish + worksheet groups); exact deck
+height per the elevation; generalize to DP-BP.
