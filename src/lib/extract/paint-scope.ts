@@ -38,8 +38,12 @@ const EXCLUDED_CATEGORIES = new Set([
   "vestibule",
   "electrical",
   "mechanical",
-  "kitchen",
 ]);
+/** Categories whose finish genuinely varies by build-out: residential
+ *  kitchens are painted, commercial kitchens are FRP/tile-clad. No safe
+ *  category default exists, so tags decide and the room is always flagged
+ *  for review (basis stays `tag`/`default` so the AI fallback may override). */
+const AMBIVALENT_CATEGORIES = new Set(["kitchen"]);
 
 /** CT (wall tile) tags above this count in a paint-default room flag a
  *  conflict worth an AI second look. Tile BASE never counts. */
@@ -67,6 +71,12 @@ export interface RoomScope {
 
 function wallTileCount(b: RoomFinishBinding): number {
   return b.tags.filter((t) => t.family === "wall-tile").length;
+}
+/** Wall finishes that displace paint (tile + FRP cladding). */
+function nonPaintWallTagCount(b: RoomFinishBinding): number {
+  return b.tags.filter(
+    (t) => t.family === "wall-tile" || t.family === "frp",
+  ).length;
 }
 function paintTagCount(b: RoomFinishBinding): number {
   return b.tags.filter((t) => PAINT_FAMILIES.has(t.family)).length;
@@ -123,6 +133,23 @@ export function decidePaintScope(
         needsReview = true;
         reason += ` — but ${ct} wall-tile tags present (often a feature wall); flagged`;
       }
+    } else if (AMBIVALENT_CATEGORIES.has(b.category)) {
+      const nonPaint = nonPaintWallTagCount(b);
+      basis = nonPaint > 0 || paintTags > 0 ? "tag" : "default";
+      if (nonPaint > paintTags && nonPaint > 0) {
+        decision = "excluded";
+        confidence = 0.6;
+        reason = `"${b.category}" finish varies by build-out; ${nonPaint} tile/FRP tags`;
+      } else if (paintTags > 0) {
+        decision = "paint";
+        confidence = 0.6;
+        reason = `"${b.category}" finish varies by build-out; ${paintTags} paint tags`;
+      } else {
+        decision = "paint"; // conservative: over-include, user/AI trims
+        confidence = 0.5;
+        reason = `"${b.category}" walls vary by build-out (residential paint vs commercial FRP/tile) — defaulting to paint`;
+      }
+      needsReview = true;
     } else if (EXCLUDED_CATEGORIES.has(b.category)) {
       decision = "excluded";
       confidence = 0.8;

@@ -356,8 +356,12 @@ export function EstimateWorksheet({ projectId }: Props) {
  * bid math skips. Only shown when wall-path traces exist.
  */
 function ScopeSummary({ surfaces }: { surfaces: SurfaceDTO[] }) {
+  // Same rule as the bid math: unreviewed proposals are not scope yet.
   const walls = surfaces.filter(
-    (s) => s.type === "wall-path" && s.status !== "excluded",
+    (s) =>
+      s.type === "wall-path" &&
+      s.status !== "excluded" &&
+      s.status !== "proposed",
   );
   if (walls.length === 0) return null;
 

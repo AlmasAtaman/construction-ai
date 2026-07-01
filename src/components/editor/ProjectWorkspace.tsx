@@ -314,15 +314,15 @@ export function ProjectWorkspace({
             {/* The Opus vision takeoff ("Measure my plan") is retired: on
                 dense plans it guessed coordinates at real API cost. Wall
                 takeoff runs through the deterministic CAD-layer path
-                (geometry fallback) — per page via the toolbar's AI Takeoff,
-                or every floor plan at once via this button. */}
+                (geometry fallback) — per page via the toolbar's "Trace all
+                walls", or every floor plan at once via this button. */}
             <PlanTakeoffButton
               planId={plan?.id ?? null}
               onComplete={refreshSurfaces}
             />
             <p className="mt-2 text-[11px] leading-snug text-[hsl(var(--ink-3))]">
-              Or use <span className="font-semibold">AI Takeoff</span> in the
-              toolbar for just the current page.
+              Or use <span className="font-semibold">Trace all walls</span> in
+              the toolbar for just the current page.
             </p>
           </div>
         </aside>

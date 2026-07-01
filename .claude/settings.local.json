@@ -2,7 +2,12 @@
   "permissions": {
     "allow": [
       "Bash(claude mcp *)",
-      "Bash(node scripts/probe-fixtures.mjs)"
+      "Bash(node scripts/probe-fixtures.mjs)",
+      "Bash(lsof -i :3000 -sTCP:LISTEN)"
     ]
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "playwright"
+  ]
 }

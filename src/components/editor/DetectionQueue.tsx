@@ -175,7 +175,7 @@ export function DetectionQueue({ onAcceptAllHighConfidence }: Props) {
           </svg>
         </div>
         <p>Nothing to review yet.</p>
-        <p className="mt-1">Click <strong>AI Takeoff</strong> in the toolbar to find and measure the walls.</p>
+        <p className="mt-1">Click <strong>Trace all walls</strong> in the toolbar to find and measure the walls, or <strong>Paint takeoff</strong> for a scoped paint estimate.</p>
       </div>
     );
   }
