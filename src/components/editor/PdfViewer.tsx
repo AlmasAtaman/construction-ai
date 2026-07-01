@@ -119,7 +119,7 @@ export function PdfViewer({
           setState({
             status: "error",
             message:
-              "We couldn't display this blueprint page. Try refreshing the page.",
+              "We couldn't display this sheet. Try refreshing the page.",
           });
           // eslint-disable-next-line no-console
           console.error("[PdfViewer]", err);
@@ -230,7 +230,7 @@ export function PdfViewer({
           data-testid="pdf-loading"
         >
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600" />
-          <span>Loading blueprint page {pageNumber}...</span>
+          <span>Loading sheet {pageNumber}...</span>
         </div>
       )}
       {state.status === "error" && (

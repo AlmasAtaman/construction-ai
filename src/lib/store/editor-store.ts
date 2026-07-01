@@ -71,6 +71,22 @@ interface EditorState {
   // toolbar button can label itself.
   paintScopeNonce: number;
   paintScopeActive: boolean;
+  // Current page's scale, published by ScaleBanner so the workflow spine
+  // and status bar can display it without their own fetches. `undefined`
+  // = still loading, `null` = no scale on this page.
+  pageScale:
+    | { label: string; method: string; ptPerFoot: number }
+    | null
+    | undefined;
+  // Bumped by the spine's Scale segment to pop the calibration UI open.
+  scaleEditNonce: number;
+  // Live bid rollup published by the estimate worksheet so the spine and
+  // the collapsed estimate bar can show money without recomputing.
+  estimateSummary: {
+    grandTotal: number;
+    lineItems: number;
+    paintSqft: number | null;
+  } | null;
   // Per-surface-type visibility. On dense plans, every room produces 4-5
   // overlapping polygons (wall + ceiling + trim + door + window) and the
   // canvas becomes unreadable. Default to walls-only and let the user
@@ -123,6 +139,20 @@ interface EditorState {
   setShowAiOverlay: (v: boolean) => void;
   requestPaintScope: () => void;
   setPaintScopeActive: (v: boolean) => void;
+  setPageScale: (
+    s:
+      | { label: string; method: string; ptPerFoot: number }
+      | null
+      | undefined,
+  ) => void;
+  requestScaleEdit: () => void;
+  setEstimateSummary: (
+    s: {
+      grandTotal: number;
+      lineItems: number;
+      paintSqft: number | null;
+    } | null,
+  ) => void;
   toggleType: (t: keyof EditorState["visibleTypes"]) => void;
   startScaleCalibration: () => void;
   cancelScaleCalibration: () => void;
@@ -193,6 +223,9 @@ export const useEditorStore = create<EditorState>((set) => ({
   showAiOverlay: true,
   paintScopeNonce: 0,
   paintScopeActive: false,
+  pageScale: undefined,
+  scaleEditNonce: 0,
+  estimateSummary: null,
   visibleTypes: {
     wall: true,
     ceiling: false,
@@ -255,6 +288,10 @@ export const useEditorStore = create<EditorState>((set) => ({
   requestPaintScope: () =>
     set((st) => ({ paintScopeNonce: st.paintScopeNonce + 1 })),
   setPaintScopeActive: (v) => set({ paintScopeActive: v }),
+  setPageScale: (s) => set({ pageScale: s }),
+  requestScaleEdit: () =>
+    set((st) => ({ scaleEditNonce: st.scaleEditNonce + 1 })),
+  setEstimateSummary: (s) => set({ estimateSummary: s }),
   toggleType: (t) =>
     set((st) => ({
       visibleTypes: { ...st.visibleTypes, [t]: !st.visibleTypes[t] },

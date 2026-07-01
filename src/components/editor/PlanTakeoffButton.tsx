@@ -26,9 +26,13 @@ interface PlanTakeoffResponse {
 export function PlanTakeoffButton({
   planId,
   onComplete,
+  variant = "primary",
 }: {
   planId: string | null;
   onComplete: () => void;
+  /** "secondary" renders the neutral style for use inside the takeoff
+   *  console, where Paint takeoff owns the accent color. */
+  variant?: "primary" | "secondary";
 }) {
   const [running, setRunning] = useState(false);
   const [summary, setSummary] = useState<PlanTakeoffResponse | null>(null);
@@ -80,10 +84,18 @@ export function PlanTakeoffButton({
         data-testid="plan-takeoff"
         title="Classify every sheet, read each floor plan's scale, and trace the walls on all of them in one go."
         className={cn(
-          "inline-flex w-full items-center justify-center gap-1.5 rounded-[8px] px-3 py-2 text-[12.5px] font-semibold text-white shadow-sm transition-colors",
-          !planId || running
-            ? "bg-[hsl(var(--ink-3))]"
-            : "bg-[hsl(var(--accent))] hover:brightness-95",
+          "inline-flex w-full items-center justify-center gap-1.5 rounded-[8px] px-3 py-2 text-[12.5px] font-semibold shadow-sm transition-colors",
+          variant === "secondary"
+            ? cn(
+                "border border-[hsl(var(--line))] bg-white text-[hsl(var(--ink))] hover:bg-[hsl(var(--panel-2))]",
+                (!planId || running) && "opacity-60",
+              )
+            : cn(
+                "text-white",
+                !planId || running
+                  ? "bg-[hsl(var(--ink-3))]"
+                  : "bg-[hsl(var(--accent))] hover:brightness-95",
+              ),
         )}
       >
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8">

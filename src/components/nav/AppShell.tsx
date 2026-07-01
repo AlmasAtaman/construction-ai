@@ -232,7 +232,6 @@ function DefaultStatusBar() {
     <StatusBar
       segments={[
         { key: "Ready", value: "" },
-        { key: "Model", value: "Opus 4.7" },
         { right: true, key: "Build", value: "PainterDesk · v0.5" },
       ]}
     />

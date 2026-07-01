@@ -118,7 +118,7 @@ export function PlanUploader({
       </div>
 
       <h3 className="text-[16px] font-semibold text-[hsl(var(--ink))]">
-        Upload your blueprint
+        Upload your plans
       </h3>
       <p className="mx-auto mt-1.5 max-w-sm text-[13px] text-[hsl(var(--ink-2))]">
         Drag and drop a PDF here, or click the button below. Larger files may

@@ -39,6 +39,8 @@ export function ScaleBanner({ planPageId }: Props) {
   const scaleCalib = useEditorStore((s) => s.scaleCalib);
   const startCalib = useEditorStore((s) => s.startScaleCalibration);
   const cancelCalib = useEditorStore((s) => s.cancelScaleCalibration);
+  const setPageScale = useEditorStore((s) => s.setPageScale);
+  const scaleEditNonce = useEditorStore((s) => s.scaleEditNonce);
 
   // Guards against out-of-order responses: switching pages (or the
   // auto-jump to the first floor plan) fires several /scale fetches, and
@@ -57,12 +59,32 @@ export function ScaleBanner({ planPageId }: Props) {
       if (res.ok) {
         const json = (await res.json()) as ScaleResponse;
         // Only commit if this response is still for the active page.
-        if (json.planPageId === latestPageRef.current) setInfo(json);
+        if (json.planPageId === latestPageRef.current) {
+          setInfo(json);
+          // Publish to the store so the workflow spine + status bar can
+          // show the scale without their own fetches.
+          setPageScale(json.scale ?? null);
+        }
       }
     } finally {
       setLoading(false);
     }
-  }, [planPageId]);
+  }, [planPageId, setPageScale]);
+
+  // Page switch → the spine shows "loading" until the fetch lands.
+  useEffect(() => {
+    setPageScale(undefined);
+  }, [planPageId, setPageScale]);
+
+  // Spine's Scale segment asks to edit/calibrate.
+  const seenNonce = useRef(0);
+  useEffect(() => {
+    if (scaleEditNonce > 0 && scaleEditNonce !== seenNonce.current) {
+      seenNonce.current = scaleEditNonce;
+      setOpen(true);
+      startCalib();
+    }
+  }, [scaleEditNonce, startCalib]);
 
   useEffect(() => {
     void fetchScale();
@@ -118,6 +140,11 @@ export function ScaleBanner({ planPageId }: Props) {
     "scale-bar": "from scale bar",
     user: "set by you",
   };
+
+  // A confirmed, unwarned scale lives in the spine's Scale segment — the
+  // full banner row only appears when something needs attention (no scale
+  // yet, a cross-check warning) or while calibrating.
+  if (scale && !info?.warning && !open) return null;
 
   return (
     <div className="relative border-b border-[hsl(var(--line))] bg-white">

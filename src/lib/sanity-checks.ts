@@ -51,15 +51,21 @@ export interface SanityReport {
  */
 export function runSanityChecks(surfaces: SurfaceDTO[]): SanityReport {
   const flags: SanityFlag[] = [];
-  const active = surfaces.filter((s) => s.status !== "excluded");
+  // Same rule as the bid: unreviewed proposals aren't part of the numbers.
+  const active = surfaces.filter(
+    (s) => s.status !== "excluded" && s.status !== "proposed",
+  );
   const walls = active.filter((s) => s.type === "wall");
+  // Wall-path traces are the takeoff's primary wall primitive — they carry
+  // their own height-derived sqft and lf and must count toward the totals
+  // the estimator eyeballs (they already bill).
+  const wallPaths = active.filter((s) => s.type === "wall-path");
   const ceilings = active.filter((s) => s.type === "ceiling");
   const doors = active.filter((s) => s.type === "door");
 
-  const totalWallSqft = walls.reduce(
-    (a, w) => a + (w.squareFootage ?? 0),
-    0,
-  );
+  const totalWallSqft =
+    walls.reduce((a, w) => a + (w.squareFootage ?? 0), 0) +
+    wallPaths.reduce((a, w) => a + (w.squareFootage ?? 0), 0);
   const totalFloorSqft = ceilings.reduce(
     (a, c) => a + (c.squareFootage ?? 0),
     0,
@@ -153,15 +159,17 @@ export function runSanityChecks(surfaces: SurfaceDTO[]): SanityReport {
     });
   }
 
-  const totalWallLinearFt = walls.reduce(
-    (a, w) => a + (w.linearFootage ?? 0),
-    0,
-  );
+  const totalWallLinearFt =
+    walls.reduce((a, w) => a + (w.linearFootage ?? 0), 0) +
+    wallPaths.reduce((a, w) => a + (w.linearFootage ?? 0), 0);
   // Net = floor area minus a wall band approximation. For each room with
   // wall LF, deduct LF × 0.25 ft (half of a 6" wall, applied to interior
   // perimeter). Gross = floor + same band added back. These are
   // approximations until polygon-level computation is plumbed everywhere.
-  const NET_DEDUCTION = totalWallLinearFt * 0.25;
+  // No floor measured → no band math; "0 net / 60 gross" out of thin air
+  // reads as a measurement that never happened.
+  const NET_DEDUCTION =
+    totalFloorSqft > 0 ? totalWallLinearFt * 0.25 : 0;
   const totalNetFloorSqft = Math.max(0, totalFloorSqft - NET_DEDUCTION);
   const totalGrossFloorSqft = totalFloorSqft + NET_DEDUCTION;
   return {

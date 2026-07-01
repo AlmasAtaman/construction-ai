@@ -14,6 +14,16 @@ interface Project {
   status: string;
   updatedAt: Date;
   _count: { surfaces: number; plans: number };
+  /** Latest generated estimate's grand total, if one exists. */
+  latestEstimate?: number | null;
+}
+
+function formatMoney(n: number): string {
+  return n.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  });
 }
 
 function statusTone(status: string): "draft" | "active" | "sent" {
@@ -86,8 +96,10 @@ export function ProjectRow({ project: p }: { project: Project }) {
       <td className="text-right num text-[hsl(var(--ink-2))]">
         {p._count.plans}
       </td>
-      <td className="text-right num text-[hsl(var(--ink-2))]">
-        {p._count.surfaces}
+      <td className="text-right num font-medium text-[hsl(var(--ink))]">
+        {p.latestEstimate != null && p.latestEstimate > 0
+          ? formatMoney(p.latestEstimate)
+          : "—"}
       </td>
       <td className="text-right text-[hsl(var(--ink-3))]">
         {formatDate(p.updatedAt)}

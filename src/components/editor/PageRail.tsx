@@ -191,8 +191,10 @@ export function PageRail({
     <div className="flex-1 overflow-y-auto py-2" data-testid="pages-list">
       {floorPages.length > 0 && (
         <>
+          {/* floor_plan + rcp both live here — they're the sheets a takeoff
+              runs on, so the label must cover both. */}
           <RailGroupLabel>
-            Floor plans{classifying ? " · identifying…" : ""}
+            Floor &amp; ceiling plans{classifying ? " · identifying…" : ""}
           </RailGroupLabel>
           <ul className="space-y-0.5 px-1.5">
             {floorPages.map((p) => renderPage(p, { actions: ["hide"] }))}

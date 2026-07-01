@@ -150,14 +150,29 @@ export default function BidPage({
             Back to plan
           </Button>
         </Link>
-        <Button
-          variant="accent"
-          onClick={() => void generate()}
-          disabled={loading}
-          data-testid="generate-bid-button"
-        >
-          {loading ? "Working…" : bid ? "Update price" : "Calculate price"}
-        </Button>
+        {/* When there's no estimate yet, the empty state below owns the one
+            orange action — a second identical button up here reads as two
+            different features. */}
+        {bid ? (
+          <Button
+            variant="accent"
+            onClick={() => void generate()}
+            disabled={loading}
+            data-testid="generate-bid-button"
+          >
+            {loading ? "Working…" : "Refresh estimate"}
+          </Button>
+        ) : (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => void generate()}
+            disabled={loading}
+            data-testid="generate-bid-button"
+          >
+            {loading ? "Working…" : "Generate estimate"}
+          </Button>
+        )}
         {bid && (
           <>
             <a
@@ -199,9 +214,9 @@ export default function BidPage({
                 Ready to price the job?
               </h2>
               <p className="mx-auto mt-2 max-w-md text-[13px] text-[hsl(var(--ink-2))]">
-                Click <strong>Calculate price</strong> and we&apos;ll add up
-                every room, paint cost, and labor hour into a clean estimate
-                you can send to your customer.
+                <strong>Generate estimate</strong> rolls every kept
+                measurement, paint cost, and labor hour into a priced
+                estimate you can export and send.
               </p>
               <div className="mt-5">
                 <Button
@@ -210,7 +225,7 @@ export default function BidPage({
                   onClick={() => void generate()}
                   disabled={loading}
                 >
-                  {loading ? "Working…" : "Calculate price"}
+                  {loading ? "Working…" : "Generate estimate"}
                 </Button>
               </div>
             </div>

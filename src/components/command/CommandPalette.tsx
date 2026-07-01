@@ -64,7 +64,7 @@ export function CommandPalette({ projectId }: { projectId?: string }) {
       {
         id: "run-takeoff",
         label: "Trace all walls on current page",
-        hint: "Find and measure walls on the visible blueprint page",
+        hint: "Find and measure walls on the current sheet",
         action: () => {
           setOpen(false);
           window.dispatchEvent(new Event("command:run-takeoff"));

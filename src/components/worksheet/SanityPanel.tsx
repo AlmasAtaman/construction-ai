@@ -135,25 +135,35 @@ export function SanityPanel({ projectId, refreshKey = 0 }: Props) {
             <div className="text-[10px] uppercase tracking-wide text-[hsl(var(--ink-3))]">
               Wall : floor
             </div>
-            <div
-              className={cn(
-                "num text-[14px] font-semibold",
-                report.wallToCeilingRatio >= 2 &&
-                  report.wallToCeilingRatio <= 3.5
-                  ? "text-emerald-700"
-                  : "text-amber-800",
-              )}
-            >
-              {report.wallToCeilingRatio.toFixed(2)}×
-            </div>
+            {report.totalFloorSqft > 0 ? (
+              <div
+                className={cn(
+                  "num text-[14px] font-semibold",
+                  report.wallToCeilingRatio >= 2 &&
+                    report.wallToCeilingRatio <= 3.5
+                    ? "text-emerald-700"
+                    : "text-amber-800",
+                )}
+              >
+                {report.wallToCeilingRatio.toFixed(2)}×
+              </div>
+            ) : (
+              <div
+                className="num text-[14px] font-semibold text-[hsl(var(--ink-3))]"
+                title="No floor/ceiling areas measured yet, so there's nothing to compare walls against."
+              >
+                —
+              </div>
+            )}
           </div>
         </div>
       </div>
 
       {report.flags.length === 0 ? (
         <div className="px-5 py-3 text-[12px] text-[hsl(var(--ink-2))]">
-          No flags. Wall-to-floor ratio looks healthy. You can submit this
-          bid with confidence.
+          {report.totalFloorSqft > 0
+            ? "No flags. Wall-to-floor ratio looks healthy. You can submit this bid with confidence."
+            : "No flags on the wall measurements. Floor and ceiling areas aren't measured yet, so the wall-to-floor cross-check can't run."}
         </div>
       ) : (
         <ul

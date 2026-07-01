@@ -52,7 +52,13 @@ Categories:
 - cover: title page, sheet index, perspective rendering, project info.
 - other: anything else.
 
-Be conservative — when ambiguous, pick "other" with low confidence.`;
+Commercial sheets often mix several things on one sheet (a floor plan view
+plus schedules, notes, and wall-type details). If ANY room-and-walls plan
+view appears anywhere on the sheet, classify it as floor_plan — the plan
+view wins over the tables around it, because the takeoff runs on it.
+
+Be conservative otherwise — when ambiguous, pick "other" with low
+confidence.`;
 
 const classifyTool = {
   name: "classify_sheet",
@@ -92,6 +98,9 @@ export async function classifyPage(opts: {
   const msg = await anthropic.messages.create({
     model: CLASSIFIER_MODEL,
     max_tokens: 200,
+    // Classification must be repeatable — the same sheet flipping between
+    // floor_plan and schedule across runs buries the takeoff sheet.
+    temperature: 0,
     system: [
       {
         type: "text",

@@ -1350,6 +1350,7 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
               {paintScope.paintRooms.map((r) => (
                 <div
                   key={`pr-${r.label}`}
+                  title={`Why: ${r.reason} — ${Math.round(r.wallPerimeterFt)} lf × ${r.heightFt} ft`}
                   className="flex items-center justify-between gap-2 py-0.5 text-[12px]"
                 >
                   <span className="flex min-w-0 items-center gap-1.5">
@@ -1360,6 +1361,12 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
                     <span className="truncate font-medium text-[hsl(var(--ink))]">
                       {r.label.charAt(0) + r.label.slice(1).toLowerCase()}
                     </span>
+                    {r.needsReview && (
+                      <span
+                        title="Worth a check — hover the row to see why this room was scoped"
+                        className="h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400"
+                      />
+                    )}
                     {r.heightBasis === "to-deck" && (
                       <span
                         title={`Painted to deck (~${r.heightFt} ft) — confirm vs. elevation`}
@@ -1385,6 +1392,7 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
                   {paintScope.excludedRooms.map((r) => (
                     <span
                       key={`ex-${r.label}`}
+                      title={`Why: ${r.reason}`}
                       className="inline-flex items-center gap-1 rounded-[3px] border border-[hsl(var(--line))] bg-[hsl(var(--panel))] px-1.5 py-px text-[10px] text-[hsl(var(--ink-3))]"
                     >
                       <span className="h-1.5 w-1.5 rounded-[1px] bg-[hsl(var(--ink-3))] opacity-50" />
@@ -1498,6 +1506,14 @@ export function SurfaceOverlay(props: SurfaceOverlayProps) {
             wallData?.ptPerFoot != null && wallData.ptPerFoot > 0;
           return (
             <div className="absolute bottom-4 left-4 z-20 max-w-xs space-y-1.5 rounded-md bg-gray-900/90 px-3 py-2 text-[11px] leading-relaxed text-white">
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-white/80">
+                  Wall tracer
+                </span>
+                <span className="text-[9.5px] text-white/45">
+                  keys 1–4 switch mode
+                </span>
+              </div>
               <div className="flex items-center gap-1" data-testid="snap-mode-toggle">
                 {(["point", "line", "polyline", "room"] as const).map((m, i) => (
                   <button

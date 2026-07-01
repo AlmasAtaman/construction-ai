@@ -20,8 +20,20 @@ export default async function DashboardPage() {
       status: true,
       updatedAt: true,
       _count: { select: { surfaces: true, plans: true } },
+      // Latest generated estimate — the number an estimator scans this
+      // list for.
+      bidVersions: {
+        orderBy: { versionNumber: "desc" },
+        take: 1,
+        select: { grandTotal: true },
+      },
     },
   });
+
+  const rows = projects.map(({ bidVersions, ...p }) => ({
+    ...p,
+    latestEstimate: bidVersions[0]?.grandTotal ?? null,
+  }));
 
   return (
     <AppShell>
@@ -43,7 +55,7 @@ export default async function DashboardPage() {
 
       <main className="flex-1 overflow-y-auto px-6 py-6">
         <div className="mx-auto max-w-6xl">
-          {projects.length === 0 ? (
+          {rows.length === 0 ? (
             <EmptyState />
           ) : (
             <div className="overflow-hidden rounded-[var(--radius)] border border-[hsl(var(--line))] bg-white">
@@ -54,13 +66,13 @@ export default async function DashboardPage() {
                     <th>Client</th>
                     <th>Status</th>
                     <th className="text-right">Plans</th>
-                    <th className="text-right">Rooms</th>
+                    <th className="text-right">Estimate</th>
                     <th className="text-right">Updated</th>
                     <th className="w-[44px]"></th>
                   </tr>
                 </thead>
                 <tbody>
-                  {projects.map((p) => (
+                  {rows.map((p) => (
                     <ProjectRow key={p.id} project={p} />
                   ))}
                 </tbody>
@@ -99,8 +111,8 @@ function EmptyState() {
         No projects yet
       </h3>
       <p className="mx-auto mt-2 max-w-md text-[13px] text-[hsl(var(--ink-2))]">
-        Each bid starts with a new project. Upload a blueprint, run the AI
-        takeoff, and generate a professional proposal in minutes.
+        Each bid starts with a new project. Upload the plans, run the
+        takeoff, and generate a priced estimate in minutes.
       </p>
       <div className="mt-6">
         <Link href="/projects/new">

@@ -6,6 +6,7 @@ import { UsageBadge } from "@/components/usage/UsageBadge";
 import { UsageWarningBanner } from "@/components/usage/UsageWarningBanner";
 import { ProjectWorkspace } from "@/components/editor/ProjectWorkspace";
 import { HistoryButton } from "@/components/editor/HistoryButton";
+import { EditorStatusBar } from "@/components/editor/EditorStatusBar";
 import { AppShell, TopBar } from "@/components/nav/AppShell";
 
 export const dynamic = "force-dynamic";
@@ -36,7 +37,7 @@ export default async function ProjectPage({
   const latestPlan = project.plans[0] ?? null;
 
   return (
-    <AppShell>
+    <AppShell statusBar={<EditorStatusBar />}>
       <UsageWarningBanner />
       <TopBar
         title={project.name}
@@ -55,14 +56,15 @@ export default async function ProjectPage({
           </Button>
         </Link>
         <HistoryButton projectId={project.id} />
+        {/* One door to the money. The old "See estimate" + "Get price" pair
+            both went here; two buttons, one destination reads as two
+            features. */}
         <Link href={`/projects/${project.id}/bid`}>
-          <Button variant="secondary" size="sm" data-testid="open-bid-link">
-            See estimate
-          </Button>
-        </Link>
-        <Link href={`/projects/${project.id}/bid`}>
-          <Button variant="accent" size="sm" data-testid="generate-bid-cta">
-            Get price
+          <Button variant="primary" size="sm" data-testid="open-bid-link">
+            Estimate
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" className="ml-1">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14m-6-6 6 6-6 6" />
+            </svg>
           </Button>
         </Link>
       </TopBar>

@@ -1,25 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useEditorStore, MIN_ZOOM, MAX_ZOOM } from "@/lib/store/editor-store";
-import { TakeoffLayersPanel } from "./TakeoffLayersPanel";
 import { cn } from "@/lib/utils";
 
-interface CanvasToolbarProps {
-  /** Current plan page — enables the "Auto-trace walls" action. */
-  planPageId?: string | null;
-  /** Called after an auto-trace run so the workspace can refresh. */
-  onAutoTraced?: () => void;
-}
-
-export function CanvasToolbar({ planPageId, onAutoTraced }: CanvasToolbarProps = {}) {
+// View controls only — zoom, surface-type visibility, AI-overlay toggle.
+// Everything that MEASURES lives in the workflow spine's takeoff console;
+// this row is strictly about how you look at the sheet.
+export function CanvasToolbar() {
   const zoom = useEditorStore((s) => s.zoom);
   const setViewport = useEditorStore((s) => s.setViewport);
   const resetViewport = useEditorStore((s) => s.resetViewport);
   const showAiOverlay = useEditorStore((s) => s.showAiOverlay);
   const setShowAiOverlay = useEditorStore((s) => s.setShowAiOverlay);
-  const requestPaintScope = useEditorStore((s) => s.requestPaintScope);
-  const paintScopeActive = useEditorStore((s) => s.paintScopeActive);
   const visibleTypes = useEditorStore((s) => s.visibleTypes);
   const toggleType = useEditorStore((s) => s.toggleType);
   const surfaces = useEditorStore((s) => s.surfaces);
@@ -47,62 +40,6 @@ export function CanvasToolbar({ planPageId, onAutoTraced }: CanvasToolbarProps =
     }
     return c;
   }, [surfaces]);
-
-  const [autoTracing, setAutoTracing] = useState(false);
-  const [autoTraceMsg, setAutoTraceMsg] = useState<string | null>(null);
-
-  async function runAutoTrace(
-    opts: { reset?: boolean; autoClean?: boolean; wallLayers?: string[] } = {},
-  ) {
-    const { reset = false, autoClean = false, wallLayers } = opts;
-    if (!planPageId || autoTracing) return;
-    if (
-      reset &&
-      !window.confirm(
-        "Reset all traced walls on this page back to the AI's version? Your manual edits to walls on this page will be discarded.",
-      )
-    ) {
-      return;
-    }
-    setAutoTracing(true);
-    setAutoTraceMsg(null);
-    try {
-      const res = await fetch(`/api/plan-pages/${planPageId}/auto-trace`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reset, autoClean, wallLayers }),
-      });
-      if (!res.ok) {
-        setAutoTraceMsg("AI takeoff failed.");
-        return;
-      }
-      const json = (await res.json()) as {
-        count: number;
-        cleanedOut?: number;
-        skippedExisting?: number;
-        hasScale: boolean;
-        method?: "layers" | "geometry";
-      };
-      const cleaned =
-        autoClean && json.cleanedOut
-          ? ` (${json.cleanedOut} low-confidence hidden)`
-          : "";
-      const fromLayers = json.method === "layers" ? " from CAD layers" : "";
-      setAutoTraceMsg(
-        json.count === 0
-          ? json.skippedExisting
-            ? `All ${json.skippedExisting} walls already kept — nothing new.`
-            : "No walls detected on this page."
-          : `${json.count} wall${json.count === 1 ? "" : "s"} found${fromLayers}${cleaned}${json.hasScale ? " — review & price below." : " — set scale to price."}`,
-      );
-      onAutoTraced?.();
-    } catch {
-      setAutoTraceMsg("AI takeoff failed.");
-    } finally {
-      setAutoTracing(false);
-      window.setTimeout(() => setAutoTraceMsg(null), 7000);
-    }
-  }
 
   function zoomIn() {
     setViewport({ zoom: Math.min(MAX_ZOOM, zoom * 1.25) });
@@ -175,72 +112,8 @@ export function CanvasToolbar({ planPageId, onAutoTraced }: CanvasToolbarProps =
         </ToolbarButton>
       </div>
 
-      {/* Right cluster — auto-trace + counts + AI overlay toggle */}
+      {/* Right cluster — surface-type counts + AI overlay toggle */}
       <div className="flex items-center gap-2">
-        {planPageId && (
-          <div className="flex items-center gap-1.5">
-            {autoTraceMsg && (
-              <span className="rounded-[6px] border border-[hsl(var(--line))] bg-white/95 px-2 py-1 text-[11px] text-[hsl(var(--ink-2))] shadow-sm backdrop-blur">
-                {autoTraceMsg}
-              </span>
-            )}
-            {/* PRIMARY — scoped paint takeoff: named rooms, correct finishes
-                and heights, one coherent total. The accurate deliverable. */}
-            <button
-              type="button"
-              onClick={() => requestPaintScope()}
-              data-testid="paint-takeoff"
-              title="Scoped paint takeoff: reads the finish schedule + plan notes, measures each painted room (correct finish + height), and shows one coherent total you can apply to the estimate."
-              className={cn(
-                "inline-flex items-center gap-1.5 rounded-[8px] px-3 py-1.5 text-[12px] font-semibold text-white shadow-sm transition-colors",
-                paintScopeActive
-                  ? "bg-[hsl(var(--accent-hover))]"
-                  : "bg-[hsl(var(--accent))] hover:brightness-95",
-              )}
-            >
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4M4 19h4M13 3l2.5 6.5L22 12l-6.5 2.5L13 21l-2.5-6.5L4 12l6.5-2.5z" />
-              </svg>
-              {paintScopeActive ? "Hide paint scope" : "Paint takeoff"}
-            </button>
-            {/* SECONDARY — raw wall trace (every wall, unscoped). Power-user /
-                fallback path; demoted so the scoped flow reads as primary. */}
-            <button
-              type="button"
-              onClick={() => void runAutoTrace({ autoClean: true })}
-              disabled={autoTracing}
-              data-testid="ai-takeoff"
-              title="Trace every wall on this sheet (unscoped) and drop them into Review. Use when there's no finish schedule, or to audit the raw geometry."
-              className={cn(
-                "inline-flex items-center gap-1.5 rounded-[8px] border px-3 py-1.5 text-[12px] font-medium shadow-sm transition-colors",
-                autoTracing
-                  ? "border-[hsl(var(--line))] bg-[hsl(var(--panel-2))] text-[hsl(var(--ink-3))]"
-                  : "border-[hsl(var(--line))] bg-[hsl(var(--panel))] text-[hsl(var(--ink-2))] hover:bg-[hsl(var(--panel-2))]",
-              )}
-            >
-              {autoTracing ? "Working…" : "Trace all walls"}
-            </button>
-            <TakeoffLayersPanel
-              planPageId={planPageId}
-              busy={autoTracing}
-              onRunTakeoff={(layers) =>
-                void runAutoTrace({ autoClean: true, wallLayers: layers })
-              }
-            />
-            <button
-              type="button"
-              onClick={() => void runAutoTrace({ reset: true, autoClean: true })}
-              disabled={autoTracing}
-              data-testid="reset-to-ai-walls"
-              title="Discard manual wall edits on this page and re-run the AI takeoff."
-              className="inline-flex h-[30px] w-[30px] items-center justify-center rounded-[8px] border border-[hsl(var(--line))] bg-white text-[hsl(var(--ink-3))] hover:bg-[hsl(var(--panel-2))] hover:text-[hsl(var(--ink))]"
-            >
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 12a9 9 0 1 0 9-9 9 9 0 0 0-7 3.4M3 4v4h4" />
-              </svg>
-            </button>
-          </div>
-        )}
         {counts.total > 0 && (
           <div
             data-testid="surface-count-chip"
@@ -297,7 +170,7 @@ export function CanvasToolbar({ planPageId, onAutoTraced }: CanvasToolbarProps =
           aria-pressed={showAiOverlay}
           title={
             showAiOverlay
-              ? "Hide the AI overlay to see the bare blueprint"
+              ? "Hide the AI overlay to read the bare sheet"
               : "Show the AI-detected surfaces again"
           }
           className={cn(

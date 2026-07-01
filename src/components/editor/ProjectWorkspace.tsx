@@ -15,9 +15,9 @@ import { SurfaceContextMenu } from "./SurfaceContextMenu";
 import type { SurfaceDTO } from "@/types/surface";
 import { DetectionQueue } from "./DetectionQueue";
 import { CanvasToolbar } from "./CanvasToolbar";
-import { PlanTakeoffButton } from "./PlanTakeoffButton";
 import { ScaleBanner } from "./ScaleBanner";
 import { PageRail } from "./PageRail";
+import { WorkflowBar } from "./WorkflowBar";
 import { cn } from "@/lib/utils";
 
 const SurfaceOverlay = dynamic(
@@ -52,7 +52,10 @@ export function ProjectWorkspace({
 }) {
   const [plan, setPlan] = useState<PlanData | null>(initialPlan);
   const [currentPage, setCurrentPage] = useState(1);
-  const [worksheetOpen, setWorksheetOpen] = useState(true);
+  // The estimate panel starts collapsed so the sheet dominates; it opens
+  // itself the first time measurements are kept (money appears when there
+  // is money to show).
+  const [worksheetOpen, setWorksheetOpen] = useState(false);
   const [worksheetHeight, setWorksheetHeight] = useState(WORKSHEET_DEFAULT_PX);
   const [rightTab, setRightTab] = useState<RightPanelTab>("queue");
   const [rightPanelOpen, setRightPanelOpen] = useState(true);
@@ -122,6 +125,12 @@ export function ProjectWorkspace({
 
   const currentPlanPage = plan?.pages.find((p) => p.pageNumber === currentPage);
 
+  // Baseline of kept measurements per page, recorded on each page's first
+  // fetch. The estimate panel auto-opens only on a real 0 → N transition
+  // (the user's first kept measurement), never because a page that already
+  // had kept work loaded.
+  const keptBaseline = useRef<{ pageId: string; count: number } | null>(null);
+
   const refreshSurfaces = useCallback(async () => {
     if (!currentPlanPage) return;
     const res = await fetch(
@@ -131,6 +140,14 @@ export function ProjectWorkspace({
     if (!res.ok) return;
     const json = (await res.json()) as { surfaces: SurfaceDTO[] };
     setSurfaces(json.surfaces);
+    if (keptBaseline.current?.pageId !== currentPlanPage.id) {
+      keptBaseline.current = {
+        pageId: currentPlanPage.id,
+        count: json.surfaces.filter(
+          (s) => s.status === "accepted" || s.status === "manual",
+        ).length,
+      };
+    }
   }, [currentPlanPage, setSurfaces]);
 
   useEffect(() => {
@@ -209,12 +226,24 @@ export function ProjectWorkspace({
     return () => document.removeEventListener("wheel", onWheelCapture);
   }, []);
 
-  // Command palette dispatched events
+  // Command palette dispatched events. run-takeoff is handled here (not by
+  // querying a button) because the takeoff actions live in the spine's
+  // console, which may be closed.
+  const runTakeoffFromPalette = useCallback(async () => {
+    if (!currentPlanPage) return;
+    await fetch(`/api/plan-pages/${currentPlanPage.id}/auto-trace`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ autoClean: true }),
+    });
+    void refreshSurfaces();
+    setRightTab("queue");
+    setRightPanelOpen(true);
+  }, [currentPlanPage, refreshSurfaces]);
+
   useEffect(() => {
     function onRunTakeoff() {
-      document
-        .querySelector<HTMLButtonElement>('[data-testid="run-takeoff"]')
-        ?.click();
+      void runTakeoffFromPalette();
     }
     function onToggleWorksheet() {
       setWorksheetOpen((v) => !v);
@@ -225,7 +254,7 @@ export function ProjectWorkspace({
       window.removeEventListener("command:run-takeoff", onRunTakeoff);
       window.removeEventListener("command:toggle-worksheet", onToggleWorksheet);
     };
-  }, []);
+  }, [runTakeoffFromPalette]);
 
   async function onAcceptAllHighConfidence() {
     const proposed = surfaces.filter(
@@ -250,8 +279,39 @@ export function ProjectWorkspace({
     (s) => s.status === "accepted" || s.status === "manual",
   ).length;
 
+  // Open the estimate panel the first time kept measurements appear —
+  // the moment geometry becomes money is worth showing.
+  useEffect(() => {
+    const pageId = currentPlanPage?.id ?? null;
+    const b = keptBaseline.current;
+    if (!pageId || !b || b.pageId !== pageId) return; // no baseline yet
+    if (b.count === 0 && acceptedCount > 0) {
+      setWorksheetOpen(true);
+      keptBaseline.current = { pageId, count: acceptedCount };
+    }
+  }, [acceptedCount, currentPlanPage?.id]);
+
+  const estimateSummary = useEditorStore((s) => s.estimateSummary);
+
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
+      <WorkflowBar
+        hasPlan={!!plan}
+        pageCount={plan?.pages.filter((p) => !p.hidden).length ?? 0}
+        currentPage={currentPage}
+        planPageId={currentPlanPage?.id ?? null}
+        planId={plan?.id ?? null}
+        onAutoTraced={() => {
+          void refreshSurfaces();
+          setRightTab("queue");
+          setRightPanelOpen(true);
+        }}
+        onOpenReview={() => {
+          setRightTab("queue");
+          setRightPanelOpen(true);
+        }}
+        onOpenEstimate={() => setWorksheetOpen(true)}
+      />
       <div className="flex flex-1 overflow-hidden">
         {/* Left panel: pages + AI takeoff */}
         <aside
@@ -265,7 +325,7 @@ export function ProjectWorkspace({
                 data-testid="pages-placeholder"
                 className="px-3 text-[12px] text-[hsl(var(--ink-3))]"
               >
-                Pages appear here once you upload a blueprint.
+                Sheets appear here once you upload the plans.
               </p>
             </div>
           ) : (
@@ -304,27 +364,6 @@ export function ProjectWorkspace({
             />
           )}
 
-          <div className="border-t border-[hsl(var(--line))] p-3">
-            <div className="mb-2 flex items-center justify-between">
-              <SectionTitle>Measure plan</SectionTitle>
-              <span className="text-[11px] text-[hsl(var(--ink-3))]">
-                {acceptedCount} kept · {proposedCount} to review
-              </span>
-            </div>
-            {/* The Opus vision takeoff ("Measure my plan") is retired: on
-                dense plans it guessed coordinates at real API cost. Wall
-                takeoff runs through the deterministic CAD-layer path
-                (geometry fallback) — per page via the toolbar's "Trace all
-                walls", or every floor plan at once via this button. */}
-            <PlanTakeoffButton
-              planId={plan?.id ?? null}
-              onComplete={refreshSurfaces}
-            />
-            <p className="mt-2 text-[11px] leading-snug text-[hsl(var(--ink-3))]">
-              Or use <span className="font-semibold">Trace all walls</span> in
-              the toolbar for just the current page.
-            </p>
-          </div>
         </aside>
 
         {/* Tool ribbon */}
@@ -351,14 +390,7 @@ export function ProjectWorkspace({
                   (zoom / auto-trace / surface toggles), both in document
                   flow above the canvas — no floating chrome over the plan. */}
               <ScaleBanner planPageId={currentPlanPage.id} />
-              <CanvasToolbar
-                planPageId={currentPlanPage.id}
-                onAutoTraced={() => {
-                  void refreshSurfaces();
-                  setRightTab("queue"); // drop the user into Review
-                  setRightPanelOpen(true);
-                }}
-              />
+              <CanvasToolbar />
               <div className="relative flex-1 overflow-hidden">
                 <PdfViewer planId={plan.id} pageNumber={currentPage}>
                   {(size) => (
@@ -507,22 +539,38 @@ export function ProjectWorkspace({
             >
               <path d="m6 9 6 6 6-6" />
             </svg>
-            <span className="text-[13px] font-semibold text-[hsl(var(--ink))]">
-              Cost breakdown
+            <span className="font-display text-[12px] font-semibold uppercase tracking-[0.08em] text-[hsl(var(--ink))]">
+              Estimate
             </span>
             <span className="text-[11px] text-[hsl(var(--ink-3))]">
-              ({acceptedCount} {acceptedCount === 1 ? "room" : "rooms"})
+              {acceptedCount} kept measurement{acceptedCount === 1 ? "" : "s"}
             </span>
           </div>
+          {/* Live money is always visible, even collapsed — the geometry →
+              dollars link should never be more than a glance away. */}
+          {estimateSummary && estimateSummary.grandTotal > 0 && (
+            <span
+              data-testid="estimate-bar-total"
+              className="num text-[13.5px] font-semibold text-[hsl(var(--ink))]"
+            >
+              {estimateSummary.grandTotal.toLocaleString("en-US", {
+                style: "currency",
+                currency: "USD",
+              })}
+            </span>
+          )}
         </button>
-        {worksheetOpen && (
-          <div
-            className="overflow-auto border-t border-[hsl(var(--line))]"
-            style={{ height: worksheetHeight }}
-          >
-            <EstimateWorksheet projectId={projectId} />
-          </div>
-        )}
+        {/* Always mounted so the live totals keep publishing to the spine
+            and the collapsed bar; height collapses to zero when closed. */}
+        <div
+          className={cn(
+            "overflow-auto border-t border-[hsl(var(--line))]",
+            !worksheetOpen && "hidden",
+          )}
+          style={worksheetOpen ? { height: worksheetHeight } : undefined}
+        >
+          <EstimateWorksheet projectId={projectId} />
+        </div>
       </section>
 
       <UndoToast />

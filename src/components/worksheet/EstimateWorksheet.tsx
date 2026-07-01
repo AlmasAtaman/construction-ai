@@ -95,6 +95,20 @@ export function EstimateWorksheet({ projectId }: Props) {
 
   const bid = useMemo(() => calculateBid(surfaces, config), [surfaces, config]);
 
+  // Publish the live rollup so the workflow spine and the collapsed
+  // estimate bar can show money without recomputing the bid.
+  const setEstimateSummary = useEditorStore((s) => s.setEstimateSummary);
+  useEffect(() => {
+    const paintSqft = bid.lineItems
+      .filter((li) => li.type === "wall-path" && li.unit === "sqft")
+      .reduce((a, li) => a + li.quantity, 0);
+    setEstimateSummary({
+      grandTotal: bid.grandTotal,
+      lineItems: bid.lineItems.length,
+      paintSqft: paintSqft > 0 ? paintSqft : null,
+    });
+  }, [bid, setEstimateSummary]);
+
   async function refreshSurfaces() {
     try {
       const res = await fetch(`/api/surfaces?projectId=${projectId}`, {

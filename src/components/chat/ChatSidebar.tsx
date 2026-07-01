@@ -316,11 +316,11 @@ function NoPlanState() {
         </svg>
       </div>
       <div className="text-[13px] font-semibold text-[hsl(var(--ink))]">
-        Upload a blueprint first
+        Upload a plan set first
       </div>
       <p className="mt-1.5 text-[12px] leading-[1.5] text-[hsl(var(--ink-2))]">
         The AI chat works on the surfaces in your project. Drag a PDF
-        blueprint into the center panel to get started, then come back
+        plan set into the center panel to get started, then come back
         here.
       </p>
     </div>
